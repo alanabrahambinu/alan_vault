@@ -377,13 +377,18 @@ app.use('/api/*', (req, res) => {
 });
 
 // 404 handler for all other routes (serves 404.html)
+// 404 handler for all other routes (serves 404.html)
 app.use((req, res) => {
     res.status(404).sendFile(path.join(__dirname, '404.html'));
 });
 
-// Start server
-app.listen(PORT, () => {
-    console.log(`
+// Export for Vercel
+module.exports = app;
+
+// Start server (only if not running on Vercel)
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`
     ╔═══════════════════════════════════════════════════════╗
     ║                                                       ║
     ║   🚀 ALAN VAULT SERVER STARTED SUCCESSFULLY!         ║
@@ -393,5 +398,6 @@ app.listen(PORT, () => {
     ║   🟢 Status:   Running                               ║
     ║                                                       ║
     ╚═══════════════════════════════════════════════════════╝
-    `);
-});
+        `);
+    });
+}
