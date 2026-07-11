@@ -15,23 +15,29 @@
     <link rel="manifest" href="/assets/favicon/site.webmanifest">
     <meta name="theme-color" content="#4F46E5">
     
-    <link rel="stylesheet" href="admin.css">
     <link rel="stylesheet" href="theme.css">
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: white; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: white; transition: background 0.3s, color 0.3s; }
         .animated-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 20% 50%, rgba(79,70,229,0.15) 0%, transparent 50%); }
         
-        .admin-wrapper { display: flex; min-height: 100vh; }
-        
+        /* ===== SIDEBAR ===== */
         .admin-sidebar { 
             position: fixed; left: 0; top: 0; width: 280px; height: 100vh; 
             background: rgba(10,10,15,0.95); backdrop-filter: blur(20px); 
             border-right: 1px solid rgba(139,92,246,0.2); z-index: 100; 
             transition: transform 0.3s; overflow-y: auto; 
         }
+        body.light .admin-sidebar { background: rgba(255,255,255,0.95); border-right: 1px solid rgba(0,0,0,0.1); }
+        body.purple .admin-sidebar { background: rgba(15,7,23,0.95); border-right: 1px solid rgba(139,92,246,0.2); }
+        body.ocean .admin-sidebar { background: rgba(8,47,73,0.95); border-right: 1px solid rgba(14,165,233,0.2); }
+        body.forest .admin-sidebar { background: rgba(6,78,59,0.95); border-right: 1px solid rgba(16,185,129,0.2); }
+        body.sunset .admin-sidebar { background: rgba(67,20,7,0.95); border-right: 1px solid rgba(249,115,22,0.2); }
+        
         .sidebar-header { padding: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        body.light .sidebar-header { border-bottom: 1px solid rgba(0,0,0,0.05); }
+        
         .logo { display: flex; align-items: center; gap: 12px; font-size: 1.2rem; font-weight: 700; }
         .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #4F46E5, #8B5CF6); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
         
@@ -42,7 +48,9 @@
             transition: all 0.3s; margin-bottom: 0.25rem; width: 100%; 
             background: transparent; border: none; font-size: 1rem; cursor: pointer; 
         }
+        body.light .nav-item { color: #475569; }
         .nav-item:hover, .nav-item.active { background: rgba(139,92,246,0.15); color: #8B5CF6; }
+        body.light .nav-item:hover, body.light .nav-item.active { background: rgba(139,92,246,0.1); }
         
         .admin-badge { 
             background: linear-gradient(135deg, #ef4444, #f59e0b); 
@@ -50,7 +58,8 @@
             margin-left: auto; 
         }
         
-        .admin-main { margin-left: 280px; padding: 1.5rem; width: calc(100% - 280px); min-height: 100vh; }
+        /* ===== MAIN CONTENT ===== */
+        .admin-main { margin-left: 280px; padding: 1.5rem; width: calc(100% - 280px); min-height: 100vh; transition: margin-left 0.3s; }
         
         .top-bar { 
             background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); 
@@ -58,6 +67,12 @@
             display: flex; justify-content: space-between; align-items: center; 
             margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; 
         }
+        body.light .top-bar { background: rgba(255,255,255,0.8); border: 1px solid rgba(0,0,0,0.05); }
+        body.purple .top-bar { background: rgba(139,92,246,0.05); border: 1px solid rgba(139,92,246,0.2); }
+        body.ocean .top-bar { background: rgba(14,165,233,0.05); border: 1px solid rgba(14,165,233,0.2); }
+        body.forest .top-bar { background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2); }
+        body.sunset .top-bar { background: rgba(249,115,22,0.05); border: 1px solid rgba(249,115,22,0.2); }
+        
         .top-bar h2 { font-size: 1.2rem; }
         .logout-btn { 
             background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.3); 
@@ -66,6 +81,7 @@
         }
         .logout-btn:hover { background: rgba(239,68,68,0.3); transform: translateY(-2px); }
         
+        /* ===== TABS ===== */
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         
@@ -74,62 +90,93 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
+        /* ===== STATS ===== */
         .stats-grid { 
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
             gap: 1rem; margin-bottom: 1.5rem; 
         }
         .stat-card { 
             background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); 
-            border-radius: 16px; padding: 1.5rem; text-align: center; 
+            border-radius: 16px; padding: 1.2rem; text-align: center; 
+            transition: all 0.3s;
         }
-        .stat-value { font-size: 2rem; font-weight: 700; color: #8B5CF6; }
-        .stat-label { color: #71717a; font-size: 0.85rem; margin-top: 0.25rem; }
+        body.light .stat-card { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.05); }
+        .stat-card:hover { transform: translateY(-3px); border-color: rgba(139,92,246,0.3); }
+        .stat-value { font-size: 1.8rem; font-weight: 700; color: #8B5CF6; }
+        .stat-label { color: #71717a; font-size: 0.8rem; margin-top: 0.25rem; }
         
+        /* ===== SECTIONS ===== */
         .section { 
             background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); 
-            border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; 
+            border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; 
         }
-        .section h2 { margin-bottom: 1rem; font-size: 1.1rem; }
+        body.light .section { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.05); }
+        body.purple .section { background: rgba(139,92,246,0.05); border: 1px solid rgba(139,92,246,0.2); }
+        body.ocean .section { background: rgba(14,165,233,0.05); border: 1px solid rgba(14,165,233,0.2); }
+        body.forest .section { background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2); }
+        body.sunset .section { background: rgba(249,115,22,0.05); border: 1px solid rgba(249,115,22,0.2); }
         
+        .section h2 { margin-bottom: 1rem; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
+        
+        /* ===== TABLES ===== */
         .table-container { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        th { color: #8B5CF6; font-weight: 600; }
+        body.light th, body.light td { border-bottom: 1px solid rgba(0,0,0,0.05); }
+        th { color: #8B5CF6; font-weight: 600; font-size: 0.85rem; }
         tr:hover { background: rgba(139,92,246,0.05); }
         
+        /* ===== BUTTONS ===== */
         .btn-primary { 
             background: linear-gradient(135deg, #4F46E5, #8B5CF6); 
-            border: none; border-radius: 12px; padding: 8px 16px; 
+            border: none; border-radius: 8px; padding: 8px 16px; 
             color: white; cursor: pointer; transition: all 0.3s; 
         }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(79,70,229,0.4); }
         
         .btn-danger { 
             background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.3); 
-            border-radius: 8px; padding: 6px 12px; color: #ef4444; 
-            cursor: pointer; transition: all 0.3s; 
+            border-radius: 6px; padding: 4px 12px; color: #ef4444; 
+            cursor: pointer; transition: all 0.3s; font-size: 0.8rem;
         }
         .btn-danger:hover { background: rgba(239,68,68,0.3); }
         
         .btn-warning { 
             background: rgba(245,158,11,0.2); border: 1px solid rgba(245,158,11,0.3); 
-            border-radius: 8px; padding: 6px 12px; color: #f59e0b; 
-            cursor: pointer; transition: all 0.3s; 
+            border-radius: 6px; padding: 4px 12px; color: #f59e0b; 
+            cursor: pointer; transition: all 0.3s; font-size: 0.8rem;
         }
         .btn-warning:hover { background: rgba(245,158,11,0.3); }
         
-        .role-badge { 
-            padding: 0.25rem 0.5rem; border-radius: 50px; font-size: 0.7rem; 
+        .btn-success { 
+            background: rgba(16,185,129,0.2); border: 1px solid rgba(16,185,129,0.3); 
+            border-radius: 6px; padding: 4px 12px; color: #10b981; 
+            cursor: pointer; transition: all 0.3s; font-size: 0.8rem;
         }
+        .btn-success:hover { background: rgba(16,185,129,0.3); }
+        
+        /* ===== BADGES ===== */
+        .role-badge { padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; }
         .role-admin { background: rgba(239,68,68,0.2); color: #ef4444; }
         .role-user { background: rgba(16,185,129,0.2); color: #10b981; }
         
-        .status-badge { 
-            padding: 0.25rem 0.5rem; border-radius: 50px; font-size: 0.7rem; 
-        }
+        .status-badge { padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; }
         .status-active { background: rgba(16,185,129,0.2); color: #10b981; }
         .status-inactive { background: rgba(239,68,68,0.2); color: #ef4444; }
+        .status-pending { background: rgba(245,158,11,0.2); color: #f59e0b; }
         
+        /* ===== SEARCH ===== */
+        .search-box { 
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
+            padding: 8px 16px; border-radius: 50px; color: white; width: 200px; 
+            transition: all 0.3s;
+        }
+        body.light .search-box { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.1); color: #0f172a; }
+        .search-box:focus { outline: none; border-color: #8B5CF6; box-shadow: 0 0 0 3px rgba(139,92,246,0.1); }
+        .search-box::placeholder { color: #71717a; }
+        
+        /* ===== TOAST ===== */
         .toast { 
             position: fixed; bottom: 30px; right: 30px; padding: 12px 24px; 
             border-radius: 12px; color: white; font-size: 0.9rem; 
@@ -139,31 +186,37 @@
         .toast.success { background: #10b981; }
         .toast.error { background: #ef4444; }
         .toast.info { background: #3b82f6; }
+        .toast.warning { background: #f59e0b; }
         
         @keyframes slideInRight {
             from { opacity: 0; transform: translateX(100px); }
             to { opacity: 1; transform: translateX(0); }
         }
         
-        .search-box { 
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
-            padding: 8px 16px; border-radius: 50px; color: white; width: 200px; 
+        /* ===== ACTIVITY LOG ===== */
+        .activity-item { 
+            padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); 
+            display: flex; justify-content: space-between; align-items: center; 
         }
-        .search-box:focus { outline: none; border-color: #8B5CF6; }
+        body.light .activity-item { border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .activity-item .time { color: #71717a; font-size: 0.8rem; }
         
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .admin-sidebar { transform: translateX(-100%); }
             .admin-sidebar.active { transform: translateX(0); }
             .admin-main { margin-left: 0; padding: 1rem; }
             .stats-grid { grid-template-columns: 1fr 1fr; }
             .top-bar { flex-direction: column; align-items: stretch; }
+            .section-header { flex-direction: column; align-items: stretch; }
+            .search-box { width: 100%; }
         }
     </style>
 </head>
 <body>
     <div class="animated-bg"></div>
     
-    <!-- Admin Auth Check -->
+    <!-- ===== ADMIN AUTH CHECK ===== -->
     <script>
         (function() {
             const isAdminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
@@ -175,7 +228,7 @@
     </script>
 
     <div class="admin-wrapper">
-        <!-- Sidebar -->
+        <!-- ===== SIDEBAR ===== -->
         <aside class="admin-sidebar" id="adminSidebar">
             <div class="sidebar-header">
                 <div class="logo">
@@ -193,8 +246,9 @@
             </div>
         </aside>
 
-        <!-- Main Content -->
+        <!-- ===== MAIN CONTENT ===== -->
         <main class="admin-main">
+            <!-- ===== TOP BAR ===== -->
             <div class="top-bar">
                 <h2>👑 Admin Dashboard <span class="admin-badge">Administrator</span></h2>
                 <div style="display: flex; align-items: center; gap: 1rem;">
@@ -203,7 +257,9 @@
                 </div>
             </div>
 
+            <!-- ============================================ -->
             <!-- ===== DASHBOARD TAB ===== -->
+            <!-- ============================================ -->
             <div id="dashboardTab" class="tab-content active">
                 <div class="stats-grid">
                     <div class="stat-card"><div class="stat-value" id="totalUsers">0</div><div class="stat-label">Total Users</div></div>
@@ -216,16 +272,18 @@
                 
                 <div class="section">
                     <h2>📈 Recent Activity</h2>
-                    <div id="recentActivity" class="table-container"></div>
+                    <div id="recentActivity"></div>
                 </div>
             </div>
 
-            <!-- ===== USERS TAB ===== -->
+            <!-- ============================================ -->
+            <!-- ===== USER MANAGEMENT TAB ===== -->
+            <!-- ============================================ -->
             <div id="usersTab" class="tab-content">
                 <div class="section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                    <div class="section-header">
                         <h2>👥 User Management</h2>
-                        <button class="btn-primary" onclick="addUser()">+ Add User</button>
+                        <button class="btn-primary" onclick="openAddUserModal()">+ Add User</button>
                     </div>
                     <div class="table-container">
                         <table>
@@ -236,12 +294,14 @@
                 </div>
             </div>
 
-            <!-- ===== FILES TAB ===== -->
+            <!-- ============================================ -->
+            <!-- ===== FILE MANAGEMENT TAB ===== -->
+            <!-- ============================================ -->
             <div id="filesTab" class="tab-content">
                 <div class="section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                    <div class="section-header">
                         <h2>📁 File Management</h2>
-                        <input type="text" id="fileSearch" class="search-box" placeholder="Search files..." onkeyup="searchFiles()">
+                        <input type="text" id="fileSearch" class="search-box" placeholder="🔍 Search files..." onkeyup="searchFiles()">
                     </div>
                     <div class="table-container">
                         <table>
@@ -252,33 +312,136 @@
                 </div>
             </div>
 
+            <!-- ============================================ -->
             <!-- ===== MODERATION TAB ===== -->
+            <!-- ============================================ -->
             <div id="moderationTab" class="tab-content">
                 <div class="section">
                     <h2>⚖️ Content Moderation</h2>
-                    <p style="color: #71717a;">Content moderation system coming soon...</p>
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-value" id="pendingReports">0</div><div class="stat-label">Pending Reports</div></div>
+                        <div class="stat-card"><div class="stat-value" id="reviewedReports">0</div><div class="stat-label">Reviewed</div></div>
+                        <div class="stat-card"><div class="stat-value" id="actionTaken">0</div><div class="stat-label">Actions Taken</div></div>
+                    </div>
+                    <div id="reportedContent" style="color: #71717a; text-align: center; padding: 2rem;">No reported content</div>
                 </div>
             </div>
 
-            <!-- ===== LOGS TAB ===== -->
+            <!-- ============================================ -->
+            <!-- ===== SYSTEM LOGS TAB ===== -->
+            <!-- ============================================ -->
             <div id="logsTab" class="tab-content">
                 <div class="section">
-                    <h2>📜 System Logs</h2>
-                    <p style="color: #71717a;">System logs coming soon...</p>
+                    <div class="section-header">
+                        <h2>📜 System Logs</h2>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <button class="btn-primary" onclick="exportLogs()">📥 Export</button>
+                            <button class="btn-danger" onclick="clearLogs()">🗑️ Clear</button>
+                        </div>
+                    </div>
+                    <div id="logsList" style="max-height: 400px; overflow-y: auto;"></div>
                 </div>
             </div>
 
+            <!-- ============================================ -->
             <!-- ===== SETTINGS TAB ===== -->
+            <!-- ============================================ -->
             <div id="settingsTab" class="tab-content">
                 <div class="section">
                     <h2>⚙️ System Settings</h2>
-                    <p style="color: #71717a;">Settings coming soon...</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                        <!-- General Settings -->
+                        <div style="background: rgba(255,255,255,0.02); border-radius: 12px; padding: 1rem; border: 1px solid rgba(255,255,255,0.05);">
+                            <h3 style="color: #8B5CF6; margin-bottom: 1rem;">⚙️ General</h3>
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <span>Site Name</span>
+                                <input type="text" id="siteName" value="Alan Vault" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 4px 8px; color: white; width: 140px;">
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <span>Maintenance Mode</span>
+                                <label class="toggle-switch"><input type="checkbox" id="maintenanceMode"><span class="toggle-slider"></span></label>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem 0;">
+                                <span>Allow Registration</span>
+                                <label class="toggle-switch"><input type="checkbox" id="allowRegistration" checked><span class="toggle-slider"></span></label>
+                            </div>
+                        </div>
+                        
+                        <!-- File Settings -->
+                        <div style="background: rgba(255,255,255,0.02); border-radius: 12px; padding: 1rem; border: 1px solid rgba(255,255,255,0.05);">
+                            <h3 style="color: #8B5CF6; margin-bottom: 1rem;">📎 File Settings</h3>
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <span>Max File Size (MB)</span>
+                                <input type="number" id="maxFileSize" value="100" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 4px 8px; color: white; width: 80px;">
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem 0;">
+                                <span>Storage Limit (GB)</span>
+                                <input type="number" id="storageLimit" value="10" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 4px 8px; color: white; width: 80px;">
+                            </div>
+                        </div>
+                        
+                        <!-- Security Settings -->
+                        <div style="background: rgba(255,255,255,0.02); border-radius: 12px; padding: 1rem; border: 1px solid rgba(255,255,255,0.05);">
+                            <h3 style="color: #8B5CF6; margin-bottom: 1rem;">🔐 Security</h3>
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <span>Session Timeout (hours)</span>
+                                <input type="number" id="sessionTimeout" value="24" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 4px 8px; color: white; width: 80px;">
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem 0;">
+                                <span>Two-Factor Auth</span>
+                                <label class="toggle-switch"><input type="checkbox" id="twoFactorAuth"><span class="toggle-slider"></span></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 1.5rem;">
+                        <button class="btn-primary" onclick="saveSettings()" style="padding: 10px 30px;">💾 Save All Settings</button>
+                    </div>
+                    <div id="settingsStatus" style="text-align: center; margin-top: 0.5rem; color: #71717a; font-size: 0.9rem;"></div>
                 </div>
             </div>
         </main>
     </div>
 
+    <!-- ============================================ -->
+    <!-- ===== ADD USER MODAL ===== -->
+    <!-- ============================================ -->
+    <div id="addUserModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); align-items: center; justify-content: center; z-index: 10000;">
+        <div style="background: #1a1a2e; border: 1px solid rgba(139,92,246,0.3); border-radius: 24px; padding: 2rem; width: 90%; max-width: 450px;">
+            <h3 style="margin-bottom: 1.5rem;">➕ Add New User</h3>
+            <input type="text" id="newUsername" placeholder="Username" style="width:100%; padding:0.75rem; margin-bottom:1rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white;">
+            <input type="email" id="newEmail" placeholder="Email" style="width:100%; padding:0.75rem; margin-bottom:1rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white;">
+            <input type="password" id="newPassword" placeholder="Password" value="password123" style="width:100%; padding:0.75rem; margin-bottom:1rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white;">
+            <select id="newRole" style="width:100%; padding:0.75rem; margin-bottom:1rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white;">
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+            </select>
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button onclick="closeAddUserModal()" style="padding:0.5rem 1.5rem; background:transparent; border:1px solid rgba(139,92,246,0.5); border-radius:8px; color:#8B5CF6; cursor:pointer;">Cancel</button>
+                <button onclick="addUser()" style="padding:0.5rem 1.5rem; background:linear-gradient(135deg,#4F46E5,#8B5CF6); border:none; border-radius:8px; color:white; cursor:pointer;">Add User</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- ===== SCRIPTS ===== -->
+    <!-- ============================================ -->
+    <script src="theme.js"></script>
     <script>
+        // ========================================
+        // TOGGLE SWITCH STYLES (injected)
+        // ========================================
+        const toggleStyles = document.createElement('style');
+        toggleStyles.textContent = `
+            .toggle-switch { position: relative; display: inline-block; width: 44px; height: 22px; flex-shrink: 0; }
+            .toggle-switch input { opacity: 0; width: 0; height: 0; }
+            .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #444; transition: .3s; border-radius: 22px; }
+            .toggle-slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+            input:checked + .toggle-slider { background: linear-gradient(135deg, #4F46E5, #8B5CF6); }
+            input:checked + .toggle-slider:before { transform: translateX(22px); }
+            body.light .toggle-slider { background-color: #ccc; }
+        `;
+        document.head.appendChild(toggleStyles);
+
         // ========================================
         // TAB MANAGEMENT
         // ========================================
@@ -291,9 +454,12 @@
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             if (event && event.target) event.target.classList.add('active');
             
+            // Load data when tab is shown
             if (tab === 'dashboard') loadDashboard();
             if (tab === 'users') loadUsers();
             if (tab === 'files') loadFiles();
+            if (tab === 'logs') loadLogs();
+            if (tab === 'moderation') loadModeration();
         }
 
         // ========================================
@@ -319,17 +485,22 @@
             document.getElementById('activeToday').textContent = users.length;
             
             const logs = JSON.parse(localStorage.getItem('system_logs') || '[]');
-            const recent = logs.slice(0, 10);
-            document.getElementById('recentActivity').innerHTML = recent.length ? 
-                recent.map(l => `<div style="padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between;">
-                    <span>${l.action || 'Activity'}</span>
-                    <span style="color: #71717a; font-size: 0.8rem;">${new Date(l.timestamp).toLocaleString()}</span>
-                </div>`).join('') : 
-                '<p style="color: #71717a; text-align: center; padding: 1rem;">No recent activity</p>';
+            const recent = logs.slice(0, 15);
+            const container = document.getElementById('recentActivity');
+            if (recent.length === 0) {
+                container.innerHTML = '<div style="color:#71717a; text-align:center; padding:1rem;">No recent activity</div>';
+            } else {
+                container.innerHTML = recent.map(l => `
+                    <div class="activity-item">
+                        <span>${l.action || 'Activity'}</span>
+                        <span class="time">${new Date(l.timestamp).toLocaleString()}</span>
+                    </div>
+                `).join('');
+            }
         }
 
         // ========================================
-        // USERS
+        // USER MANAGEMENT
         // ========================================
         
         function loadUsers() {
@@ -358,22 +529,39 @@
         }
 
         function deleteUser(id) {
-            if (!confirm('Delete this user?')) return;
+            if (!confirm('Delete this user? This cannot be undone!')) return;
             let users = JSON.parse(localStorage.getItem('users') || '[]');
             users = users.filter(u => u.id !== id);
             localStorage.setItem('users', JSON.stringify(users));
+            localStorage.removeItem(`vault_${id}`);
             loadUsers();
             loadDashboard();
-            showToast('User deleted', 'success');
+            showToast('User deleted successfully', 'success');
+        }
+
+        function openAddUserModal() {
+            document.getElementById('addUserModal').style.display = 'flex';
+            document.getElementById('newUsername').value = '';
+            document.getElementById('newEmail').value = '';
+            document.getElementById('newPassword').value = 'password123';
+            document.getElementById('newRole').value = 'user';
+            setTimeout(() => document.getElementById('newUsername').focus(), 100);
+        }
+
+        function closeAddUserModal() {
+            document.getElementById('addUserModal').style.display = 'none';
         }
 
         function addUser() {
-            const username = prompt('Enter username:');
-            if (!username) return;
-            const email = prompt('Enter email:');
-            if (!email) return;
-            const password = prompt('Enter password:');
-            if (!password) return;
+            const username = document.getElementById('newUsername').value.trim();
+            const email = document.getElementById('newEmail').value.trim();
+            const password = document.getElementById('newPassword').value;
+            const role = document.getElementById('newRole').value;
+            
+            if (!username || !email) {
+                showToast('Username and email are required', 'error');
+                return;
+            }
             
             const users = JSON.parse(localStorage.getItem('users') || '[]');
             if (users.find(u => u.email === email)) {
@@ -386,20 +574,22 @@
                 username: username,
                 email: email,
                 password: password,
-                role: 'user',
+                role: role,
                 status: 'active',
                 createdAt: new Date().toISOString()
             };
             users.push(newUser);
             localStorage.setItem('users', JSON.stringify(users));
             localStorage.setItem(`vault_${newUser.id}`, JSON.stringify({ files: [], notes: [], tasks: [], bookmarks: [] }));
+            
+            closeAddUserModal();
             loadUsers();
             loadDashboard();
-            showToast(`User ${username} added`, 'success');
+            showToast(`User "${username}" added successfully!`, 'success');
         }
 
         // ========================================
-        // FILES
+        // FILE MANAGEMENT
         // ========================================
         
         function loadFiles() {
@@ -409,6 +599,12 @@
                 const vault = JSON.parse(localStorage.getItem(`vault_${u.id}`) || '{"files":[]}');
                 vault.files.forEach(f => allFiles.push({ ...f, owner: u.username }));
             });
+            
+            // Apply search filter
+            const search = document.getElementById('fileSearch')?.value?.toLowerCase() || '';
+            if (search) {
+                allFiles = allFiles.filter(f => f.name.toLowerCase().includes(search));
+            }
             
             const container = document.getElementById('filesList');
             if (!allFiles.length) {
@@ -440,6 +636,101 @@
         }
 
         function searchFiles() { loadFiles(); }
+
+        // ========================================
+        // MODERATION
+        // ========================================
+        
+        function loadModeration() {
+            const reports = JSON.parse(localStorage.getItem('reported_content') || '[]');
+            document.getElementById('pendingReports').textContent = reports.filter(r => r.status === 'pending').length || 0;
+            document.getElementById('reviewedReports').textContent = reports.filter(r => r.status === 'reviewed').length || 0;
+            document.getElementById('actionTaken').textContent = reports.filter(r => r.actionTaken).length || 0;
+        }
+
+        // ========================================
+        // SYSTEM LOGS
+        // ========================================
+        
+        function loadLogs() {
+            const logs = JSON.parse(localStorage.getItem('system_logs') || '[]');
+            const container = document.getElementById('logsList');
+            if (!logs.length) {
+                container.innerHTML = '<div style="color:#71717a; text-align:center; padding:2rem;">No logs available</div>';
+                return;
+            }
+            container.innerHTML = logs.slice(0, 50).map(l => `
+                <div style="padding:0.5rem 0; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; font-size:0.85rem;">
+                    <span><span style="color:#8B5CF6;">${l.level || 'info'}</span> ${l.action || 'Action'}</span>
+                    <span style="color:#71717a; font-size:0.75rem;">${new Date(l.timestamp).toLocaleString()}</span>
+                </div>
+            `).join('');
+        }
+
+        function exportLogs() {
+            const logs = JSON.parse(localStorage.getItem('system_logs') || '[]');
+            const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `logs_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Logs exported', 'success');
+        }
+
+        function clearLogs() {
+            if (!confirm('Clear all logs?')) return;
+            localStorage.setItem('system_logs', '[]');
+            loadLogs();
+            showToast('Logs cleared', 'success');
+        }
+
+        // ========================================
+        // SETTINGS
+        // ========================================
+        
+        function saveSettings() {
+            const settings = {
+                siteName: document.getElementById('siteName').value,
+                maintenanceMode: document.getElementById('maintenanceMode').checked,
+                allowRegistration: document.getElementById('allowRegistration').checked,
+                maxFileSize: parseInt(document.getElementById('maxFileSize').value) || 100,
+                storageLimit: parseInt(document.getElementById('storageLimit').value) || 10,
+                sessionTimeout: parseInt(document.getElementById('sessionTimeout').value) || 24,
+                twoFactorAuth: document.getElementById('twoFactorAuth').checked,
+                savedAt: new Date().toISOString()
+            };
+            localStorage.setItem('admin_settings', JSON.stringify(settings));
+            document.getElementById('settingsStatus').textContent = '✅ Settings saved successfully!';
+            document.getElementById('settingsStatus').style.color = '#10b981';
+            showToast('Settings saved!', 'success');
+            setTimeout(() => {
+                document.getElementById('settingsStatus').textContent = 'Settings saved at ' + new Date().toLocaleTimeString();
+                document.getElementById('settingsStatus').style.color = '#71717a';
+            }, 3000);
+            
+            // Add to logs
+            addLog('success', 'admin', 'Settings updated', 'Admin updated system settings');
+        }
+
+        // ========================================
+        // ADD LOG
+        // ========================================
+        
+        function addLog(level, type, action, details) {
+            const logs = JSON.parse(localStorage.getItem('system_logs') || '[]');
+            logs.unshift({
+                id: Date.now(),
+                level: level,
+                type: type,
+                action: action,
+                details: details,
+                timestamp: new Date().toISOString()
+            });
+            if (logs.length > 500) logs.pop();
+            localStorage.setItem('system_logs', JSON.stringify(logs));
+        }
 
         // ========================================
         // ADMIN LOGOUT
@@ -486,15 +777,55 @@
         }
 
         // ========================================
+        // CLOSE MODAL ON CLICK OUTSIDE
+        // ========================================
+        
+        document.getElementById('addUserModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAddUserModal();
+        });
+
+        // ========================================
+        // KEYBOARD SHORTCUTS
+        // ========================================
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (document.getElementById('addUserModal').style.display === 'flex') {
+                    closeAddUserModal();
+                }
+            }
+        });
+
+        // ========================================
         // INIT
         // ========================================
         
         document.addEventListener('DOMContentLoaded', function() {
             const adminName = localStorage.getItem('adminName') || 'Administrator';
             document.getElementById('adminName').textContent = adminName;
-            loadDashboard();
             
-            // Add sample data if empty
+            // Apply theme
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.className = savedTheme;
+            
+            // Load all data
+            loadDashboard();
+            loadUsers();
+            loadFiles();
+            loadLogs();
+            loadModeration();
+            
+            // Load settings
+            const settings = JSON.parse(localStorage.getItem('admin_settings') || '{}');
+            if (settings.siteName) document.getElementById('siteName').value = settings.siteName;
+            if (settings.maintenanceMode) document.getElementById('maintenanceMode').checked = settings.maintenanceMode;
+            if (settings.allowRegistration !== undefined) document.getElementById('allowRegistration').checked = settings.allowRegistration;
+            if (settings.maxFileSize) document.getElementById('maxFileSize').value = settings.maxFileSize;
+            if (settings.storageLimit) document.getElementById('storageLimit').value = settings.storageLimit;
+            if (settings.sessionTimeout) document.getElementById('sessionTimeout').value = settings.sessionTimeout;
+            if (settings.twoFactorAuth) document.getElementById('twoFactorAuth').checked = settings.twoFactorAuth;
+            
+            // Create default admin if no users
             const users = JSON.parse(localStorage.getItem('users') || '[]');
             if (users.length === 0) {
                 users.push({
@@ -507,6 +838,7 @@
                     createdAt: new Date().toISOString()
                 });
                 localStorage.setItem('users', JSON.stringify(users));
+                loadDashboard();
             }
         });
     </script>
