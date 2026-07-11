@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - Alan Vault</title>
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Alan Vault</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -21,13 +15,154 @@
     <link rel="manifest" href="/assets/favicon/site.webmanifest">
     <meta name="theme-color" content="#4F46E5">
     
-    <link rel="stylesheet" href="dashboard.css">
-</head>
     <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="theme.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: white; }
+        .animated-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 20% 50%, rgba(79,70,229,0.15) 0%, transparent 50%); }
+        
+        .admin-wrapper { display: flex; min-height: 100vh; }
+        
+        .admin-sidebar { 
+            position: fixed; left: 0; top: 0; width: 280px; height: 100vh; 
+            background: rgba(10,10,15,0.95); backdrop-filter: blur(20px); 
+            border-right: 1px solid rgba(139,92,246,0.2); z-index: 100; 
+            transition: transform 0.3s; overflow-y: auto; 
+        }
+        .sidebar-header { padding: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .logo { display: flex; align-items: center; gap: 12px; font-size: 1.2rem; font-weight: 700; }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #4F46E5, #8B5CF6); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        
+        .sidebar-nav { padding: 1rem; }
+        .nav-item { 
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px; 
+            color: #a1a1aa; text-decoration: none; border-radius: 12px; 
+            transition: all 0.3s; margin-bottom: 0.25rem; width: 100%; 
+            background: transparent; border: none; font-size: 1rem; cursor: pointer; 
+        }
+        .nav-item:hover, .nav-item.active { background: rgba(139,92,246,0.15); color: #8B5CF6; }
+        
+        .admin-badge { 
+            background: linear-gradient(135deg, #ef4444, #f59e0b); 
+            padding: 2px 10px; border-radius: 50px; font-size: 0.65rem; 
+            margin-left: auto; 
+        }
+        
+        .admin-main { margin-left: 280px; padding: 1.5rem; width: calc(100% - 280px); min-height: 100vh; }
+        
+        .top-bar { 
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 16px; padding: 1rem 1.5rem; 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; 
+        }
+        .top-bar h2 { font-size: 1.2rem; }
+        .logout-btn { 
+            background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.3); 
+            border-radius: 8px; padding: 8px 16px; color: #ef4444; 
+            cursor: pointer; transition: all 0.3s; 
+        }
+        .logout-btn:hover { background: rgba(239,68,68,0.3); transform: translateY(-2px); }
+        
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .stats-grid { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 1rem; margin-bottom: 1.5rem; 
+        }
+        .stat-card { 
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 16px; padding: 1.5rem; text-align: center; 
+        }
+        .stat-value { font-size: 2rem; font-weight: 700; color: #8B5CF6; }
+        .stat-label { color: #71717a; font-size: 0.85rem; margin-top: 0.25rem; }
+        
+        .section { 
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; 
+        }
+        .section h2 { margin-bottom: 1rem; font-size: 1.1rem; }
+        
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        th { color: #8B5CF6; font-weight: 600; }
+        tr:hover { background: rgba(139,92,246,0.05); }
+        
+        .btn-primary { 
+            background: linear-gradient(135deg, #4F46E5, #8B5CF6); 
+            border: none; border-radius: 12px; padding: 8px 16px; 
+            color: white; cursor: pointer; transition: all 0.3s; 
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(79,70,229,0.4); }
+        
+        .btn-danger { 
+            background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.3); 
+            border-radius: 8px; padding: 6px 12px; color: #ef4444; 
+            cursor: pointer; transition: all 0.3s; 
+        }
+        .btn-danger:hover { background: rgba(239,68,68,0.3); }
+        
+        .btn-warning { 
+            background: rgba(245,158,11,0.2); border: 1px solid rgba(245,158,11,0.3); 
+            border-radius: 8px; padding: 6px 12px; color: #f59e0b; 
+            cursor: pointer; transition: all 0.3s; 
+        }
+        .btn-warning:hover { background: rgba(245,158,11,0.3); }
+        
+        .role-badge { 
+            padding: 0.25rem 0.5rem; border-radius: 50px; font-size: 0.7rem; 
+        }
+        .role-admin { background: rgba(239,68,68,0.2); color: #ef4444; }
+        .role-user { background: rgba(16,185,129,0.2); color: #10b981; }
+        
+        .status-badge { 
+            padding: 0.25rem 0.5rem; border-radius: 50px; font-size: 0.7rem; 
+        }
+        .status-active { background: rgba(16,185,129,0.2); color: #10b981; }
+        .status-inactive { background: rgba(239,68,68,0.2); color: #ef4444; }
+        
+        .toast { 
+            position: fixed; bottom: 30px; right: 30px; padding: 12px 24px; 
+            border-radius: 12px; color: white; font-size: 0.9rem; 
+            z-index: 10001; animation: slideInRight 0.3s ease; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3); 
+        }
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        .toast.info { background: #3b82f6; }
+        
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .search-box { 
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
+            padding: 8px 16px; border-radius: 50px; color: white; width: 200px; 
+        }
+        .search-box:focus { outline: none; border-color: #8B5CF6; }
+        
+        @media (max-width: 768px) {
+            .admin-sidebar { transform: translateX(-100%); }
+            .admin-sidebar.active { transform: translateX(0); }
+            .admin-main { margin-left: 0; padding: 1rem; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .top-bar { flex-direction: column; align-items: stretch; }
+        }
+    </style>
 </head>
 <body>
     <div class="animated-bg"></div>
-
+    
     <!-- Admin Auth Check -->
     <script>
         (function() {
@@ -52,13 +187,9 @@
                 <button class="nav-item active" onclick="showTab('dashboard')">📊 Dashboard</button>
                 <button class="nav-item" onclick="showTab('users')">👥 User Management</button>
                 <button class="nav-item" onclick="showTab('files')">📁 File Management</button>
-                <button class="nav-item" onclick="showTab('moderation')">⚖️ Content Moderation</button>
+                <button class="nav-item" onclick="showTab('moderation')">⚖️ Moderation</button>
                 <button class="nav-item" onclick="showTab('logs')">📜 System Logs</button>
-                <button class="nav-item" onclick="showTab('settings')">⚙️ System Settings</button>
-                <button class="nav-item" onclick="showTab('reports')">📊 Reports</button>
-                <button class="nav-item" onclick="showTab('security')">🔐 Security</button>
-                <button class="nav-item" onclick="showTab('backup')">💾 Backup</button>
-                <button class="nav-item" onclick="showTab('health')">🩺 System Health</button>
+                <button class="nav-item" onclick="showTab('settings')">⚙️ Settings</button>
             </div>
         </aside>
 
@@ -72,7 +203,7 @@
                 </div>
             </div>
 
-            <!-- Dashboard Tab -->
+            <!-- ===== DASHBOARD TAB ===== -->
             <div id="dashboardTab" class="tab-content active">
                 <div class="stats-grid">
                     <div class="stat-card"><div class="stat-value" id="totalUsers">0</div><div class="stat-label">Total Users</div></div>
@@ -82,21 +213,22 @@
                     <div class="stat-card"><div class="stat-value" id="totalTasks">0</div><div class="stat-label">Total Tasks</div></div>
                     <div class="stat-card"><div class="stat-value" id="activeToday">0</div><div class="stat-label">Active Today</div></div>
                 </div>
+                
                 <div class="section">
                     <h2>📈 Recent Activity</h2>
                     <div id="recentActivity" class="table-container"></div>
                 </div>
             </div>
 
-            <!-- Users Tab -->
+            <!-- ===== USERS TAB ===== -->
             <div id="usersTab" class="tab-content">
                 <div class="section">
-                    <div class="section-header">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
                         <h2>👥 User Management</h2>
-                        <button class="btn-primary" onclick="openAddUserModal()">+ Add User</button>
+                        <button class="btn-primary" onclick="addUser()">+ Add User</button>
                     </div>
                     <div class="table-container">
-                        <table id="usersTable">
+                        <table>
                             <thead><tr><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
                             <tbody id="usersList"></tbody>
                         </table>
@@ -104,15 +236,15 @@
                 </div>
             </div>
 
-            <!-- Files Tab -->
+            <!-- ===== FILES TAB ===== -->
             <div id="filesTab" class="tab-content">
                 <div class="section">
-                    <div class="section-header">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
                         <h2>📁 File Management</h2>
-                        <input type="text" id="fileSearch" placeholder="Search files..." style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.5rem; color: white; width: 200px;" onkeyup="searchFiles()">
+                        <input type="text" id="fileSearch" class="search-box" placeholder="Search files..." onkeyup="searchFiles()">
                     </div>
                     <div class="table-container">
-                        <table id="filesTable">
+                        <table>
                             <thead><tr><th>File Name</th><th>Owner</th><th>Size</th><th>Uploaded</th><th>Actions</th></tr></thead>
                             <tbody id="filesList"></tbody>
                         </table>
@@ -120,193 +252,54 @@
                 </div>
             </div>
 
-            <!-- Moderation Tab -->
+            <!-- ===== MODERATION TAB ===== -->
             <div id="moderationTab" class="tab-content">
-                <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-value" id="pendingReports">0</div><div class="stat-label">Pending Reports</div></div>
-                    <div class="stat-card"><div class="stat-value" id="reviewedReports">0</div><div class="stat-label">Reviewed</div></div>
-                    <div class="stat-card"><div class="stat-value" id="actionTaken">0</div><div class="stat-label">Actions Taken</div></div>
-                </div>
                 <div class="section">
-                    <h2>⚠️ Reported Content</h2>
-                    <div id="reportedList" class="table-container"></div>
+                    <h2>⚖️ Content Moderation</h2>
+                    <p style="color: #71717a;">Content moderation system coming soon...</p>
                 </div>
             </div>
 
-            <!-- Logs Tab -->
+            <!-- ===== LOGS TAB ===== -->
             <div id="logsTab" class="tab-content">
                 <div class="section">
-                    <div class="section-header">
-                        <h2>📜 System Logs</h2>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <select id="logFilter" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.5rem; color: white;">
-                                <option value="all">All</option>
-                                <option value="info">Info</option>
-                                <option value="warning">Warning</option>
-                                <option value="error">Error</option>
-                                <option value="success">Success</option>
-                            </select>
-                            <button class="btn-primary" onclick="exportLogs()">📥 Export</button>
-                            <button class="btn-danger" onclick="clearLogs()">🗑️ Clear</button>
-                        </div>
-                    </div>
-                    <div id="logsList" class="logs-container"></div>
+                    <h2>📜 System Logs</h2>
+                    <p style="color: #71717a;">System logs coming soon...</p>
                 </div>
             </div>
 
-            <!-- Settings Tab -->
+            <!-- ===== SETTINGS TAB ===== -->
             <div id="settingsTab" class="tab-content">
-                <div class="settings-grid">
-                    <div class="setting-card">
-                        <h3>⚙️ General Settings</h3>
-                        <div class="setting-row"><span>Site Name</span><input type="text" id="siteName" value="Alan Vault" style="width: 200px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.5rem; color: white;"></div>
-                        <div class="setting-row"><span>Maintenance Mode</span><label class="toggle-switch"><input type="checkbox" id="maintenanceMode"><span class="toggle-slider"></span></label></div>
-                        <div class="setting-row"><span>Allow Registration</span><label class="toggle-switch"><input type="checkbox" id="allowRegistration" checked><span class="toggle-slider"></span></label></div>
-                    </div>
-                    <div class="setting-card">
-                        <h3>📎 File Settings</h3>
-                        <div class="setting-row"><span>Max File Size (MB)</span><input type="number" id="maxFileSize" value="100" style="width: 100px;"></div>
-                        <div class="setting-row"><span>Storage Limit (GB)</span><input type="number" id="storageLimit" value="5" style="width: 100px;"></div>
-                    </div>
-                    <div class="setting-card">
-                        <h3>🔐 Security Settings</h3>
-                        <div class="setting-row"><span>Session Timeout (hours)</span><input type="number" id="sessionTimeout" value="24" style="width: 100px;"></div>
-                        <div class="setting-row"><span>Two-Factor Auth</span><label class="toggle-switch"><input type="checkbox" id="twoFactorAuth"><span class="toggle-slider"></span></label></div>
-                    </div>
-                </div>
-                <div class="section" style="margin-top: 1rem;">
-                    <button class="btn-primary" onclick="saveSettings()">Save All Settings</button>
-                </div>
-            </div>
-
-            <!-- Reports Tab -->
-            <div id="reportsTab" class="tab-content">
                 <div class="section">
-                    <h2>📊 Generate Report</h2>
-                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
-                        <select id="reportType" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.5rem; color: white;">
-                            <option value="users">User Report</option>
-                            <option value="storage">Storage Report</option>
-                            <option value="activity">Activity Report</option>
-                            <option value="files">Files Report</option>
-                        </select>
-                        <select id="reportPeriod" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.5rem; color: white;">
-                            <option value="week">Last 7 Days</option>
-                            <option value="month">Last 30 Days</option>
-                            <option value="year">Last Year</option>
-                            <option value="all">All Time</option>
-                        </select>
-                        <button class="btn-primary" onclick="generateReport()">Generate Report</button>
-                    </div>
-                    <div id="reportPreview"></div>
-                </div>
-            </div>
-
-            <!-- Security Tab -->
-            <div id="securityTab" class="tab-content">
-                <div class="section">
-                    <h2>🔐 Login Attempts</h2>
-                    <div id="loginAttempts" class="table-container"></div>
-                </div>
-                <div class="section">
-                    <h2>🖥️ Active Sessions</h2>
-                    <div id="activeSessions" class="table-container"></div>
-                </div>
-            </div>
-
-            <!-- Backup Tab -->
-            <div id="backupTab" class="tab-content">
-                <div class="section">
-                    <h2>💾 Backup & Restore</h2>
-                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
-                        <button class="btn-primary" onclick="backupData()">📥 Create Backup</button>
-                        <button class="btn-warning" onclick="restoreData()">🔄 Restore from Backup</button>
-                        <button class="btn-danger" onclick="resetSystem()">⚠️ Reset System</button>
-                    </div>
-                    <div id="backupList"></div>
-                </div>
-            </div>
-
-            <!-- Health Tab -->
-            <div id="healthTab" class="tab-content">
-                <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-value" id="serverStatus">🟢</div><div class="stat-label">Server Status</div></div>
-                    <div class="stat-card"><div class="stat-value" id="dbSize">0 MB</div><div class="stat-label">Database Size</div></div>
-                    <div class="stat-card"><div class="stat-value" id="cacheHits">0%</div><div class="stat-label">Cache Hit Rate</div></div>
-                    <div class="stat-card"><div class="stat-value" id="uptime">0h</div><div class="stat-label">Uptime</div></div>
+                    <h2>⚙️ System Settings</h2>
+                    <p style="color: #71717a;">Settings coming soon...</p>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Add User Modal -->
-    <div id="addUserModal" class="modal">
-        <div class="modal-content">
-            <h3>Add New User</h3>
-            <input type="text" id="newUsername" placeholder="Username">
-            <input type="email" id="newEmail" placeholder="Email">
-            <input type="password" id="newPassword" placeholder="Password" value="password123">
-            <select id="newRole"><option value="user">User</option><option value="admin">Admin</option></select>
-            <div class="modal-buttons">
-                <button class="btn-warning" onclick="closeAddUserModal()">Cancel</button>
-                <button class="btn-primary" onclick="addUser()">Add User</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Utility Functions
-        function formatBytes(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function addLog(level, type, action) {
-            const logs = JSON.parse(localStorage.getItem('system_logs') || '[]');
-            logs.unshift({
-                id: Date.now(),
-                level: level,
-                type: type,
-                action: action,
-                timestamp: new Date().toISOString()
-            });
-            if (logs.length > 500) logs.pop();
-            localStorage.setItem('system_logs', JSON.stringify(logs));
-        }
-
-        // Tab Management
-        let currentTab = 'dashboard';
-
+        // ========================================
+        // TAB MANAGEMENT
+        // ========================================
+        
         function showTab(tab) {
-            currentTab = tab;
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById(`${tab}Tab`).classList.add('active');
+            const target = document.getElementById(tab + 'Tab');
+            if (target) target.classList.add('active');
+            
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             if (event && event.target) event.target.classList.add('active');
-            loadTabData(tab);
-        }
-
-        function loadTabData(tab) {
+            
             if (tab === 'dashboard') loadDashboard();
             if (tab === 'users') loadUsers();
             if (tab === 'files') loadFiles();
-            if (tab === 'moderation') loadModeration();
-            if (tab === 'logs') loadLogs();
-            if (tab === 'security') loadSecurity();
-            if (tab === 'health') loadHealth();
         }
 
-        // Dashboard Functions
+        // ========================================
+        // DASHBOARD
+        // ========================================
+        
         function loadDashboard() {
             const users = JSON.parse(localStorage.getItem('users') || '[]');
             document.getElementById('totalUsers').textContent = users.length;
@@ -327,90 +320,88 @@
             
             const logs = JSON.parse(localStorage.getItem('system_logs') || '[]');
             const recent = logs.slice(0, 10);
-            document.getElementById('recentActivity').innerHTML = recent.map(l => `<div class="log-entry"><span class="log-level ${l.level}">${l.level}</span><span>${l.action}</span><span style="margin-left:auto;">${new Date(l.timestamp).toLocaleString()}</span></div>`).join('');
+            document.getElementById('recentActivity').innerHTML = recent.length ? 
+                recent.map(l => `<div style="padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between;">
+                    <span>${l.action || 'Activity'}</span>
+                    <span style="color: #71717a; font-size: 0.8rem;">${new Date(l.timestamp).toLocaleString()}</span>
+                </div>`).join('') : 
+                '<p style="color: #71717a; text-align: center; padding: 1rem;">No recent activity</p>';
         }
 
-        // User Functions
+        // ========================================
+        // USERS
+        // ========================================
+        
         function loadUsers() {
             const users = JSON.parse(localStorage.getItem('users') || '[]');
-            document.getElementById('usersList').innerHTML = users.map(u => `
+            const container = document.getElementById('usersList');
+            
+            if (!users.length) {
+                container.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:#71717a;">No users found</td></tr>';
+                return;
+            }
+            
+            container.innerHTML = users.map(u => `
                 <tr>
                     <td><strong>${escapeHtml(u.username)}</strong></td>
                     <td>${escapeHtml(u.email)}</td>
                     <td><span class="role-badge ${u.role === 'admin' ? 'role-admin' : 'role-user'}">${u.role || 'user'}</span></td>
                     <td><span class="status-badge status-active">${u.status || 'active'}</span></td>
-                    <td>${new Date(u.createdAt).toLocaleDateString()}</td>
+                    <td>${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A'}</td>
                     <td>
-                        <button class="btn-warning" onclick="editUser('${u.id}')">Edit</button>
-                        ${u.email !== 'admin@alanvault.com' ? `<button class="btn-danger" onclick="deleteUser('${u.id}')">Delete</button>` : '<span style="color:#71717a;">Protected</span>'}
+                        ${u.email !== 'admin@alanvault.com' ? 
+                            `<button class="btn-danger" onclick="deleteUser('${u.id}')">Delete</button>` : 
+                            '<span style="color:#71717a;">Protected</span>'}
                     </td>
                 </tr>
             `).join('');
         }
 
-        function openAddUserModal() { document.getElementById('addUserModal').classList.add('active'); }
-        function closeAddUserModal() { document.getElementById('addUserModal').classList.remove('active'); }
+        function deleteUser(id) {
+            if (!confirm('Delete this user?')) return;
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            users = users.filter(u => u.id !== id);
+            localStorage.setItem('users', JSON.stringify(users));
+            loadUsers();
+            loadDashboard();
+            showToast('User deleted', 'success');
+        }
 
         function addUser() {
-            const username = document.getElementById('newUsername').value.trim();
-            const email = document.getElementById('newEmail').value.trim();
-            const password = document.getElementById('newPassword').value;
-            const role = document.getElementById('newRole').value;
-            
-            if (!username || !email) { alert('Please fill all fields'); return; }
+            const username = prompt('Enter username:');
+            if (!username) return;
+            const email = prompt('Enter email:');
+            if (!email) return;
+            const password = prompt('Enter password:');
+            if (!password) return;
             
             const users = JSON.parse(localStorage.getItem('users') || '[]');
-            if (users.find(u => u.email === email)) { alert('Email already exists'); return; }
+            if (users.find(u => u.email === email)) {
+                showToast('Email already exists', 'error');
+                return;
+            }
             
             const newUser = {
                 id: 'user_' + Date.now(),
                 username: username,
                 email: email,
                 password: password,
-                role: role,
+                role: 'user',
                 status: 'active',
                 createdAt: new Date().toISOString()
             };
             users.push(newUser);
             localStorage.setItem('users', JSON.stringify(users));
             localStorage.setItem(`vault_${newUser.id}`, JSON.stringify({ files: [], notes: [], tasks: [], bookmarks: [] }));
-            
-            closeAddUserModal();
             loadUsers();
             loadDashboard();
-            addLog('success', 'admin', `Added user: ${username}`);
-            alert(`User ${username} added successfully! Password: ${password}`);
+            showToast(`User ${username} added`, 'success');
         }
 
-        function deleteUser(id) {
-            if (confirm('Delete user? This cannot be undone!')) {
-                let users = JSON.parse(localStorage.getItem('users') || '[]');
-                const user = users.find(u => u.id === id);
-                if (user && user.email === 'admin@alanvault.com') { alert('Cannot delete main admin!'); return; }
-                users = users.filter(u => u.id !== id);
-                localStorage.setItem('users', JSON.stringify(users));
-                localStorage.removeItem(`vault_${id}`);
-                loadUsers();
-                loadDashboard();
-                addLog('warning', 'admin', `Deleted user: ${user?.username}`);
-                alert('User deleted');
-            }
-        }
-
-        function editUser(id) {
-            const user = JSON.parse(localStorage.getItem('users') || '[]').find(u => u.id === id);
-            if (user) {
-                const newRole = prompt('Enter new role (user/admin):', user.role);
-                if (newRole && (newRole === 'user' || newRole === 'admin')) {
-                    user.role = newRole;
-                    localStorage.setItem('users', JSON.stringify(JSON.parse(localStorage.getItem('users') || '[]').map(u => u.id === id ? user : u)));
-                    loadUsers();
-                    alert(`User role updated to ${newRole}`);
-                }
-            }
-        }
-
-        // File Functions
+        // ========================================
+        // FILES
+        // ========================================
+        
         function loadFiles() {
             const users = JSON.parse(localStorage.getItem('users') || '[]');
             let allFiles = [];
@@ -418,208 +409,106 @@
                 const vault = JSON.parse(localStorage.getItem(`vault_${u.id}`) || '{"files":[]}');
                 vault.files.forEach(f => allFiles.push({ ...f, owner: u.username }));
             });
-            document.getElementById('filesList').innerHTML = allFiles.map(f => `
+            
+            const container = document.getElementById('filesList');
+            if (!allFiles.length) {
+                container.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem; color:#71717a;">No files found</td></tr>';
+                return;
+            }
+            
+            container.innerHTML = allFiles.map(f => `
                 <tr>
                     <td>${escapeHtml(f.name)}</td>
                     <td>${escapeHtml(f.owner)}</td>
                     <td>${formatBytes(f.size)}</td>
-                    <td>${new Date(f.date).toLocaleDateString()}</td>
+                    <td>${f.date ? new Date(f.date).toLocaleDateString() : 'N/A'}</td>
                     <td><button class="btn-danger" onclick="deleteFile('${f.id}')">Delete</button></td>
                 </tr>
             `).join('');
         }
 
         function deleteFile(fileId) {
-            if (confirm('Delete this file?')) {
-                const users = JSON.parse(localStorage.getItem('users') || '[]');
-                users.forEach(u => {
-                    const vault = JSON.parse(localStorage.getItem(`vault_${u.id}`) || '{"files":[]}');
-                    vault.files = vault.files.filter(f => f.id !== fileId);
-                    localStorage.setItem(`vault_${u.id}`, JSON.stringify(vault));
-                });
-                loadFiles();
-                addLog('warning', 'admin', `Deleted file: ${fileId}`);
-                alert('File deleted');
-            }
+            if (!confirm('Delete this file?')) return;
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            users.forEach(u => {
+                const vault = JSON.parse(localStorage.getItem(`vault_${u.id}`) || '{"files":[]}');
+                vault.files = vault.files.filter(f => f.id !== fileId);
+                localStorage.setItem(`vault_${u.id}`, JSON.stringify(vault));
+            });
+            loadFiles();
+            showToast('File deleted', 'success');
         }
 
         function searchFiles() { loadFiles(); }
 
-        // Moderation Functions
-        function loadModeration() {
-            const reports = JSON.parse(localStorage.getItem('reported_content') || '[]');
-            const pending = reports.filter(r => r.status === 'pending');
-            document.getElementById('pendingReports').textContent = pending.length;
-            document.getElementById('reviewedReports').textContent = reports.length - pending.length;
-            document.getElementById('actionTaken').textContent = reports.filter(r => r.actionTaken).length;
-            document.getElementById('reportedList').innerHTML = pending.map(r => `<div class="log-entry"><span>${r.reason}</span><span>${r.contentType}</span><button class="btn-warning" onclick="resolveReport('${r.id}')">Resolve</button></div>`).join('');
-        }
-
-        function resolveReport(id) {
-            let reports = JSON.parse(localStorage.getItem('reported_content') || '[]');
-            reports = reports.filter(r => r.id !== id);
-            localStorage.setItem('reported_content', JSON.stringify(reports));
-            loadModeration();
-            alert('Report resolved');
-        }
-
-        // Logs Functions
-        function loadLogs() {
-            const logs = JSON.parse(localStorage.getItem('system_logs') || '[]');
-            renderLogs(logs);
-        }
-
-        function renderLogs(logs) {
-            document.getElementById('logsList').innerHTML = logs.map(l => `<div class="log-entry"><span class="log-level ${l.level}">${l.level}</span><span>${l.action}</span><span style="margin-left:auto;">${new Date(l.timestamp).toLocaleString()}</span></div>`).join('');
-        }
-
-        function exportLogs() {
-            const logs = JSON.parse(localStorage.getItem('system_logs') || '[]');
-            const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `logs_${new Date().toISOString()}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            alert('Logs exported!');
-        }
-
-        function clearLogs() {
-            if (confirm('Clear all logs?')) {
-                localStorage.setItem('system_logs', '[]');
-                loadLogs();
-                alert('Logs cleared');
-            }
-        }
-
-        // Security Functions
-        function loadSecurity() {
-            const attempts = JSON.parse(localStorage.getItem('login_history') || '[]');
-            document.getElementById('loginAttempts').innerHTML = `<tr>
-                <thead><tr><th>Email</th><th>Status</th><th>Time</th></tr></thead>
-                <tbody>${attempts.slice(0, 20).map(a => `<tr><td>${a.email}</td><td>${a.success ? '✅ Success' : '❌ Failed'}</td><td>${new Date(a.timestamp).toLocaleString()}</td></tr>`).join('')}</tbody>
-            </table>`;
-            
-            const sessions = JSON.parse(localStorage.getItem('active_sessions') || '[]');
-            document.getElementById('activeSessions').innerHTML = `<table>
-                <thead><tr><th>Device</th><th>Browser</th><th>Last Active</th><th>Action</th></tr></thead>
-                <tbody>${sessions.map(s => `<tr><td>${s.name || 'Unknown'}</td><td>${s.browser || 'Unknown'}</td><td>${new Date(s.lastActive).toLocaleString()}</td><td><button class="btn-danger" onclick="revokeSession('${s.id}')">Revoke</button></td></tr>`).join('')}</tbody>
-            </table>`;
-        }
-
-        function revokeSession(id) {
-            let sessions = JSON.parse(localStorage.getItem('active_sessions') || '[]');
-            sessions = sessions.filter(s => s.id !== id);
-            localStorage.setItem('active_sessions', JSON.stringify(sessions));
-            loadSecurity();
-            alert('Session revoked');
-        }
-
-        // Health Functions
-        function loadHealth() {
-            document.getElementById('serverStatus').innerHTML = '🟢 Online';
-            document.getElementById('dbSize').textContent = '2.3 MB';
-            document.getElementById('cacheHits').textContent = '87%';
-            document.getElementById('uptime').textContent = '24h';
-        }
-
-        // Settings Functions
-        function saveSettings() {
-            const settings = {
-                siteName: document.getElementById('siteName').value,
-                maintenanceMode: document.getElementById('maintenanceMode').checked,
-                allowRegistration: document.getElementById('allowRegistration').checked,
-                maxFileSize: document.getElementById('maxFileSize').value,
-                storageLimit: document.getElementById('storageLimit').value,
-                sessionTimeout: document.getElementById('sessionTimeout').value,
-                twoFactorAuth: document.getElementById('twoFactorAuth').checked
-            };
-            localStorage.setItem('system_settings', JSON.stringify(settings));
-            alert('Settings saved!');
-            addLog('success', 'admin', 'Updated system settings');
-        }
-
-        // Report Functions
-        function generateReport() {
-            const type = document.getElementById('reportType').value;
-            const period = document.getElementById('reportPeriod').value;
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            let report = `<h3>${type.toUpperCase()} Report - ${period}</h3><table><tr><th>Metric</th><th>Value</th></tr>`;
-            if (type === 'users') {
-                report += `<tr><td>Total Users</td><td>${users.length}</td></tr>`;
-                report += `<tr><td>Admins</td><td>${users.filter(u => u.role === 'admin').length}</td></tr>`;
-            }
-            if (type === 'storage') {
-                let total = 0;
-                users.forEach(u => {
-                    const v = JSON.parse(localStorage.getItem(`vault_${u.id}`) || '{"files":[]}');
-                    total += v.files.reduce((s, f) => s + (f.size || 0), 0);
-                });
-                report += `<tr><td>Total Storage</td><td>${formatBytes(total)}</td></tr>`;
-            }
-            report += `</table><br><button class="btn-primary" onclick="window.print()">Print Report</button>`;
-            document.getElementById('reportPreview').innerHTML = report;
-        }
-
-        // Backup Functions
-        function backupData() {
-            const data = { users: localStorage.getItem('users'), vaults: {} };
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            users.forEach(u => {
-                data.vaults[`vault_${u.id}`] = localStorage.getItem(`vault_${u.id}`);
-            });
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `backup_${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            addLog('success', 'admin', 'Created backup');
-            alert('Backup created!');
-        }
-
-        function restoreData() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.onchange = e => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = e => {
-                    const data = JSON.parse(e.target.result);
-                    localStorage.setItem('users', data.users);
-                    Object.entries(data.vaults).forEach(([k, v]) => localStorage.setItem(k, v));
-                    alert('Restored successfully!');
-                    location.reload();
-                };
-                reader.readAsText(file);
-            };
-            input.click();
-        }
-
-        function resetSystem() {
-            if (confirm('⚠️ WARNING: This will delete ALL data! Type "RESET" to confirm')) {
-                if (prompt('Type RESET to confirm') === 'RESET') {
-                    localStorage.clear();
-                    alert('System reset. Redirecting...');
-                    window.location.href = 'admin-login.html';
-                }
-            }
-        }
-
-        // Admin Functions
+        // ========================================
+        // ADMIN LOGOUT
+        // ========================================
+        
         function adminLogout() {
-            localStorage.removeItem('adminLoggedIn');
-            localStorage.removeItem('adminEmail');
-            localStorage.removeItem('adminName');
-            localStorage.removeItem('adminLoginTime');
-            window.location.href = 'admin-login.html';
+            if (confirm('Logout from admin panel?')) {
+                localStorage.removeItem('adminLoggedIn');
+                localStorage.removeItem('adminEmail');
+                localStorage.removeItem('adminName');
+                window.location.href = 'admin-login.html';
+            }
         }
 
-        // Initialize Dashboard
-        loadDashboard();
+        // ========================================
+        // UTILITY FUNCTIONS
+        // ========================================
+        
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ========================================
+        // INIT
+        // ========================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const adminName = localStorage.getItem('adminName') || 'Administrator';
+            document.getElementById('adminName').textContent = adminName;
+            loadDashboard();
+            
+            // Add sample data if empty
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            if (users.length === 0) {
+                users.push({
+                    id: 'admin_1',
+                    username: 'Administrator',
+                    email: 'admin@alanvault.com',
+                    password: 'admin123',
+                    role: 'admin',
+                    status: 'active',
+                    createdAt: new Date().toISOString()
+                });
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+        });
     </script>
 </body>
 </html>
