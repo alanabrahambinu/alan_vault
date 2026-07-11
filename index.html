@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alan Vault - Premium Secure Cloud Platform</title>
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Alan Vault</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -22,8 +16,11 @@
     <meta name="theme-color" content="#4F46E5">
     
     <link rel="stylesheet" href="dashboard.css">
-</head>
+    
     <style>
+        /* ========================================
+           ALL YOUR EXISTING STYLES (KEPT INTACT)
+           ======================================== */
         * {
             margin: 0;
             padding: 0;
@@ -427,7 +424,227 @@
             color: #71717a;
         }
 
-        /* Floating Chat Button */
+        /* ========================================
+           NEW CHATBOT STYLES (ADDED)
+           ======================================== */
+        
+        /* Chat Modal Overlay */
+        .chat-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-overlay.active {
+            display: flex;
+        }
+
+        .chat-modal {
+            background: #141b2d;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 24px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .chat-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .chat-modal-header h2 {
+            color: #8B5CF6;
+            margin: 0;
+        }
+
+        .chat-close-btn {
+            background: transparent;
+            border: none;
+            color: #71717a;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .chat-close-btn:hover {
+            color: #fff;
+        }
+
+        /* Chat Messages */
+        .chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #8B5CF6;
+            border-radius: 10px;
+        }
+
+        .chat-message {
+            animation: fadeIn 0.3s ease;
+            margin-bottom: 0.75rem;
+        }
+
+        .chat-message.bot {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .chat-message.bot .avatar {
+            font-size: 1.2rem;
+        }
+
+        .chat-message.bot .bubble {
+            background: rgba(139, 92, 246, 0.15);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            max-width: 80%;
+        }
+
+        .chat-message.user {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .chat-message.user .bubble {
+            background: rgba(79, 70, 229, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            max-width: 80%;
+        }
+
+        .chat-message .bubble strong {
+            color: #8B5CF6;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(139, 92, 246, 0.15);
+            border-radius: 12px;
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #8B5CF6;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-10px); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Quick Replies */
+        .quick-replies {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.75rem;
+        }
+
+        .quick-reply {
+            padding: 0.3rem 0.8rem;
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 50px;
+            color: #8B5CF6;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .quick-reply:hover {
+            background: rgba(139, 92, 246, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Chat Input */
+        .chat-input-area {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        .chat-input-area input:focus {
+            outline: none;
+            border-color: #8B5CF6;
+        }
+
+        .chat-input-area input::placeholder {
+            color: #71717a;
+        }
+
+        .chat-send-btn {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #4F46E5, #8B5CF6);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .chat-send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(79, 70, 229, 0.4);
+        }
+
+        /* Floating Chat Button (updated) */
         .chat-float {
             position: fixed;
             bottom: 30px;
@@ -443,11 +660,46 @@
             z-index: 1000;
             transition: all 0.3s;
             box-shadow: 0 4px 20px rgba(79, 70, 229, 0.4);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
         }
 
         .chat-float:hover {
             transform: scale(1.1);
             box-shadow: 0 6px 30px rgba(79, 70, 229, 0.6);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            padding: 12px 24px;
+            background: #1a2340;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            color: #fff;
+            z-index: 10001;
+            animation: slideUp 0.3s ease;
+            display: none;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        .toast.success {
+            border-color: #10b981;
+        }
+
+        .toast.error {
+            border-color: #ef4444;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Animations */
@@ -518,6 +770,15 @@
             .cta-card {
                 padding: 2rem;
             }
+
+            .chat-modal {
+                padding: 1.5rem;
+                max-height: 95vh;
+            }
+
+            .chat-messages {
+                height: 200px;
+            }
         }
     </style>
 </head>
@@ -552,7 +813,7 @@
             <p class="animate-fade-up">Store files, manage tasks, take notes, and access everything with bank-grade security from anywhere in the world.</p>
             <div class="hero-buttons animate-fade-up">
                 <a href="signup.html" class="btn-glass btn-primary-glass btn-large">Get Started Free →</a>
-                <a href="#demo" class="btn-glass btn-outline-glass btn-large">Watch Demo ▶</a>
+                <a href="#demo" class="btn-glass btn-outline-glass btn-large" onclick="showDemo()">Watch Demo ▶</a>
             </div>
             <div class="hero-stats animate-fade-up">
                 <div class="stat">
@@ -685,20 +946,61 @@
         </div>
     </footer>
 
-    <div class="chat-float" onclick="openChat()">
+    <!-- ======================================== -->
+    <!-- CHATBOT MODAL (NEW) -->
+    <!-- ======================================== -->
+    <div id="chatOverlay" class="chat-overlay">
+        <div class="chat-modal">
+            <div class="chat-modal-header">
+                <h2>🤖 Alan Assistant</h2>
+                <button class="chat-close-btn" onclick="closeChat()">✕</button>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-message bot">
+                    <div class="avatar">🤖</div>
+                    <div class="bubble">
+                        Hello! I'm your Alan Vault Assistant.<br>
+                        <span style="font-size:0.7rem; color:#71717a;">Try: "How do I upload a file?" or "Help with security"</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="quick-replies">
+                <button class="quick-reply" onclick="sendQuickReply('How do I upload a file?')">📁 Upload</button>
+                <button class="quick-reply" onclick="sendQuickReply('How secure is my data?')">🔒 Security</button>
+                <button class="quick-reply" onclick="sendQuickReply('Help with sign up')">📝 Sign Up</button>
+                <button class="quick-reply" onclick="sendQuickReply('What are the features?')">⚡ Features</button>
+            </div>
+            
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Type your message..." onkeydown="if(event.key==='Enter') sendMessage()">
+                <button class="chat-send-btn" onclick="sendMessage()">Send →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Floating Chat Button -->
+    <div class="chat-float" onclick="openChat()" title="Chat with us (Ctrl+K)">
         💬
     </div>
 
+    <!-- ======================================== -->
+    <!-- SCRIPTS -->
+    <!-- ======================================== -->
     <script>
+        // ========================================
+        // YOUR EXISTING FUNCTIONS (KEPT INTACT)
+        // ========================================
+        
         function toggleMenu() {
             document.querySelector('.nav-links').classList.toggle('active');
         }
 
-        function openChat() {
-            alert("💬 Alan Vault Assistant\n\nHello! I'm here to help you with:\n• Account setup\n• Security features\n• File management\n• Premium plans\n\nClick Sign Up to start your journey!");
-        }
-
-        // Smooth scroll
+        // Smooth scroll (preserved)
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -709,7 +1011,7 @@
             });
         });
 
-        // Intersection Observer for animations
+        // Intersection Observer for animations (preserved)
         const observerOptions = { threshold: 0.1 };
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -725,6 +1027,207 @@
             el.style.transform = 'translateY(30px)';
             el.style.transition = 'all 0.6s ease';
             observer.observe(el);
+        });
+
+        // ========================================
+        // DEMO FUNCTION (NEW)
+        // ========================================
+        function showDemo() {
+            showToast('🎬 Demo video coming soon!', 'info');
+        }
+
+        // ========================================
+        // CHATBOT SYSTEM (NEW)
+        // ========================================
+        
+        // Chatbot Knowledge Base
+        const chatbotKnowledge = {
+            'signup': {
+                keywords: ['sign up', 'create account', 'register', 'join', 'signup'],
+                response: "📝 To create an account:\n\n1️⃣ Click 'Get Started Free' on the homepage\n2️⃣ Fill in your details (name, email, password)\n3️⃣ Agree to the Terms of Service\n4️⃣ Click 'Create Free Account'\n\nIt's completely free with 5GB storage! 🎉"
+            },
+            'login': {
+                keywords: ['login', 'sign in', 'log in'],
+                response: "🔐 To login:\n\n1️⃣ Click 'Login' in the top navigation\n2️⃣ Enter your email and password\n3️⃣ Click 'Sign In'\n\nForgot password? Click 'Forgot password' on the login page."
+            },
+            'features': {
+                keywords: ['features', 'what can i do', 'capabilities', 'tools', 'feature'],
+                response: "⚡ Alan Vault Features:\n\n📁 **Secure Cloud Storage** - AES-256 encrypted\n📝 **Smart Notes** - Rich text editor with sync\n✅ **Task Management** - Priorities and due dates\n🔗 **Bookmarks** - Save and organize links\n📊 **Analytics** - Track your productivity\n🔒 **Military Security** - 2FA and threat monitoring"
+            },
+            'file': {
+                keywords: ['upload file', 'file upload', 'upload', 'files', 'file'],
+                response: "📁 To upload a file:\n\n1️⃣ Go to your Dashboard\n2️⃣ Click 'Upload' or drag and drop\n3️⃣ Select your file (max 100MB)\n4️⃣ Click 'Upload'\n\nSupported formats: JPG, PNG, PDF, DOC, TXT, ZIP"
+            },
+            'note': {
+                keywords: ['note', 'notes', 'create note'],
+                response: "📝 To create a note:\n\n1️⃣ Go to the Notes section\n2️⃣ Click 'New Note'\n3️⃣ Add a title and content\n4️⃣ Save it\n\nYour notes are auto-saved and synced across all devices!"
+            },
+            'task': {
+                keywords: ['task', 'tasks', 'todo', 'to do'],
+                response: "✅ To manage tasks:\n\n1️⃣ Go to Tasks section\n2️⃣ Click 'Add Task'\n3️⃣ Set title, due date, and priority\n4️⃣ Mark as complete when done\n\nStay organized and boost your productivity!"
+            },
+            'security': {
+                keywords: ['security', 'encryption', 'safe', 'secure', 'protect', 'privacy'],
+                response: "🔒 Alan Vault Security Features:\n\n• **AES-256 Encryption** - Military-grade security\n• **Two-Factor Authentication** - Extra protection\n• **Secure File Sharing** - Encrypted links\n• **Real-time Monitoring** - Threat detection\n• **Auto Backup** - Never lose your data\n\nYour data is encrypted before it leaves your device!"
+            },
+            'password': {
+                keywords: ['password', 'reset password', 'change password', 'forgot password'],
+                response: "🔑 To reset your password:\n\n1️⃣ Go to Login page\n2️⃣ Click 'Forgot Password'\n3️⃣ Enter your registered email\n4️⃣ Check your email for reset link\n5️⃣ Create a new password\n\nUse a strong password with 8+ characters!"
+            },
+            'pricing': {
+                keywords: ['pricing', 'price', 'cost', 'free', 'premium', 'plan'],
+                response: "💰 Alan Vault is **FREE** for lifetime!\n\n✓ 5GB Storage\n✓ Unlimited Devices\n✓ Real-time Sync\n✓ 24/7 Support\n✓ All Features Included\n\nNo credit card required. Start for free today!"
+            },
+            'storage': {
+                keywords: ['storage', 'space', 'capacity', 'limit', 'gb'],
+                response: "💾 Storage Details:\n\n• **Free Plan**: 5GB storage\n• **Files**: Max 100MB per file\n• **Auto-sync**: All devices\n• **Upgrade**: Coming soon\n\nYou can check your usage in the Dashboard."
+            },
+            'help': {
+                keywords: ['help', 'support', 'assistance', 'contact', 'question'],
+                response: "🆘 Need help? Here's how:\n\n📧 Email: support@alanvault.com\n💬 Chat: Use this chatbot! (I'm here to help)\n📚 Documentation: Check our guides\n\nWhat specific help do you need?"
+            }
+        };
+
+        // Chat functions
+        function openChat() {
+            const overlay = document.getElementById('chatOverlay');
+            overlay.classList.add('active');
+            document.getElementById('chatInput').focus();
+        }
+
+        function closeChat() {
+            document.getElementById('chatOverlay').classList.remove('active');
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            addMessage(message, 'user');
+            input.value = '';
+            input.focus();
+            
+            showTyping();
+            
+            setTimeout(() => {
+                hideTyping();
+                const response = getBotResponse(message);
+                addMessage(response, 'bot');
+            }, 800 + Math.random() * 600);
+        }
+
+        function sendQuickReply(message) {
+            document.getElementById('chatInput').value = message;
+            sendMessage();
+        }
+
+        function addMessage(text, sender) {
+            const container = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender}`;
+            
+            if (sender === 'bot') {
+                messageDiv.innerHTML = `
+                    <div class="avatar">🤖</div>
+                    <div class="bubble">${formatText(text)}</div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="bubble">${formatText(text)}</div>
+                `;
+            }
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function formatText(text) {
+            return text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        }
+
+        function showTyping() {
+            const container = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typingIndicator';
+            typingDiv.className = 'chat-message bot';
+            typingDiv.innerHTML = `
+                <div class="avatar">🤖</div>
+                <div class="typing-indicator">
+                    <span></span><span></span><span></span>
+                </div>
+            `;
+            container.appendChild(typingDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function hideTyping() {
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
+        }
+
+        function getBotResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            // Check each knowledge entry
+            for (const key in chatbotKnowledge) {
+                const entry = chatbotKnowledge[key];
+                if (entry.keywords.some(keyword => lowerMessage.includes(keyword))) {
+                    return entry.response;
+                }
+            }
+            
+            // Check for greetings
+            if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+                return "👋 Hello! Welcome to Alan Vault! 🎉\n\nHow can I help you today? Try asking about:\n• Features\n• Sign up\n• Security\n• Pricing";
+            }
+            
+            // Check for name
+            if (lowerMessage.includes('name') || lowerMessage.includes('who are you')) {
+                return "🤖 I'm the Alan Vault Assistant!\n\nI'm here to help you with:\n• Account setup\n• Feature questions\n• Security tips\n• Troubleshooting\n\nWhat would you like to know?";
+            }
+            
+            // Check for thanks
+            if (lowerMessage.includes('thank')) {
+                return "🙌 You're welcome! Happy to help!\n\nNeed anything else? Just ask! 😊";
+            }
+            
+            // Default response
+            return "🤔 I'm not sure I understand. Here's what I can help with:\n\n• **Account**: Sign up, login, password\n• **Features**: Files, notes, tasks\n• **Security**: Encryption, 2FA, safety\n• **Pricing**: Free plan, storage\n• **Support**: Help, contact\n\nJust type what you need help with! 🌟";
+        }
+
+        // Toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            clearTimeout(toast.timeout);
+            toast.timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ========================================
+        // KEYBOARD SHORTCUTS
+        // ========================================
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+K opens chat
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                openChat();
+            }
+            
+            // Escape closes chat
+            if (e.key === 'Escape') {
+                closeChat();
+            }
+        });
+
+        // Click outside to close
+        document.getElementById('chatOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeChat();
+            }
         });
     </script>
 </body>
