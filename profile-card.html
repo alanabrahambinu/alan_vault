@@ -1,0 +1,237 @@
+<!-- profile-card.html - Profile Card Component -->
+<div class="profile-card">
+    <div class="profile-cover"></div>
+    <div class="profile-avatar-wrapper">
+        <div class="profile-avatar-large" id="cardAvatar">
+            <img id="cardAvatarImage" src="" alt="" style="display:none; width:100%; height:100%; border-radius:50%; object-fit:cover;">
+            <span id="cardAvatarPlaceholder">👤</span>
+        </div>
+        <button class="edit-avatar-btn" onclick="location.href='profile.html'">✏️</button>
+    </div>
+    <div class="profile-info">
+        <h3 class="profile-name" id="cardName">John Doe</h3>
+        <p class="profile-email" id="cardEmail">john@example.com</p>
+        <p class="profile-bio" id="cardBio">Product Designer & Developer</p>
+    </div>
+    <div class="profile-stats">
+        <div class="profile-stat">
+            <span class="stat-number" id="cardFiles">0</span>
+            <span class="stat-label">Files</span>
+        </div>
+        <div class="profile-stat">
+            <span class="stat-number" id="cardNotes">0</span>
+            <span class="stat-label">Notes</span>
+        </div>
+        <div class="profile-stat">
+            <span class="stat-number" id="cardTasks">0</span>
+            <span class="stat-label">Tasks</span>
+        </div>
+        <div class="profile-stat">
+            <span class="stat-number" id="cardBookmarks">0</span>
+            <span class="stat-label">Bookmarks</span>
+        </div>
+    </div>
+    <div class="profile-actions">
+        <button class="btn-primary" onclick="location.href='profile.html'">View Profile</button>
+        <button class="btn-outline" onclick="location.href='settings.html'">Settings</button>
+    </div>
+</div>
+
+<style>
+    .profile-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 24px;
+        overflow: hidden;
+        transition: all 0.3s;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
+    .profile-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(139, 92, 246, 0.3);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .profile-cover {
+        height: 100px;
+        background: linear-gradient(135deg, #4F46E5, #8B5CF6);
+    }
+    
+    .profile-avatar-wrapper {
+        position: relative;
+        text-align: center;
+        margin-top: -40px;
+    }
+    
+    .profile-avatar-large {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #4F46E5, #8B5CF6);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        border: 3px solid #0a0a0f;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+    }
+    
+    .profile-avatar-large img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .edit-avatar-btn {
+        position: absolute;
+        bottom: 0;
+        right: calc(50% - 40px);
+        width: 28px;
+        height: 28px;
+        background: #1a1a2e;
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 0.7rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #a1a1aa;
+    }
+    
+    .edit-avatar-btn:hover {
+        background: rgba(139, 92, 246, 0.2);
+        transform: scale(1.1);
+        color: #8B5CF6;
+    }
+    
+    .profile-info {
+        text-align: center;
+        padding: 1rem;
+    }
+    
+    .profile-name {
+        font-size: 1.2rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .profile-email {
+        font-size: 0.8rem;
+        color: #a1a1aa;
+        margin-bottom: 0.5rem;
+    }
+    
+    .profile-bio {
+        font-size: 0.8rem;
+        color: #71717a;
+    }
+    
+    .profile-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        padding: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .profile-stat {
+        text-align: center;
+    }
+    
+    .stat-number {
+        display: block;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #8B5CF6;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+        color: #71717a;
+    }
+    
+    .profile-actions {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .profile-actions .btn-primary,
+    .profile-actions .btn-outline {
+        flex: 1;
+        text-align: center;
+        padding: 0.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #4F46E5, #8B5CF6);
+        border: none;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(79,70,229,0.4);
+    }
+    
+    .btn-outline {
+        background: transparent;
+        border: 1px solid rgba(139, 92, 246, 0.5);
+        color: #8B5CF6;
+    }
+    
+    .btn-outline:hover {
+        background: rgba(139, 92, 246, 0.1);
+        transform: translateY(-2px);
+    }
+</style>
+
+<script>
+    function loadProfileCard() {
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        if (!user || !user.id) return;
+        
+        const vault = JSON.parse(localStorage.getItem(`vault_${user.id}`) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+        const profile = JSON.parse(localStorage.getItem(`profile_${user.id}`) || '{}');
+        
+        // Update name
+        document.getElementById('cardName').textContent = profile.fullName || user.username || 'User';
+        document.getElementById('cardEmail').textContent = user.email || 'user@example.com';
+        document.getElementById('cardBio').textContent = profile.bio || 'No bio yet';
+        
+        // Update stats
+        document.getElementById('cardFiles').textContent = vault.files?.length || 0;
+        document.getElementById('cardNotes').textContent = vault.notes?.length || 0;
+        document.getElementById('cardTasks').textContent = vault.tasks?.filter(t => t.completed).length || 0;
+        document.getElementById('cardBookmarks').textContent = vault.bookmarks?.length || 0;
+        
+        // Update profile picture
+        const avatarImg = document.getElementById('cardAvatarImage');
+        const avatarPlaceholder = document.getElementById('cardAvatarPlaceholder');
+        const avatarContainer = document.getElementById('cardAvatar');
+        
+        if (profile.avatar) {
+            avatarImg.src = profile.avatar;
+            avatarImg.style.display = 'block';
+            avatarPlaceholder.style.display = 'none';
+            avatarContainer.style.background = 'transparent';
+        } else {
+            avatarImg.style.display = 'none';
+            avatarPlaceholder.style.display = 'block';
+            avatarContainer.style.background = 'linear-gradient(135deg, #4F46E5, #8B5CF6)';
+        }
+    }
+    
+    // Load on page ready
+    document.addEventListener('DOMContentLoaded', loadProfileCard);
+</script>

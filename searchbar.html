@@ -1,0 +1,465 @@
+<!-- searchbar.html - Search Bar Component -->
+<div class="searchbar-container">
+    <div class="searchbar-wrapper">
+        <span class="searchbar-icon">🔍</span>
+        <input type="text" class="searchbar-input" placeholder="Search files, notes, tasks, bookmarks..." id="globalSearchInput">
+        <button class="searchbar-clear" id="clearSearch">✕</button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+</div>
+
+<style>
+    .searchbar-container {
+        position: relative;
+        width: 100%;
+        max-width: 400px;
+    }
+    
+    .searchbar-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    
+    .searchbar-icon {
+        position: absolute;
+        left: 1rem;
+        color: #71717a;
+        font-size: 1rem;
+        z-index: 1;
+    }
+    
+    .searchbar-input {
+        width: 100%;
+        padding: 0.75rem 2.5rem 0.75rem 2.5rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 50px;
+        color: white;
+        font-size: 0.9rem;
+        transition: all 0.3s;
+    }
+    
+    .searchbar-input:focus {
+        outline: none;
+        border-color: #8B5CF6;
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+    
+    .searchbar-input::placeholder {
+        color: #71717a;
+    }
+    
+    .searchbar-clear {
+        position: absolute;
+        right: 1rem;
+        background: transparent;
+        border: none;
+        color: #71717a;
+        cursor: pointer;
+        font-size: 0.9rem;
+        opacity: 0;
+        transition: all 0.3s;
+        z-index: 1;
+    }
+    
+    .searchbar-input:not(:placeholder-shown) ~ .searchbar-clear {
+        opacity: 1;
+    }
+    
+    .searchbar-clear:hover {
+        color: #ef4444;
+    }
+    
+    .search-results {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        background: #1a1a2e;
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        border-radius: 16px;
+        max-height: 400px;
+        overflow-y: auto;
+        display: none;
+        z-index: 9999;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        padding: 0.5rem 0;
+    }
+    
+    .search-results.active {
+        display: block;
+    }
+    
+    .search-result-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.6rem 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .search-result-item:hover {
+        background: rgba(139, 92, 246, 0.1);
+    }
+    
+    .result-icon {
+        font-size: 1.2rem;
+        width: 28px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+    
+    .result-info {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .result-title {
+        font-weight: 500;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .result-title .highlight {
+        background: rgba(139, 92, 246, 0.4);
+        padding: 0.1rem 0.2rem;
+        border-radius: 3px;
+    }
+    
+    .result-type {
+        font-size: 0.65rem;
+        color: #71717a;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .no-results {
+        padding: 2rem 1rem;
+        text-align: center;
+        color: #71717a;
+    }
+    
+    .no-results strong {
+        color: #a1a1aa;
+    }
+    
+    .search-result-divider {
+        height: 1px;
+        background: rgba(255, 255, 255, 0.05);
+        margin: 0.25rem 1rem;
+    }
+    
+    .view-all-btn {
+        display: block;
+        width: 100%;
+        padding: 0.6rem;
+        text-align: center;
+        color: #8B5CF6;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+        background: transparent;
+        font-size: 0.85rem;
+    }
+    
+    .view-all-btn:hover {
+        background: rgba(139, 92, 246, 0.1);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .searchbar-container {
+            max-width: 100%;
+        }
+        .search-results {
+            max-height: 300px;
+            left: -10px;
+            right: -10px;
+            border-radius: 12px;
+        }
+    }
+</style>
+
+<script>
+    (function() {
+        'use strict';
+        
+        // Get elements
+        var input = document.getElementById('globalSearchInput');
+        var resultsContainer = document.getElementById('searchResults');
+        var clearBtn = document.getElementById('clearSearch');
+        var debounceTimer = null;
+        
+        // ========================================
+        // SEARCH FUNCTION
+        // ========================================
+        
+        function performSearch(query) {
+            if (!query || query.trim().length === 0) {
+                resultsContainer.classList.remove('active');
+                return;
+            }
+            
+            var searchTerm = query.toLowerCase().trim();
+            
+            // Get current user
+            var userData = localStorage.getItem('currentUser');
+            if (!userData) {
+                resultsContainer.innerHTML = '<div class="no-results">Please login to search</div>';
+                resultsContainer.classList.add('active');
+                return;
+            }
+            
+            var user = JSON.parse(userData);
+            var vaultData = localStorage.getItem('vault_' + user.id);
+            
+            if (!vaultData) {
+                resultsContainer.innerHTML = '<div class="no-results">No data found</div>';
+                resultsContainer.classList.add('active');
+                return;
+            }
+            
+            var vault = JSON.parse(vaultData);
+            
+            // Collect all items
+            var allItems = [];
+            
+            // Files
+            if (vault.files && Array.isArray(vault.files)) {
+                vault.files.forEach(function(f) {
+                    if (f.name && f.name.toLowerCase().includes(searchTerm)) {
+                        allItems.push({
+                            name: f.name,
+                            type: 'file',
+                            icon: '📄',
+                            page: 'vault.html',
+                            size: f.size || 0
+                        });
+                    }
+                });
+            }
+            
+            // Notes
+            if (vault.notes && Array.isArray(vault.notes)) {
+                vault.notes.forEach(function(n) {
+                    if (n.title && n.title.toLowerCase().includes(searchTerm)) {
+                        allItems.push({
+                            name: n.title,
+                            type: 'note',
+                            icon: '📝',
+                            page: 'notes.html'
+                        });
+                    }
+                });
+            }
+            
+            // Tasks
+            if (vault.tasks && Array.isArray(vault.tasks)) {
+                vault.tasks.forEach(function(t) {
+                    if (t.title && t.title.toLowerCase().includes(searchTerm)) {
+                        allItems.push({
+                            name: t.title,
+                            type: 'task',
+                            icon: '✅',
+                            page: 'tasks.html'
+                        });
+                    }
+                });
+            }
+            
+            // Bookmarks
+            if (vault.bookmarks && Array.isArray(vault.bookmarks)) {
+                vault.bookmarks.forEach(function(b) {
+                    if (b.title && b.title.toLowerCase().includes(searchTerm)) {
+                        allItems.push({
+                            name: b.title,
+                            type: 'bookmark',
+                            icon: '🔗',
+                            page: 'bookmarks.html'
+                        });
+                    }
+                });
+            }
+            
+            // Sort results (files first, then notes, tasks, bookmarks)
+            var typeOrder = { file: 1, note: 2, task: 3, bookmark: 4 };
+            allItems.sort(function(a, b) {
+                return (typeOrder[a.type] || 5) - (typeOrder[b.type] || 5);
+            });
+            
+            // Display results
+            displayResults(allItems, searchTerm);
+        }
+        
+        // ========================================
+        // DISPLAY RESULTS
+        // ========================================
+        
+        function displayResults(items, query) {
+            if (items.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="no-results">
+                        No results for "<strong>${escapeHtml(query)}</strong>"
+                        <div style="margin-top: 0.5rem; font-size: 0.8rem; color: #71717a;">
+                            Press <strong style="color: #8B5CF6;">Enter</strong> to see all results
+                        </div>
+                    </div>
+                `;
+                resultsContainer.classList.add('active');
+                return;
+            }
+            
+            // Show top 8 results
+            var topItems = items.slice(0, 8);
+            var totalCount = items.length;
+            
+            var html = '';
+            
+            topItems.forEach(function(item) {
+                var highlightedName = highlightText(item.name, query);
+                var sizeText = item.size ? ' • ' + formatBytes(item.size) : '';
+                
+                html += `
+                    <div class="search-result-item" onclick="window.location.href='${item.page}'">
+                        <div class="result-icon">${item.icon}</div>
+                        <div class="result-info">
+                            <div class="result-title">${highlightedName}</div>
+                            <div class="result-type">${item.type}${sizeText}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Add "View All" if there are more results
+            if (totalCount > topItems.length) {
+                html += `
+                    <div class="search-result-divider"></div>
+                    <button class="view-all-btn" onclick="window.location.href='search.html?q=${encodeURIComponent(query)}'">
+                        🔍 View all ${totalCount} results for "${escapeHtml(query)}"
+                    </button>
+                `;
+            }
+            
+            resultsContainer.innerHTML = html;
+            resultsContainer.classList.add('active');
+        }
+        
+        // ========================================
+        // UTILITY FUNCTIONS
+        // ========================================
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function highlightText(text, query) {
+            if (!text || !query) return escapeHtml(text);
+            var escaped = escapeHtml(text);
+            var regex = new RegExp('(' + escapeRegex(query) + ')', 'gi');
+            return escaped.replace(regex, '<span class="highlight">$1</span>');
+        }
+        
+        function escapeRegex(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+        
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            var k = 1024;
+            var sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            var i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // ========================================
+        // EVENT HANDLERS
+        // ========================================
+        
+        function handleSearch() {
+            var query = this.value;
+            
+            if (debounceTimer) clearTimeout(debounceTimer);
+            
+            if (!query || query.trim().length === 0) {
+                resultsContainer.classList.remove('active');
+                return;
+            }
+            
+            debounceTimer = setTimeout(function() {
+                performSearch(query);
+            }, 300);
+        }
+        
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                var query = this.value.trim();
+                if (query) {
+                    window.location.href = 'search.html?q=' + encodeURIComponent(query);
+                }
+            }
+        }
+        
+        function clearSearch() {
+            input.value = '';
+            resultsContainer.classList.remove('active');
+            input.focus();
+        }
+        
+        function handleClickOutside(e) {
+            var container = document.querySelector('.searchbar-container');
+            if (container && !container.contains(e.target)) {
+                resultsContainer.classList.remove('active');
+            }
+        }
+        
+        // ========================================
+        // INITIALIZE
+        // ========================================
+        
+        function init() {
+            if (!input || !resultsContainer) return;
+            
+            // Input events
+            input.addEventListener('input', handleSearch);
+            input.addEventListener('keypress', handleKeyPress);
+            
+            // Focus to show results if text exists
+            input.addEventListener('focus', function() {
+                if (this.value.trim()) {
+                    performSearch(this.value);
+                }
+            });
+            
+            // Clear button
+            if (clearBtn) {
+                clearBtn.addEventListener('click', clearSearch);
+            }
+            
+            // Click outside to close
+            document.addEventListener('click', handleClickOutside);
+        }
+        
+        // Run on DOM ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+        
+        // Expose for debugging
+        window.searchBar = {
+            performSearch: performSearch,
+            clearSearch: clearSearch
+        };
+        
+    })();
+</script>

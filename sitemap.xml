@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+                            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+    <!-- Main Pages -->
+    <url>
+        <loc>https://alanvault.com/</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/index.html</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/dashboard.html</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <!-- Authentication Pages -->
+    <url>
+        <loc>https://alanvault.com/login.html</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/signup.html</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/forgot-password.html</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/reset-password.html</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/verify-email.html</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <!-- Core Features Pages -->
+    <url>
+        <loc>https://alanvault.com/vault.html</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/upload.html</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/notes.html</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/tasks.html</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/bookmarks.html</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- User Pages -->
+    <url>
+        <loc>https://alanvault.com/profile.html</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/settings.html</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <!-- Analytics & Activity -->
+    <url>
+        <loc>https://alanvault.com/analytics.html</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/activity.html</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- Search & Utility -->
+    <url>
+        <loc>https://alanvault.com/search.html</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/offline.html</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.3</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/404.html</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.3</priority>
+    </url>
+
+    <!-- Feature Pages -->
+    <url>
+        <loc>https://alanvault.com/features/secure-vault</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/features/smart-notes</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/features/task-manager</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/features/bookmarks</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <!-- Pricing & Company Pages -->
+    <url>
+        <loc>https://alanvault.com/pricing</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/about</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/contact</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/security</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/privacy</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.4</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/terms</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.4</priority>
+    </url>
+
+    <!-- Blog Posts -->
+    <url>
+        <loc>https://alanvault.com/blog</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/blog/security-best-practices</loc>
+        <lastmod>2024-06-10</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/blog/productivity-tips</loc>
+        <lastmod>2024-06-05</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <!-- Help & Support -->
+    <url>
+        <loc>https://alanvault.com/help</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <url>
+        <loc>https://alanvault.com/faq</loc>
+        <lastmod>2024-06-13</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+</urlset>

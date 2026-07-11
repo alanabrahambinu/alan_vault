@@ -1,0 +1,106 @@
+{
+  "files": [
+    {
+      "id": "file_1734567892001",
+      "name": "Project Proposal.pdf",
+      "filename": "1734567892001-project_proposal.pdf",
+      "size": 2097152,
+      "type": "application/pdf",
+      "userId": "user_1734567890124",
+      "folderId": "root",
+      "uploadDate": "2024-06-05T10:00:00.000Z",
+      "encrypted": false,
+      "favorite": true,
+      "tags": ["work", "proposal"],
+      "description": "Q3 project proposal document"
+    },
+    {
+      "id": "file_1734567892002",
+      "name": "Budget Q3.xlsx",
+      "filename": "1734567892002-budget_q3.xlsx",
+      "size": 524288,
+      "type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "userId": "user_1734567890124",
+      "folderId": "root",
+      "uploadDate": "2024-06-06T11:30:00.000Z",
+      "encrypted": false,
+      "favorite": false,
+      "tags": ["finance", "budget"],
+      "description": "Quarter 3 budget spreadsheet"
+    },
+    {
+      "id": "file_1734567892003",
+      "name": "vacation-photos.zip",
+      "filename": "1734567892003-vacation-photos.zip",
+      "size": 15728640,
+      "type": "application/zip",
+      "userId": "user_1734567890124",
+      "folderId": "root",
+      "uploadDate": "2024-06-01T15:20:00.000Z",
+      "encrypted": false,
+      "favorite": true,
+      "tags": ["personal", "photos"],
+      "description": "Summer vacation pictures"
+    },
+    {
+      "id": "file_1734567892004",
+      "name": "README.md",
+      "filename": "1734567892004-readme.md",
+      "size": 8192,
+      "type": "text/markdown",
+      "userId": "user_1734567890125",
+      "folderId": "root",
+      "uploadDate": "2024-06-07T09:00:00.000Z",
+      "encrypted": false,
+      "favorite": false,
+      "tags": ["documentation"],
+      "description": "Project documentation"
+    },
+    {
+      "id": "file_1734567892005",
+      "name": "profile-picture.jpg",
+      "filename": "1734567892005-profile-picture.jpg",
+      "size": 1048576,
+      "type": "image/jpeg",
+      "userId": "user_1734567890126",
+      "folderId": "root",
+      "uploadDate": "2024-06-08T14:45:00.000Z",
+      "encrypted": false,
+      "favorite": true,
+      "tags": ["personal", "avatar"],
+      "description": "Profile picture"
+    },
+    {
+      "id": "file_1734567892006",
+      "name": "presentation.pptx",
+      "filename": "1734567892006-presentation.pptx",
+      "size": 3145728,
+      "type": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "userId": "user_1734567890124",
+      "folderId": "Work",
+      "uploadDate": "2024-06-09T16:00:00.000Z",
+      "encrypted": false,
+      "favorite": false,
+      "tags": ["work", "presentation"],
+      "description": "Team presentation"
+    }
+  ],
+  "stats": {
+    "totalFiles": 6,
+    "totalSize": 23068672,
+    "favoriteFiles": 3,
+    "byType": {
+      "application/pdf": 1,
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": 1,
+      "application/zip": 1,
+      "text/markdown": 1,
+      "image/jpeg": 1,
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation": 1
+    },
+    "byUser": {
+      "user_1734567890124": 4,
+      "user_1734567890125": 1,
+      "user_1734567890126": 1
+    }
+  }
+}

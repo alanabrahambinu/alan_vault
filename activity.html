@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Log - Alan Vault</title>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Alan Vault</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon/android-chrome-512x512.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <meta name="theme-color" content="#4F46E5">
+    
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: white; }
+        .animated-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 20% 50%, rgba(79,70,229,0.15) 0%, transparent 50%); }
+        
+        .container { max-width: 1200px; margin: 2rem auto; padding: 2rem; }
+        .activity-header { margin-bottom: 2rem; }
+        .activity-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .filters { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+        .filter-btn { padding: 8px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50px; cursor: pointer; }
+        .filter-btn.active { background: rgba(139,92,246,0.2); border-color: #8B5CF6; }
+        
+        .activity-timeline { position: relative; }
+        .activity-item { display: flex; gap: 1rem; padding: 1rem; border-left: 2px solid rgba(139,92,246,0.3); margin-left: 20px; position: relative; }
+        .activity-item::before { content: ''; position: absolute; left: -8px; top: 20px; width: 14px; height: 14px; background: #8B5CF6; border-radius: 50%; }
+        .activity-icon { font-size: 1.5rem; }
+        .activity-content { flex: 1; }
+        .activity-title { font-weight: 600; margin-bottom: 0.25rem; }
+        .activity-time { font-size: 0.75rem; color: #71717a; }
+        
+        .back-btn { background: rgba(139,92,246,0.2); border: 1px solid rgba(139,92,246,0.3); padding: 10px 20px; border-radius: 12px; color: white; text-decoration: none; display: inline-block; margin-top: 2rem; }
+        
+        @media (max-width: 768px) { .container { padding: 1rem; } }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    <div class="container">
+        <div class="activity-header">
+            <h1>📋 Activity Log</h1>
+            <p>Track all your actions and changes</p>
+        </div>
+        
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterActivity('all')">All</button>
+            <button class="filter-btn" onclick="filterActivity('file')">Files</button>
+            <button class="filter-btn" onclick="filterActivity('note')">Notes</button>
+            <button class="filter-btn" onclick="filterActivity('task')">Tasks</button>
+            <button class="filter-btn" onclick="filterActivity('bookmark')">Bookmarks</button>
+        </div>
+        
+        <div id="activityList" class="activity-timeline"></div>
+        
+        <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
+    </div>
+    
+    <script>
+        let currentUser = null, activities = [], currentFilter = 'all';
+        
+        function init() { const user = localStorage.getItem('currentUser'); if (!user) { location.href='login.html'; return; } currentUser = JSON.parse(user); loadActivity(); renderActivity(); }
+        
+        function loadActivity() { const vault = JSON.parse(localStorage.getItem(`vault_${currentUser.id}`) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}'); activities = [ ...vault.files.map(f => ({ ...f, type: 'file', icon: '📄', action: 'uploaded', name: f.name, date: f.date })), ...vault.notes.map(n => ({ ...n, type: 'note', icon: '📝', action: 'created/updated', name: n.title, date: n.updated })), ...vault.tasks.map(t => ({ ...t, type: 'task', icon: '✅', action: t.completed ? 'completed' : 'created', name: t.title, date: t.updated || t.created })), ...vault.bookmarks.map(b => ({ ...b, type: 'bookmark', icon: '🔗', action: 'added', name: b.title, date: b.created })) ]; activities.sort((a,b) => new Date(b.date) - new Date(a.date)); }
+        
+        function renderActivity() { let filtered = activities; if(currentFilter !== 'all') filtered = activities.filter(a => a.type === currentFilter); const container = document.getElementById('activityList'); if(!filtered.length) { container.innerHTML = '<div style="text-align:center; padding:4rem; color:#71717a;">No activity found</div>'; return; } container.innerHTML = filtered.map(a => `<div class="activity-item"><div class="activity-icon">${a.icon}</div><div class="activity-content"><div class="activity-title">${a.action} ${escapeHtml(a.name)}</div><div class="activity-time">${new Date(a.date).toLocaleString()}</div></div></div>`).join(''); }
+        
+        function filterActivity(type) { currentFilter = type; document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active')); event.target.classList.add('active'); renderActivity(); }
+        function escapeHtml(t){ const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+        init();
+    </script>
+</body>
+</html>

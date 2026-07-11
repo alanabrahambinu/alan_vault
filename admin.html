@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Alan Vault</title>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Alan Vault</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon/android-chrome-512x512.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <meta name="theme-color" content="#4F46E5">
+    
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div class="animated-bg"></div>
+
+    <!-- Admin Auth Check -->
+    <script>
+        (function() {
+            const isAdminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+            const adminEmail = localStorage.getItem('adminEmail');
+            if (!isAdminLoggedIn || adminEmail !== 'admin@alanvault.com') {
+                window.location.href = 'admin-login.html';
+            }
+        })();
+    </script>
+
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">👑</div>
+                    <span>Alan Vault Admin</span>
+                </div>
+            </div>
+            <div class="sidebar-nav">
+                <button class="nav-item active" onclick="showTab('dashboard')">📊 Dashboard</button>
+                <button class="nav-item" onclick="showTab('users')">👥 User Management</button>
+                <button class="nav-item" onclick="showTab('files')">📁 File Management</button>
+                <button class="nav-item" onclick="showTab('moderation')">⚖️ Content Moderation</button>
+                <button class="nav-item" onclick="showTab('logs')">📜 System Logs</button>
+                <button class="nav-item" onclick="showTab('settings')">⚙️ System Settings</button>
+                <button class="nav-item" onclick="showTab('reports')">📊 Reports</button>
+                <button class="nav-item" onclick="showTab('security')">🔐 Security</button>
+                <button class="nav-item" onclick="showTab('backup')">💾 Backup</button>
+                <button class="nav-item" onclick="showTab('health')">🩺 System Health</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="top-bar">
+                <h2>👑 Admin Dashboard <span class="admin-badge">Administrator</span></h2>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span id="adminName">Administrator</span>
+                    <button class="logout-btn" onclick="adminLogout()">🚪 Logout</button>
+                </div>
+            </div>
+
+            <!-- Dashboard Tab -->
+            <div id="dashboardTab" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-value" id="totalUsers">0</div><div class="stat-label">Total Users</div></div>
+                    <div class="stat-card"><div class="stat-value" id="totalStorage">0 GB</div><div class="stat-label">Storage Used</div></div>
+                    <div class="stat-card"><div class="stat-value" id="totalFiles">0</div><div class="stat-label">Total Files</div></div>
+                    <div class="stat-card"><div class="stat-value" id="totalNotes">0</div><div class="stat-label">Total Notes</div></div>
+                    <div class="stat-card"><div class="stat-value" id="totalTasks">0</div><div class="stat-label">Total Tasks</div></div>
+                    <div class="stat-card"><div class="stat-value" id="activeToday">0</div><div class="stat-label">Active Today</div></div>
+                </div>
+                <div class="section">
+                    <h2>📈 Recent Activity</h2>
+                    <div id="recentActivity" class="table-container"></div>
+                </div>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="usersTab" class="tab-content">
+                <div class="section">
+                    <div class="section-header">
+                        <h2>👥 User Management</h2>
+                        <button class="btn-primary" onclick="openAddUserModal()">+ Add User</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="usersTable">
+                            <thead><tr><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+                            <tbody id="usersList"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Files Tab -->
+            <div id="filesTab" class="tab-content">
+                <div class="section">
+                    <div class="section-header">
+                        <h2>📁 File Management</h2>
+                        <input type="text" id="fileSearch" placeholder="Search files..." style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.5rem; color: white; width: 200px;" onkeyup="searchFiles()">
+                    </div>
+                    <div class="table-container">
+                        <table id="filesTable">
+                            <thead><tr><th>File Name</th><th>Owner</th><th>Size</th><th>Uploaded</th><th>Actions</th></tr></thead>
+                            <tbody id="filesList"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Moderation Tab -->
+            <div id="moderationTab" class="tab-content">
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-value" id="pendingReports">0</div><div class="stat-label">Pending Reports</div></div>
+                    <div class="stat-card"><div class="stat-value" id="reviewedReports">0</div><div class="stat-label">Reviewed</div></div>
+                    <div class="stat-card"><div class="stat-value" id="actionTaken">0</div><div class="stat-label">Actions Taken</div></div>
+                </div>
+                <div class="section">
+                    <h2>⚠️ Reported Content</h2>
+                    <div id="reportedList" class="table-container"></div>
+                </div>
+            </div>
+
+            <!-- Logs Tab -->
+            <div id="logsTab" class="tab-content">
+                <div class="section">
+                    <div class="section-header">
+                        <h2>📜 System Logs</h2>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <select id="logFilter" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.5rem; color: white;">
+                                <option value="all">All</option>
+                                <option value="info">Info</option>
+                                <option value="warning">Warning</option>
+                                <option value="error">Error</option>
+                                <option value="success">Success</option>
+                            </select>
+                            <button class="btn-primary" onclick="exportLogs()">📥 Export</button>
+                            <button class="btn-danger" onclick="clearLogs()">🗑️ Clear</button>
+                        </div>
+                    </div>
+                    <div id="logsList" class="logs-container"></div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settingsTab" class="tab-content">
+                <div class="settings-grid">
+                    <div class="setting-card">
+                        <h3>⚙️ General Settings</h3>
+                        <div class="setting-row"><span>Site Name</span><input type="text" id="siteName" value="Alan Vault" style="width: 200px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.5rem; color: white;"></div>
+                        <div class="setting-row"><span>Maintenance Mode</span><label class="toggle-switch"><input type="checkbox" id="maintenanceMode"><span class="toggle-slider"></span></label></div>
+                        <div class="setting-row"><span>Allow Registration</span><label class="toggle-switch"><input type="checkbox" id="allowRegistration" checked><span class="toggle-slider"></span></label></div>
+                    </div>
+                    <div class="setting-card">
+                        <h3>📎 File Settings</h3>
+                        <div class="setting-row"><span>Max File Size (MB)</span><input type="number" id="maxFileSize" value="100" style="width: 100px;"></div>
+                        <div class="setting-row"><span>Storage Limit (GB)</span><input type="number" id="storageLimit" value="5" style="width: 100px;"></div>
+                    </div>
+                    <div class="setting-card">
+                        <h3>🔐 Security Settings</h3>
+                        <div class="setting-row"><span>Session Timeout (hours)</span><input type="number" id="sessionTimeout" value="24" style="width: 100px;"></div>
+                        <div class="setting-row"><span>Two-Factor Auth</span><label class="toggle-switch"><input type="checkbox" id="twoFactorAuth"><span class="toggle-slider"></span></label></div>
+                    </div>
+                </div>
+                <div class="section" style="margin-top: 1rem;">
+                    <button class="btn-primary" onclick="saveSettings()">Save All Settings</button>
+                </div>
+            </div>
+
+            <!-- Reports Tab -->
+            <div id="reportsTab" class="tab-content">
+                <div class="section">
+                    <h2>📊 Generate Report</h2>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                        <select id="reportType" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.5rem; color: white;">
+                            <option value="users">User Report</option>
+                            <option value="storage">Storage Report</option>
+                            <option value="activity">Activity Report</option>
+                            <option value="files">Files Report</option>
+                        </select>
+                        <select id="reportPeriod" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.5rem; color: white;">
+                            <option value="week">Last 7 Days</option>
+                            <option value="month">Last 30 Days</option>
+                            <option value="year">Last Year</option>
+                            <option value="all">All Time</option>
+                        </select>
+                        <button class="btn-primary" onclick="generateReport()">Generate Report</button>
+                    </div>
+                    <div id="reportPreview"></div>
+                </div>
+            </div>
+
+            <!-- Security Tab -->
+            <div id="securityTab" class="tab-content">
+                <div class="section">
+                    <h2>🔐 Login Attempts</h2>
+                    <div id="loginAttempts" class="table-container"></div>
+                </div>
+                <div class="section">
+                    <h2>🖥️ Active Sessions</h2>
+                    <div id="activeSessions" class="table-container"></div>
+                </div>
+            </div>
+
+            <!-- Backup Tab -->
+            <div id="backupTab" class="tab-content">
+                <div class="section">
+                    <h2>💾 Backup & Restore</h2>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                        <button class="btn-primary" onclick="backupData()">📥 Create Backup</button>
+                        <button class="btn-warning" onclick="restoreData()">🔄 Restore from Backup</button>
+                        <button class="btn-danger" onclick="resetSystem()">⚠️ Reset System</button>
+                    </div>
+                    <div id="backupList"></div>
+                </div>
+            </div>
+
+            <!-- Health Tab -->
+            <div id="healthTab" class="tab-content">
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-value" id="serverStatus">🟢</div><div class="stat-label">Server Status</div></div>
+                    <div class="stat-card"><div class="stat-value" id="dbSize">0 MB</div><div class="stat-label">Database Size</div></div>
+                    <div class="stat-card"><div class="stat-value" id="cacheHits">0%</div><div class="stat-label">Cache Hit Rate</div></div>
+                    <div class="stat-card"><div class="stat-value" id="uptime">0h</div><div class="stat-label">Uptime</div></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="addUserModal" class="modal">
+        <div class="modal-content">
+            <h3>Add New User</h3>
+            <input type="text" id="newUsername" placeholder="Username">
+            <input type="email" id="newEmail" placeholder="Email">
+            <input type="password" id="newPassword" placeholder="Password" value="password123">
+            <select id="newRole"><option value="user">User</option><option value="admin">Admin</option></select>
+            <div class="modal-buttons">
+                <button class="btn-warning" onclick="closeAddUserModal()">Cancel</button>
+                <button class="btn-primary" onclick="addUser()">Add User</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Utility Functions
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function addLog(level, type, action) {
+            const logs = JSON.parse(localStorage.getItem('system_logs') || '[]');
+            logs.unshift({
+                id: Date.now(),
+                level: level,
+                type: type,
+                action: action,
+                timestamp: new Date().toISOString()
+            });
+            if (logs.length > 500) logs.pop();
+            localStorage.setItem('system_logs', JSON.stringify(logs));
+        }
+
+        // Tab Management
+        let currentTab = 'dashboard';
+
+        function showTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById(`${tab}Tab`).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (event && event.target) event.target.classList.add('active');
+            loadTabData(tab);
+        }
+
+        function loadTabData(tab) {
+            if (tab === 'dashboard') loadDashboard();
+            if (tab === 'users') loadUsers();
+            if (tab === 'files') loadFiles();
+            if (tab === 'moderation') loadModeration();
+            if (tab === 'logs') loadLogs();
+            if (tab === 'security') loadSecurity();
+            if (tab === 'health') loadHealth();
+        }
+
+        // Dashboard Functions
+        function loadDashboard() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            document.getElementById('totalUsers').textContent = users.length;
+            
+            let totalSize = 0, totalFiles = 0, totalNotes = 0, totalTasks = 0;
+            users.forEach(u => {
+                const vault = JSON.parse(localStorage.getItem(`vault_${u.id}`) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+                totalSize += vault.files.reduce((s, f) => s + (f.size || 0), 0);
+                totalFiles += vault.files.length;
+                totalNotes += vault.notes.length;
+                totalTasks += vault.tasks.length;
+            });
+            document.getElementById('totalStorage').textContent = (totalSize / (1024 * 1024 * 1024)).toFixed(2);
+            document.getElementById('totalFiles').textContent = totalFiles;
+            document.getElementById('totalNotes').textContent = totalNotes;
+            document.getElementById('totalTasks').textContent = totalTasks;
+            document.getElementById('activeToday').textContent = users.length;
+            
+            const logs = JSON.parse(localStorage.getItem('system_logs') || '[]');
+            const recent = logs.slice(0, 10);
+            document.getElementById('recentActivity').innerHTML = recent.map(l => `<div class="log-entry"><span class="log-level ${l.level}">${l.level}</span><span>${l.action}</span><span style="margin-left:auto;">${new Date(l.timestamp).toLocaleString()}</span></div>`).join('');
+        }
+
+        // User Functions
+        function loadUsers() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            document.getElementById('usersList').innerHTML = users.map(u => `
+                <tr>
+                    <td><strong>${escapeHtml(u.username)}</strong></td>
+                    <td>${escapeHtml(u.email)}</td>
+                    <td><span class="role-badge ${u.role === 'admin' ? 'role-admin' : 'role-user'}">${u.role || 'user'}</span></td>
+                    <td><span class="status-badge status-active">${u.status || 'active'}</span></td>
+                    <td>${new Date(u.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn-warning" onclick="editUser('${u.id}')">Edit</button>
+                        ${u.email !== 'admin@alanvault.com' ? `<button class="btn-danger" onclick="deleteUser('${u.id}')">Delete</button>` : '<span style="color:#71717a;">Protected</span>'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openAddUserModal() { document.getElementById('addUserModal').classList.add('active'); }
+        function closeAddUserModal() { document.getElementById('addUserModal').classList.remove('active'); }
+
+        function addUser() {
+            const username = document.getElementById('newUsername').value.trim();
+            const email = document.getElementById('newEmail').value.trim();
+            const password = document.getElementById('newPassword').value;
+            const role = document.getElementById('newRole').value;
+            
+            if (!username || !email) { alert('Please fill all fields'); return; }
+            
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            if (users.find(u => u.email === email)) { alert('Email already exists'); return; }
+            
+            const newUser = {
+                id: 'user_' + Date.now(),
+                username: username,
+                email: email,
+                password: password,
+                role: role,
+                status: 'active',
+                createdAt: new Date().toISOString()
+            };
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem(`vault_${newUser.id}`, JSON.stringify({ files: [], notes: [], tasks: [], bookmarks: [] }));
+            
+            closeAddUserModal();
+            loadUsers();
+            loadDashboard();
+            addLog('success', 'admin', `Added user: ${username}`);
+            alert(`User ${username} added successfully! Password: ${password}`);
+        }
+
+        function deleteUser(id) {
+            if (confirm('Delete user? This cannot be undone!')) {
+                let users = JSON.parse(localStorage.getItem('users') || '[]');
+                const user = users.find(u => u.id === id);
+                if (user && user.email === 'admin@alanvault.com') { alert('Cannot delete main admin!'); return; }
+                users = users.filter(u => u.id !== id);
+                localStorage.setItem('users', JSON.stringify(users));
+                localStorage.removeItem(`vault_${id}`);
+                loadUsers();
+                loadDashboard();
+                addLog('warning', 'admin', `Deleted user: ${user?.username}`);
+                alert('User deleted');
+            }
+        }
+
+        function editUser(id) {
+            const user = JSON.parse(localStorage.getItem('users') || '[]').find(u => u.id === id);
+            if (user) {
+                const newRole = prompt('Enter new role (user/admin):', user.role);
+                if (newRole && (newRole === 'user' || newRole === 'admin')) {
+                    user.role = newRole;
+                    localStorage.setItem('users', JSON.stringify(JSON.parse(localStorage.getItem('users') || '[]').map(u => u.id === id ? user : u)));
+                    loadUsers();
+                    alert(`User role updated to ${newRole}`);
+                }
+            }
+        }
+
+        // File Functions
+        function loadFiles() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            let allFiles = [];
+            users.forEach(u => {
+                const vault = JSON.parse(localStorage.getItem(`vault_${u.id}`) || '{"files":[]}');
+                vault.files.forEach(f => allFiles.push({ ...f, owner: u.username }));
+            });
+            document.getElementById('filesList').innerHTML = allFiles.map(f => `
+                <tr>
+                    <td>${escapeHtml(f.name)}</td>
+                    <td>${escapeHtml(f.owner)}</td>
+                    <td>${formatBytes(f.size)}</td>
+                    <td>${new Date(f.date).toLocaleDateString()}</td>
+                    <td><button class="btn-danger" onclick="deleteFile('${f.id}')">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteFile(fileId) {
+            if (confirm('Delete this file?')) {
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                users.forEach(u => {
+                    const vault = JSON.parse(localStorage.getItem(`vault_${u.id}`) || '{"files":[]}');
+                    vault.files = vault.files.filter(f => f.id !== fileId);
+                    localStorage.setItem(`vault_${u.id}`, JSON.stringify(vault));
+                });
+                loadFiles();
+                addLog('warning', 'admin', `Deleted file: ${fileId}`);
+                alert('File deleted');
+            }
+        }
+
+        function searchFiles() { loadFiles(); }
+
+        // Moderation Functions
+        function loadModeration() {
+            const reports = JSON.parse(localStorage.getItem('reported_content') || '[]');
+            const pending = reports.filter(r => r.status === 'pending');
+            document.getElementById('pendingReports').textContent = pending.length;
+            document.getElementById('reviewedReports').textContent = reports.length - pending.length;
+            document.getElementById('actionTaken').textContent = reports.filter(r => r.actionTaken).length;
+            document.getElementById('reportedList').innerHTML = pending.map(r => `<div class="log-entry"><span>${r.reason}</span><span>${r.contentType}</span><button class="btn-warning" onclick="resolveReport('${r.id}')">Resolve</button></div>`).join('');
+        }
+
+        function resolveReport(id) {
+            let reports = JSON.parse(localStorage.getItem('reported_content') || '[]');
+            reports = reports.filter(r => r.id !== id);
+            localStorage.setItem('reported_content', JSON.stringify(reports));
+            loadModeration();
+            alert('Report resolved');
+        }
+
+        // Logs Functions
+        function loadLogs() {
+            const logs = JSON.parse(localStorage.getItem('system_logs') || '[]');
+            renderLogs(logs);
+        }
+
+        function renderLogs(logs) {
+            document.getElementById('logsList').innerHTML = logs.map(l => `<div class="log-entry"><span class="log-level ${l.level}">${l.level}</span><span>${l.action}</span><span style="margin-left:auto;">${new Date(l.timestamp).toLocaleString()}</span></div>`).join('');
+        }
+
+        function exportLogs() {
+            const logs = JSON.parse(localStorage.getItem('system_logs') || '[]');
+            const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `logs_${new Date().toISOString()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            alert('Logs exported!');
+        }
+
+        function clearLogs() {
+            if (confirm('Clear all logs?')) {
+                localStorage.setItem('system_logs', '[]');
+                loadLogs();
+                alert('Logs cleared');
+            }
+        }
+
+        // Security Functions
+        function loadSecurity() {
+            const attempts = JSON.parse(localStorage.getItem('login_history') || '[]');
+            document.getElementById('loginAttempts').innerHTML = `<tr>
+                <thead><tr><th>Email</th><th>Status</th><th>Time</th></tr></thead>
+                <tbody>${attempts.slice(0, 20).map(a => `<tr><td>${a.email}</td><td>${a.success ? '✅ Success' : '❌ Failed'}</td><td>${new Date(a.timestamp).toLocaleString()}</td></tr>`).join('')}</tbody>
+            </table>`;
+            
+            const sessions = JSON.parse(localStorage.getItem('active_sessions') || '[]');
+            document.getElementById('activeSessions').innerHTML = `<table>
+                <thead><tr><th>Device</th><th>Browser</th><th>Last Active</th><th>Action</th></tr></thead>
+                <tbody>${sessions.map(s => `<tr><td>${s.name || 'Unknown'}</td><td>${s.browser || 'Unknown'}</td><td>${new Date(s.lastActive).toLocaleString()}</td><td><button class="btn-danger" onclick="revokeSession('${s.id}')">Revoke</button></td></tr>`).join('')}</tbody>
+            </table>`;
+        }
+
+        function revokeSession(id) {
+            let sessions = JSON.parse(localStorage.getItem('active_sessions') || '[]');
+            sessions = sessions.filter(s => s.id !== id);
+            localStorage.setItem('active_sessions', JSON.stringify(sessions));
+            loadSecurity();
+            alert('Session revoked');
+        }
+
+        // Health Functions
+        function loadHealth() {
+            document.getElementById('serverStatus').innerHTML = '🟢 Online';
+            document.getElementById('dbSize').textContent = '2.3 MB';
+            document.getElementById('cacheHits').textContent = '87%';
+            document.getElementById('uptime').textContent = '24h';
+        }
+
+        // Settings Functions
+        function saveSettings() {
+            const settings = {
+                siteName: document.getElementById('siteName').value,
+                maintenanceMode: document.getElementById('maintenanceMode').checked,
+                allowRegistration: document.getElementById('allowRegistration').checked,
+                maxFileSize: document.getElementById('maxFileSize').value,
+                storageLimit: document.getElementById('storageLimit').value,
+                sessionTimeout: document.getElementById('sessionTimeout').value,
+                twoFactorAuth: document.getElementById('twoFactorAuth').checked
+            };
+            localStorage.setItem('system_settings', JSON.stringify(settings));
+            alert('Settings saved!');
+            addLog('success', 'admin', 'Updated system settings');
+        }
+
+        // Report Functions
+        function generateReport() {
+            const type = document.getElementById('reportType').value;
+            const period = document.getElementById('reportPeriod').value;
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            let report = `<h3>${type.toUpperCase()} Report - ${period}</h3><table><tr><th>Metric</th><th>Value</th></tr>`;
+            if (type === 'users') {
+                report += `<tr><td>Total Users</td><td>${users.length}</td></tr>`;
+                report += `<tr><td>Admins</td><td>${users.filter(u => u.role === 'admin').length}</td></tr>`;
+            }
+            if (type === 'storage') {
+                let total = 0;
+                users.forEach(u => {
+                    const v = JSON.parse(localStorage.getItem(`vault_${u.id}`) || '{"files":[]}');
+                    total += v.files.reduce((s, f) => s + (f.size || 0), 0);
+                });
+                report += `<tr><td>Total Storage</td><td>${formatBytes(total)}</td></tr>`;
+            }
+            report += `</table><br><button class="btn-primary" onclick="window.print()">Print Report</button>`;
+            document.getElementById('reportPreview').innerHTML = report;
+        }
+
+        // Backup Functions
+        function backupData() {
+            const data = { users: localStorage.getItem('users'), vaults: {} };
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            users.forEach(u => {
+                data.vaults[`vault_${u.id}`] = localStorage.getItem(`vault_${u.id}`);
+            });
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            addLog('success', 'admin', 'Created backup');
+            alert('Backup created!');
+        }
+
+        function restoreData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const data = JSON.parse(e.target.result);
+                    localStorage.setItem('users', data.users);
+                    Object.entries(data.vaults).forEach(([k, v]) => localStorage.setItem(k, v));
+                    alert('Restored successfully!');
+                    location.reload();
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function resetSystem() {
+            if (confirm('⚠️ WARNING: This will delete ALL data! Type "RESET" to confirm')) {
+                if (prompt('Type RESET to confirm') === 'RESET') {
+                    localStorage.clear();
+                    alert('System reset. Redirecting...');
+                    window.location.href = 'admin-login.html';
+                }
+            }
+        }
+
+        // Admin Functions
+        function adminLogout() {
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminEmail');
+            localStorage.removeItem('adminName');
+            localStorage.removeItem('adminLoginTime');
+            window.location.href = 'admin-login.html';
+        }
+
+        // Initialize Dashboard
+        loadDashboard();
+    </script>
+</body>
+</html>

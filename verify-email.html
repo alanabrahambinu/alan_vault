@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Email - Alan Vault</title>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Alan Vault</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon/android-chrome-512x512.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <meta name="theme-color" content="#4F46E5">
+    
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 50%, rgba(79, 70, 229, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 550px;
+            padding: 2rem;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 32px;
+            padding: 3rem;
+            text-align: center;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .verify-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #4F46E5, #8B5CF6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 2rem;
+            box-shadow: 0 0 40px rgba(79, 70, 229, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff, #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #71717a;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .code-inputs {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .code-input {
+            width: 60px;
+            height: 70px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .code-input:focus {
+            outline: none;
+            border-color: #8B5CF6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+
+        .btn-verify {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #4F46E5, #8B5CF6);
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-verify:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(79, 70, 229, 0.4);
+        }
+
+        .resend-link {
+            margin-top: 1.5rem;
+            color: #71717a;
+        }
+
+        .resend-link a {
+            color: #8B5CF6;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 0.75rem;
+            margin-bottom: 1.5rem;
+            color: #ef4444;
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    <div class="container">
+        <div class="glass-card">
+            <div class="verify-icon">
+                ✉️
+            </div>
+            <h2>Verify Your Email</h2>
+            <p class="subtitle">We've sent a verification code to <strong id="userEmail">your email</strong><br>Enter the code below to verify your account</p>
+
+            <div id="message" class="message"></div>
+
+            <div class="code-inputs">
+                <input type="text" class="code-input" maxlength="1" id="code1" onkeyup="moveToNext(this, 'code2')">
+                <input type="text" class="code-input" maxlength="1" id="code2" onkeyup="moveToNext(this, 'code3')">
+                <input type="text" class="code-input" maxlength="1" id="code3" onkeyup="moveToNext(this, 'code4')">
+                <input type="text" class="code-input" maxlength="1" id="code4" onkeyup="moveToNext(this, 'code5')">
+                <input type="text" class="code-input" maxlength="1" id="code5" onkeyup="moveToNext(this, 'code6')">
+                <input type="text" class="code-input" maxlength="1" id="code6">
+            </div>
+
+            <button class="btn-verify" onclick="verifyCode()">Verify Account →</button>
+
+            <div class="resend-link">
+                Didn't receive the code? <a onclick="resendCode()">Resend Code</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get email from session storage
+        const userEmail = sessionStorage.getItem('verifyEmail') || 'your email';
+        document.getElementById('userEmail').textContent = userEmail;
+        
+        // Generate random code for demo (in production, this would come from backend)
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+        console.log('Verification code (for demo):', verificationCode);
+        
+        function moveToNext(current, nextId) {
+            if (current.value.length === 1) {
+                const next = document.getElementById(nextId);
+                if (next) next.focus();
+            }
+        }
+        
+        function verifyCode() {
+            const code1 = document.getElementById('code1').value;
+            const code2 = document.getElementById('code2').value;
+            const code3 = document.getElementById('code3').value;
+            const code4 = document.getElementById('code4').value;
+            const code5 = document.getElementById('code5').value;
+            const code6 = document.getElementById('code6').value;
+            
+            const enteredCode = code1 + code2 + code3 + code4 + code5 + code6;
+            const messageDiv = document.getElementById('message');
+            
+            if (enteredCode.length !== 6) {
+                showMessage('Please enter the 6-digit verification code', 'error');
+                return;
+            }
+            
+            if (enteredCode === verificationCode) {
+                // Mark email as verified
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                const userIndex = users.findIndex(u => u.email === userEmail);
+                if (userIndex !== -1) {
+                    users[userIndex].verified = true;
+                    localStorage.setItem('users', JSON.stringify(users));
+                }
+                
+                showMessage('✓ Email verified successfully! Redirecting to login...', 'success');
+                sessionStorage.removeItem('verifyEmail');
+                
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+            } else {
+                showMessage('❌ Invalid verification code. Please try again.', 'error');
+            }
+        }
+        
+        function resendCode() {
+            const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+            console.log('New verification code:', newCode);
+            showMessage('✓ New verification code sent! Check console for demo code: ' + newCode, 'success');
+            
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        }
+        
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + (type === 'success' ? 'success-message' : '');
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Auto-focus first input on load
+        document.getElementById('code1').focus();
+    </script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 50%, rgba(79, 70, 229, 0.15) 0%, transparent 50%);
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .error-code {
+            font-size: 8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #4F46E5, #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .error-icon {
+            font-size: 6rem;
+            margin-bottom: 1rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        p {
+            color: #a1a1aa;
+            margin-bottom: 2rem;
+            max-width: 500px;
+        }
+
+        .btn-home {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #4F46E5, #8B5CF6);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0 0.5rem;
+        }
+
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(139, 92, 246, 0.5);
+        }
+
+        .btn-outline:hover {
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .suggestions {
+            margin-top: 3rem;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 24px;
+            padding: 1.5rem;
+            max-width: 500px;
+        }
+
+        .suggestions h3 {
+            margin-bottom: 1rem;
+            color: #8B5CF6;
+        }
+
+        .suggestions ul {
+            list-style: none;
+        }
+
+        .suggestions li {
+            padding: 0.5rem 0;
+            color: #a1a1aa;
+        }
+
+        .suggestions a {
+            color: #8B5CF6;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .error-code {
+                font-size: 5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    <div class="container">
+        <div class="error-icon">
+            🔍
+        </div>
+        <div class="error-code">404</div>
+        <h1>Page Not Found</h1>
+        <p>Oops! The page you're looking for seems to have vanished into the digital void.</p>
+        
+        <div>
+            <a href="dashboard.html" class="btn-home">🏠 Back to Dashboard</a>
+            <a href="index.html" class="btn-home btn-outline">🏠 Homepage</a>
+        </div>
+
+        <div class="suggestions">
+            <h3>🔗 Quick Links You Might Need</h3>
+            <ul>
+                <li>📁 <a href="vault.html">My Vault</a> - Access your files</li>
+                <li>📝 <a href="notes.html">Notes</a> - Check your notes</li>
+                <li>✅ <a href="tasks.html">Tasks</a> - View your tasks</li>
+                <li>⚙️ <a href="settings.html">Settings</a> - Account preferences</li>
+                <li>👤 <a href="profile.html">Profile</a> - Your profile</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Log 404 error for analytics
+        console.log('404 Error:', window.location.pathname);
+        
+        // Optional: Send to analytics
+        if (window.gtag) {
+            gtag('event', '404', {
+                page_path: window.location.pathname
+            });
+        }
+    </script>
+</body>
+</html>

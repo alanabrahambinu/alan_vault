@@ -1,0 +1,186 @@
+/* ========================================
+   ALAN VAULT - THEME STYLES
+   Complete Theme System
+   ======================================== */
+
+/* Base Theme Variables */
+:root {
+    --primary: #4F46E5;
+    --secondary: #8B5CF6;
+    --bg-primary: #0a0a0f;
+    --bg-card: #1a1a2e;
+    --text-primary: #ffffff;
+    --bg-card-alt: rgba(255,255,255,0.03);
+    --border-light: rgba(255,255,255,0.05);
+    --gradient-primary: linear-gradient(135deg, #4F46E5, #8B5CF6);
+}
+
+/* Theme Transitions */
+* {
+    transition: background-color 0.3s ease,
+                color 0.3s ease,
+                border-color 0.3s ease,
+                box-shadow 0.3s ease;
+}
+
+/* Theme Selector Styles */
+.theme-selector {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.theme-option {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.theme-option:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.theme-option.active {
+    border-color: var(--primary);
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(79,70,229,0.3);
+}
+
+/* Theme Preview Colors */
+.theme-dark {
+    background: #0a0a0f;
+    border: 2px solid #333;
+}
+
+.theme-light {
+    background: #f8fafc;
+    border: 2px solid #ddd;
+}
+
+.theme-purple {
+    background: linear-gradient(135deg, #0f0717, #1a0b2e);
+    border: 2px solid #8B5CF6;
+}
+
+.theme-ocean {
+    background: linear-gradient(135deg, #082f49, #0c4a6e);
+    border: 2px solid #0ea5e9;
+}
+
+.theme-forest {
+    background: linear-gradient(135deg, #064e3b, #065f46);
+    border: 2px solid #10b981;
+}
+
+.theme-sunset {
+    background: linear-gradient(135deg, #431407, #7c2d12);
+    border: 2px solid #f97316;
+}
+
+/* Theme Labels */
+.theme-option::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: var(--text-secondary, #a1a1aa);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.theme-option:hover::after {
+    opacity: 1;
+}
+
+/* Theme Status */
+.theme-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--bg-card-alt);
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+}
+
+.theme-status-icon {
+    font-size: 1.2rem;
+}
+
+.theme-status-name {
+    font-weight: 500;
+}
+
+/* Dark Theme Specific */
+[data-theme="dark"] {
+    --bg-primary: #0a0a0f;
+    --bg-card: #1a1a2e;
+    --text-primary: #ffffff;
+    --bg-card-alt: rgba(255,255,255,0.03);
+    --border-light: rgba(255,255,255,0.05);
+}
+
+/* Light Theme Specific */
+[data-theme="light"] {
+    --bg-primary: #f8fafc;
+    --bg-card: #ffffff;
+    --text-primary: #0f172a;
+    --bg-card-alt: rgba(0,0,0,0.02);
+    --border-light: rgba(0,0,0,0.05);
+}
+
+/* Purple Theme Specific */
+[data-theme="purple"] {
+    --bg-primary: #0f0717;
+    --bg-card: #1a0b2e;
+    --text-primary: #f3e8ff;
+    --bg-card-alt: rgba(139,92,246,0.05);
+    --border-light: rgba(139,92,246,0.2);
+}
+
+/* Ocean Theme Specific */
+[data-theme="ocean"] {
+    --bg-primary: #082f49;
+    --bg-card: #0c4a6e;
+    --text-primary: #e0f2fe;
+    --bg-card-alt: rgba(14,165,233,0.05);
+    --border-light: rgba(14,165,233,0.2);
+}
+
+/* Forest Theme Specific */
+[data-theme="forest"] {
+    --bg-primary: #064e3b;
+    --bg-card: #065f46;
+    --text-primary: #d1fae5;
+    --bg-card-alt: rgba(16,185,129,0.05);
+    --border-light: rgba(16,185,129,0.2);
+}
+
+/* Sunset Theme Specific */
+[data-theme="sunset"] {
+    --bg-primary: #431407;
+    --bg-card: #7c2d12;
+    --text-primary: #fed7aa;
+    --bg-card-alt: rgba(249,115,22,0.05);
+    --border-light: rgba(249,115,22,0.2);
+}
+
+/* Responsive Theme Selector */
+@media (max-width: 768px) {
+    .theme-option {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .theme-option::after {
+        font-size: 8px;
+    }
+}

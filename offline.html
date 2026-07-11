@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - Alan Vault</title>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Alan Vault</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon/android-chrome-512x512.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <meta name="theme-color" content="#4F46E5">
+    
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 50%, rgba(79, 70, 229, 0.15) 0%, transparent 50%);
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .offline-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #4F46E5, #8B5CF6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            margin: 0 auto 2rem;
+            box-shadow: 0 0 40px rgba(79, 70, 229, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff, #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            color: #a1a1aa;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            max-width: 500px;
+        }
+
+        .btn-retry {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #4F46E5, #8B5CF6);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-retry:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(79, 70, 229, 0.4);
+        }
+
+        .saved-items {
+            margin-top: 3rem;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 24px;
+            padding: 1.5rem;
+            max-width: 500px;
+        }
+
+        .saved-items h3 {
+            margin-bottom: 1rem;
+            color: #8B5CF6;
+        }
+
+        .saved-items ul {
+            list-style: none;
+        }
+
+        .saved-items li {
+            padding: 0.5rem 0;
+            color: #a1a1aa;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    <div class="container">
+        <div class="offline-icon">
+            📡
+        </div>
+        <h1>You're Offline</h1>
+        <p>It looks like you've lost your internet connection. Don't worry, your data is safe and will sync automatically when you're back online.</p>
+        
+        <button class="btn-retry" onclick="checkConnection()">Try Again →</button>
+        
+        <div class="saved-items" id="savedItems">
+            <h3>📦 Recently Accessed (Offline Cache)</h3>
+            <ul id="cachedItems">
+                <li>Loading cached items...</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function checkConnection() {
+            if (navigator.onLine) {
+                window.location.href = 'dashboard.html';
+            } else {
+                alert('Still offline. Please check your internet connection.');
+            }
+        }
+        
+        // Load cached items from localStorage
+        function loadCachedItems() {
+            const user = localStorage.getItem('currentUser');
+            if (user) {
+                const currentUser = JSON.parse(user);
+                const vault = JSON.parse(localStorage.getItem(`vault_${currentUser.id}`) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+                
+                const recentItems = [
+                    ...vault.files.slice(-3).map(f => ({ name: f.name, type: 'file' })),
+                    ...vault.notes.slice(-3).map(n => ({ name: n.title, type: 'note' })),
+                    ...vault.tasks.slice(-3).map(t => ({ name: t.title, type: 'task' }))
+                ].slice(0, 5);
+                
+                const container = document.getElementById('cachedItems');
+                if (recentItems.length === 0) {
+                    container.innerHTML = '<li>No cached items available</li>';
+                } else {
+                    container.innerHTML = recentItems.map(item => `<li>📄 ${escapeHtml(item.name)} <span style="color:#71717a; font-size:0.8rem;">(${item.type})</span></li>`).join('');
+                }
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        loadCachedItems();
+        
+        // Listen for online event
+        window.addEventListener('online', () => {
+            window.location.href = 'dashboard.html';
+        });
+    </script>
+</body>
+</html>

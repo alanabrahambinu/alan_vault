@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes - Alan Vault</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon/android-chrome-512x512.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <meta name="theme-color" content="#4F46E5">
+    
+    <link rel="stylesheet" href="theme.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: white; transition: background 0.3s, color 0.3s; }
+        .animated-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 20% 50%, rgba(79,70,229,0.15) 0%, transparent 50%); }
+        
+        /* ===== SIDEBAR ===== */
+        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: rgba(10,10,15,0.95); backdrop-filter: blur(20px); border-right: 1px solid rgba(139,92,246,0.2); z-index: 100; transition: transform 0.3s; }
+        body.light .sidebar { background: rgba(255,255,255,0.95); border-right: 1px solid rgba(0,0,0,0.1); }
+        body.purple .sidebar { background: rgba(15,7,23,0.95); border-right: 1px solid rgba(139,92,246,0.2); }
+        body.ocean .sidebar { background: rgba(8,47,73,0.95); border-right: 1px solid rgba(14,165,233,0.2); }
+        body.forest .sidebar { background: rgba(6,78,59,0.95); border-right: 1px solid rgba(16,185,129,0.2); }
+        body.sunset .sidebar { background: rgba(67,20,7,0.95); border-right: 1px solid rgba(249,115,22,0.2); }
+        
+        .sidebar-header { padding: 2rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        body.light .sidebar-header { border-bottom: 1px solid rgba(0,0,0,0.05); }
+        
+        .logo { display: flex; align-items: center; gap: 12px; font-size: 1.3rem; font-weight: 700; }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #4F46E5, #8B5CF6); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .sidebar-nav { padding: 1.5rem; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #a1a1aa; text-decoration: none; border-radius: 12px; transition: all 0.3s; margin-bottom: 0.5rem; }
+        .nav-item:hover, .nav-item.active { background: rgba(139,92,246,0.15); color: #8B5CF6; }
+        body.light .nav-item { color: #475569; }
+        body.light .nav-item:hover, body.light .nav-item.active { background: rgba(139,92,246,0.1); }
+        
+        /* ===== MAIN CONTENT ===== */
+        .main-content { margin-left: 280px; padding: 2rem; transition: margin-left 0.3s; }
+        
+        .top-bar { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        body.light .top-bar { background: rgba(255,255,255,0.8); border: 1px solid rgba(0,0,0,0.05); }
+        body.purple .top-bar { background: rgba(139,92,246,0.05); border: 1px solid rgba(139,92,246,0.2); }
+        body.ocean .top-bar { background: rgba(14,165,233,0.05); border: 1px solid rgba(14,165,233,0.2); }
+        body.forest .top-bar { background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2); }
+        body.sunset .top-bar { background: rgba(249,115,22,0.05); border: 1px solid rgba(249,115,22,0.2); }
+        
+        .search-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 50px; width: 300px; color: white; transition: all 0.3s; }
+        body.light .search-box { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.1); color: #0f172a; }
+        .search-box:focus { outline: none; border-color: #8B5CF6; box-shadow: 0 0 0 3px rgba(139,92,246,0.1); }
+        
+        .user-info { display: flex; align-items: center; gap: 1rem; }
+        .user-avatar { width: 40px; height: 40px; background: linear-gradient(135deg, #4F46E5, #8B5CF6); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.3s; }
+        .user-avatar:hover { transform: scale(1.05); }
+        
+        /* ===== NOTES GRID ===== */
+        .notes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
+        .note-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 1.5rem; transition: all 0.3s; cursor: pointer; }
+        body.light .note-card { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.05); }
+        .note-card:hover { transform: translateY(-5px); border-color: rgba(139,92,246,0.3); background: rgba(139,92,246,0.05); }
+        .note-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .note-preview { color: #a1a1aa; font-size: 0.875rem; margin-bottom: 1rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .note-meta { font-size: 0.75rem; color: #71717a; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+        .note-category { background: rgba(139,92,246,0.2); padding: 4px 10px; border-radius: 50px; font-size: 0.7rem; color: #8B5CF6; }
+        .note-actions { display: flex; gap: 0.5rem; }
+        
+        /* ===== BUTTONS ===== */
+        .btn-primary { background: linear-gradient(135deg, #4F46E5, #8B5CF6); padding: 10px 20px; border: none; border-radius: 12px; color: white; cursor: pointer; transition: all 0.3s; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(79,70,229,0.4); }
+        .btn-icon { padding: 6px 12px; background: rgba(139,92,246,0.2); border: none; border-radius: 8px; color: #8B5CF6; cursor: pointer; transition: all 0.3s; }
+        .btn-icon:hover { background: rgba(139,92,246,0.4); }
+        .btn-danger { background: rgba(239,68,68,0.2); color: #ef4444; }
+        .btn-danger:hover { background: rgba(239,68,68,0.4); }
+        
+        /* ===== MODAL ===== */
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); justify-content: center; align-items: center; z-index: 1000; }
+        .modal.active { display: flex; animation: fadeIn 0.3s ease; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal-content { background: #1a1a2e; border: 1px solid rgba(139,92,246,0.3); border-radius: 24px; padding: 2rem; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
+        body.light .modal-content { background: #ffffff; border: 1px solid rgba(0,0,0,0.1); }
+        body.purple .modal-content { background: #1a0b2e; border: 1px solid rgba(139,92,246,0.3); }
+        body.ocean .modal-content { background: #0c4a6e; border: 1px solid rgba(14,165,233,0.3); }
+        body.forest .modal-content { background: #065f46; border: 1px solid rgba(16,185,129,0.3); }
+        body.sunset .modal-content { background: #7c2d12; border: 1px solid rgba(249,115,22,0.3); }
+        
+        .modal-content h3 { margin-bottom: 1.5rem; font-size: 1.4rem; }
+        .modal-content label { display: block; margin-bottom: 0.5rem; color: #a1a1aa; font-size: 0.875rem; }
+        
+        .modal-content input,
+        .modal-content textarea,
+        .modal-content select { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 1.2rem; 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 12px; 
+            color: white; 
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        body.light .modal-content input,
+        body.light .modal-content textarea,
+        body.light .modal-content select { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.1); color: #0f172a; }
+        
+        .modal-content input:focus,
+        .modal-content textarea:focus,
+        .modal-content select:focus {
+            outline: none;
+            border-color: #8B5CF6;
+            box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+        }
+        .modal-content textarea { resize: vertical; min-height: 150px; font-family: inherit; }
+        .modal-content select option { background: #1a1a2e; color: white; }
+        body.light .modal-content select option { background: #ffffff; color: #0f172a; }
+        
+        .modal-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; }
+        .modal-actions .btn-icon { padding: 10px 20px; font-size: 0.95rem; }
+        .modal-actions .btn-primary { padding: 10px 20px; font-size: 0.95rem; }
+        
+        /* ===== TOAST ===== */
+        .toast { 
+            position: fixed; bottom: 30px; right: 30px; padding: 12px 24px; border-radius: 12px; color: white; font-size: 0.9rem; z-index: 10001; animation: slideInRight 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        .toast.info { background: #3b82f6; }
+        .toast.warning { background: #f59e0b; }
+        
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        /* ===== COMPACT MODE ===== */
+        body.compact .note-card { padding: 1rem; }
+        body.compact .main-content { padding: 1rem; }
+        body.compact .top-bar { padding: 0.75rem 1rem; }
+        body.compact .modal-content { padding: 1.5rem; }
+        body.compact .notes-grid { gap: 1rem; }
+        body.compact .note-title { font-size: 1rem; }
+        body.compact .note-preview { font-size: 0.8rem; }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) { 
+            .sidebar { transform: translateX(-100%); } 
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 1rem; }
+            .search-box { width: 100%; }
+            .top-bar { flex-direction: column; align-items: stretch; }
+            .notes-grid { grid-template-columns: 1fr; }
+            .modal-content { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon">🔐</div>
+                <span>Alan Vault</span>
+            </div>
+        </div>
+        <div class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">📊 Dashboard</a>
+            <a href="vault.html" class="nav-item">📁 My Vault</a>
+            <a href="notes.html" class="nav-item active">📝 Notes</a>
+            <a href="tasks.html" class="nav-item">✅ Tasks</a>
+            <a href="bookmarks.html" class="nav-item">🔗 Bookmarks</a>
+            <a href="analytics.html" class="nav-item">📈 Analytics</a>
+            <a href="settings.html" class="nav-item">⚙️ Settings</a>
+        </div>
+    </div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content">
+        <div class="top-bar">
+            <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search notes..." onkeyup="filterNotes()">
+            <div class="user-info">
+                <span id="usernameDisplay"></span>
+                <div class="user-avatar" onclick="location.href='profile.html'">👤</div>
+            </div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+            <h1>📝 My Notes</h1>
+            <button class="btn-primary" onclick="openNoteModal()">+ New Note</button>
+        </div>
+        
+        <div id="notesGrid" class="notes-grid"></div>
+    </div>
+
+    <!-- ===== MODAL ===== -->
+    <div id="noteModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">📝 New Note</h3>
+            
+            <label>Note Title *</label>
+            <input type="text" id="noteTitle" placeholder="Enter note title...">
+            
+            <label>Category</label>
+            <select id="noteCategory">
+                <option value="General">📄 General</option>
+                <option value="Work">💼 Work</option>
+                <option value="Personal">👤 Personal</option>
+                <option value="Ideas">💡 Ideas</option>
+                <option value="Projects">🚀 Projects</option>
+                <option value="Journal">📔 Journal</option>
+                <option value="Learning">📚 Learning</option>
+            </select>
+            
+            <label>Content</label>
+            <textarea id="noteContent" rows="8" placeholder="Write your note here... (Markdown supported)"></textarea>
+            
+            <div class="modal-actions">
+                <button class="btn-icon" onclick="closeNoteModal()">Cancel</button>
+                <button class="btn-primary" onclick="saveNote()">Save Note</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="theme.js"></script>
+    <script>
+        let currentUser = null;
+        let currentEditId = null;
+        let notes = [];
+        
+        // ========================================
+        // CATEGORIES - SINGLE SOURCE OF TRUTH
+        // ========================================
+        const CATEGORIES = [
+            'General',
+            'Work',
+            'Personal',
+            'Ideas',
+            'Projects',
+            'Journal',
+            'Learning'
+        ];
+        
+        const CATEGORY_ICONS = {
+            'General': '📄',
+            'Work': '💼',
+            'Personal': '👤',
+            'Ideas': '💡',
+            'Projects': '🚀',
+            'Journal': '📔',
+            'Learning': '📚'
+        };
+        
+        // ========================================
+        // INITIALIZATION
+        // ========================================
+        
+        function init() {
+            const user = localStorage.getItem('currentUser');
+            if (!user) { location.href='login.html'; return; }
+            currentUser = JSON.parse(user);
+            document.getElementById('usernameDisplay').textContent = currentUser.username;
+            loadNotes();
+            renderNotes();
+            
+            // Apply theme
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.className = savedTheme;
+            
+            // Apply compact mode
+            const settings = JSON.parse(localStorage.getItem(`settings_${currentUser.id}`) || '{}');
+            if (settings.compactMode) {
+                document.body.classList.add('compact');
+            }
+        }
+        
+        function loadNotes() {
+            const vault = JSON.parse(localStorage.getItem(`vault_${currentUser.id}`) || '{"notes":[]}');
+            notes = vault.notes || [];
+        }
+        
+        function saveNotes() {
+            const vault = JSON.parse(localStorage.getItem(`vault_${currentUser.id}`) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+            vault.notes = notes;
+            localStorage.setItem(`vault_${currentUser.id}`, JSON.stringify(vault));
+            renderNotes();
+        }
+        
+        // ========================================
+        // RENDER NOTES
+        // ========================================
+        
+        function renderNotes() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = notes;
+            
+            if (query) {
+                filtered = notes.filter(n => 
+                    n.title.toLowerCase().includes(query) || 
+                    n.content.toLowerCase().includes(query)
+                );
+            }
+            
+            const container = document.getElementById('notesGrid');
+            
+            if (!filtered.length) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:4rem; color:#71717a; grid-column: 1 / -1;">
+                        <div style="font-size:4rem; margin-bottom:1rem;">📝</div>
+                        <p>No notes found</p>
+                        <button class="btn-primary" style="margin-top:1rem;" onclick="openNoteModal()">+ Create Note</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filtered.map((note) => {
+                const realIndex = notes.indexOf(note);
+                const category = note.category || 'General';
+                const icon = CATEGORY_ICONS[category] || '📄';
+                const preview = note.content ? note.content.substring(0, 150) : '';
+                
+                return `
+                    <div class="note-card" onclick="viewNote(${realIndex})">
+                        <div class="note-title">${escapeHtml(note.title)}</div>
+                        <div class="note-preview">${escapeHtml(preview)}${preview.length > 150 ? '...' : ''}</div>
+                        <div class="note-meta">
+                            <span class="note-category">${icon} ${escapeHtml(category)}</span>
+                            <span>📅 ${new Date(note.updated || note.created).toLocaleDateString()}</span>
+                            <div class="note-actions">
+                                <button class="btn-icon" onclick="event.stopPropagation(); editNote(${realIndex})" title="Edit">✏️</button>
+                                <button class="btn-icon btn-danger" onclick="event.stopPropagation(); deleteNote(${realIndex})" title="Delete">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // ========================================
+        // MODAL FUNCTIONS
+        // ========================================
+        
+        function openNoteModal(note = null) {
+            currentEditId = note ? notes.indexOf(note) : null;
+            
+            const modal = document.getElementById('noteModal');
+            const title = document.getElementById('modalTitle');
+            
+            // Populate category dropdown - no duplicates!
+            const categorySelect = document.getElementById('noteCategory');
+            categorySelect.innerHTML = CATEGORIES.map(cat => {
+                const icon = CATEGORY_ICONS[cat] || '📄';
+                const selected = (note && note.category === cat) || (!note && cat === 'General') ? 'selected' : '';
+                return `<option value="${cat}" ${selected}>${icon} ${cat}</option>`;
+            }).join('');
+            
+            if (note) {
+                title.textContent = '✏️ Edit Note';
+                document.getElementById('noteTitle').value = note.title || '';
+                document.getElementById('noteContent').value = note.content || '';
+            } else {
+                title.textContent = '📝 New Note';
+                document.getElementById('noteTitle').value = '';
+                document.getElementById('noteContent').value = '';
+            }
+            
+            modal.classList.add('active');
+            
+            // Auto-focus title
+            setTimeout(() => {
+                document.getElementById('noteTitle').focus();
+            }, 100);
+        }
+        
+        function closeNoteModal() {
+            document.getElementById('noteModal').classList.remove('active');
+            currentEditId = null;
+        }
+        
+        function saveNote() {
+            const title = document.getElementById('noteTitle').value.trim();
+            const category = document.getElementById('noteCategory').value;
+            const content = document.getElementById('noteContent').value;
+            
+            if (!title) {
+                showToast('Please enter a note title', 'error');
+                document.getElementById('noteTitle').style.borderColor = '#ef4444';
+                setTimeout(() => {
+                    document.getElementById('noteTitle').style.borderColor = '';
+                }, 2000);
+                return;
+            }
+            
+            if (currentEditId !== null) {
+                notes[currentEditId] = {
+                    ...notes[currentEditId],
+                    title: title,
+                    category: category,
+                    content: content,
+                    updated: new Date().toISOString()
+                };
+                showToast('Note updated! ✅', 'success');
+            } else {
+                notes.unshift({
+                    id: Date.now(),
+                    title: title,
+                    category: category,
+                    content: content,
+                    created: new Date().toISOString(),
+                    updated: new Date().toISOString()
+                });
+                showToast('Note created! ✅', 'success');
+            }
+            
+            saveNotes();
+            closeNoteModal();
+        }
+        
+        // ========================================
+        // NOTE OPERATIONS
+        // ========================================
+        
+        function viewNote(index) {
+            const note = notes[index];
+            if (!note) return;
+            
+            // Show note in a nice preview
+            alert(`📝 ${note.title}\n\n${note.content}\n\n📁 Category: ${note.category || 'General'}\n📅 Updated: ${new Date(note.updated || note.created).toLocaleString()}`);
+        }
+        
+        function editNote(index) {
+            openNoteModal(notes[index]);
+        }
+        
+        function deleteNote(index) {
+            if (confirm('Delete this note?')) {
+                notes.splice(index, 1);
+                saveNotes();
+                showToast('🗑️ Note deleted', 'info');
+            }
+        }
+        
+        function filterNotes() {
+            renderNotes();
+        }
+        
+        // ========================================
+        // UTILITY FUNCTIONS
+        // ========================================
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        // ========================================
+        // CLOSE MODAL ON ESCAPE & CLICK OUTSIDE
+        // ========================================
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('noteModal');
+                if (modal.classList.contains('active')) {
+                    closeNoteModal();
+                }
+            }
+        });
+        
+        document.getElementById('noteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeNoteModal();
+            }
+        });
+        
+        // ========================================
+        // START
+        // ========================================
+        
+        document.addEventListener('DOMContentLoaded', init);
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            init();
+        }
+    </script>
+</body>
+</html>

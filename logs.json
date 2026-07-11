@@ -1,0 +1,173 @@
+{
+  "logs": [
+    {
+      "id": "log_1734567894001",
+      "level": "info",
+      "type": "auth",
+      "action": "User logged in",
+      "details": "Successful login from IP 192.168.1.100",
+      "userId": "user_1734567890124",
+      "userEmail": "demo@example.com",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      "timestamp": "2024-06-11T08:30:00.000Z",
+      "metadata": {
+        "ip": "192.168.1.100",
+        "location": "New York, USA"
+      }
+    },
+    {
+      "id": "log_1734567894002",
+      "level": "success",
+      "type": "file",
+      "action": "File uploaded",
+      "details": "File 'presentation.pptx' uploaded successfully (3.0 MB)",
+      "userId": "user_1734567890124",
+      "userEmail": "demo@example.com",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      "timestamp": "2024-06-10T14:20:00.000Z",
+      "metadata": {
+        "fileId": "file_1734567892006",
+        "fileSize": 3145728,
+        "fileType": "presentation"
+      }
+    },
+    {
+      "id": "log_1734567894003",
+      "level": "info",
+      "type": "note",
+      "action": "Note created",
+      "details": "Created new note: 'Meeting Notes - Product Sync'",
+      "userId": "user_1734567890124",
+      "userEmail": "demo@example.com",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      "timestamp": "2024-06-10T11:00:00.000Z",
+      "metadata": {
+        "noteId": "note_1734567891003",
+        "category": "work"
+      }
+    },
+    {
+      "id": "log_1734567894004",
+      "level": "warning",
+      "type": "security",
+      "action": "Failed login attempt",
+      "details": "Invalid password for user john@example.com",
+      "userId": null,
+      "userEmail": "john@example.com",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      "timestamp": "2024-06-10T09:45:00.000Z",
+      "metadata": {
+        "attempts": 2,
+        "ip": "192.168.1.150"
+      }
+    },
+    {
+      "id": "log_1734567894005",
+      "level": "success",
+      "type": "task",
+      "action": "Task completed",
+      "details": "Completed task: 'Prepare quarterly report'",
+      "userId": "user_1734567890124",
+      "userEmail": "demo@example.com",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      "timestamp": "2024-06-07T15:30:00.000Z",
+      "metadata": {
+        "taskId": "task_1734567893005",
+        "completedAt": "2024-06-07T15:30:00.000Z"
+      }
+    },
+    {
+      "id": "log_1734567894006",
+      "level": "info",
+      "type": "file",
+      "action": "File downloaded",
+      "details": "File 'Project Proposal.pdf' downloaded",
+      "userId": "user_1734567890125",
+      "userEmail": "john@example.com",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+      "timestamp": "2024-06-06T16:00:00.000Z",
+      "metadata": {
+        "fileId": "file_1734567892001"
+      }
+    },
+    {
+      "id": "log_1734567894007",
+      "level": "success",
+      "type": "auth",
+      "action": "User registered",
+      "details": "New user registration: jane@example.com",
+      "userId": "user_1734567890126",
+      "userEmail": "jane@example.com",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15",
+      "timestamp": "2024-06-05T14:30:00.000Z",
+      "metadata": {
+        "plan": "free"
+      }
+    },
+    {
+      "id": "log_1734567894008",
+      "level": "error",
+      "type": "system",
+      "action": "API error",
+      "details": "500 Internal Server Error on /api/files/upload",
+      "userId": null,
+      "userEmail": null,
+      "userAgent": null,
+      "timestamp": "2024-06-04T22:15:00.000Z",
+      "metadata": {
+        "endpoint": "/api/files/upload",
+        "error": "Upload failed - disk full",
+        "statusCode": 500
+      }
+    },
+    {
+      "id": "log_1734567894009",
+      "level": "info",
+      "type": "note",
+      "action": "Note updated",
+      "details": "Updated note: 'Project Ideas' - content modified",
+      "userId": "user_1734567890124",
+      "userEmail": "demo@example.com",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      "timestamp": "2024-06-09T16:45:00.000Z",
+      "metadata": {
+        "noteId": "note_1734567891002",
+        "version": 3
+      }
+    },
+    {
+      "id": "log_1734567894010",
+      "level": "warning",
+      "type": "security",
+      "action": "File deleted",
+      "details": "User deleted file 'old_document.txt'",
+      "userId": "user_1734567890125",
+      "userEmail": "john@example.com",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      "timestamp": "2024-06-08T12:00:00.000Z",
+      "metadata": {
+        "fileId": "file_1734567892007",
+        "fileName": "old_document.txt"
+      }
+    }
+  ],
+  "stats": {
+    "totalLogs": 10,
+    "byLevel": {
+      "info": 4,
+      "success": 3,
+      "warning": 2,
+      "error": 1
+    },
+    "byType": {
+      "auth": 2,
+      "file": 3,
+      "note": 2,
+      "task": 1,
+      "security": 2,
+      "system": 1
+    },
+    "last24Hours": 3,
+    "last7Days": 10
+  }
+}

@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Vault - Alan Vault</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon/android-chrome-512x512.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <meta name="theme-color" content="#4F46E5">
+    
+    <link rel="stylesheet" href="theme.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: white; transition: background 0.3s, color 0.3s; }
+        .animated-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 20% 50%, rgba(79,70,229,0.15) 0%, transparent 50%); }
+        
+        /* ===== SIDEBAR ===== */
+        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: rgba(10,10,15,0.95); backdrop-filter: blur(20px); border-right: 1px solid rgba(139,92,246,0.2); z-index: 100; transition: transform 0.3s; }
+        .sidebar-header { padding: 2rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .logo { display: flex; align-items: center; gap: 12px; font-size: 1.3rem; font-weight: 700; }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #4F46E5, #8B5CF6); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .sidebar-nav { padding: 1.5rem; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #a1a1aa; text-decoration: none; border-radius: 12px; transition: all 0.3s; margin-bottom: 0.5rem; }
+        .nav-item:hover, .nav-item.active { background: rgba(139,92,246,0.15); color: #8B5CF6; }
+        
+        /* ===== MAIN CONTENT ===== */
+        .main-content { margin-left: 280px; padding: 2rem; transition: margin-left 0.3s; }
+        
+        .top-bar { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        .search-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 50px; width: 300px; color: white; transition: all 0.3s; }
+        .search-box:focus { outline: none; border-color: #8B5CF6; box-shadow: 0 0 0 3px rgba(139,92,246,0.1); }
+        .search-box::placeholder { color: #71717a; }
+        
+        .user-info { display: flex; align-items: center; gap: 1rem; }
+        .user-avatar { width: 40px; height: 40px; background: linear-gradient(135deg, #4F46E5, #8B5CF6); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        
+        /* ===== TOOLBAR ===== */
+        .toolbar { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1rem; margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+        .btn-primary { background: linear-gradient(135deg, #4F46E5, #8B5CF6); padding: 10px 20px; border: none; border-radius: 12px; color: white; cursor: pointer; transition: all 0.3s; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(79,70,229,0.4); }
+        .btn-outline { background: transparent; border: 1px solid rgba(139,92,246,0.5); color: #8B5CF6; padding: 10px 20px; border-radius: 12px; cursor: pointer; }
+        .btn-outline:hover { background: rgba(139,92,246,0.1); transform: translateY(-2px); }
+        .btn-danger { background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+        
+        /* ===== SEARCH RESULTS COUNT ===== */
+        .search-info { 
+            display: flex; 
+            align-items: center; 
+            gap: 0.75rem; 
+            margin-bottom: 1rem; 
+            padding: 0.5rem 1rem; 
+            background: rgba(139,92,246,0.05); 
+            border-radius: 8px; 
+            border: 1px solid rgba(139,92,246,0.15);
+            font-size: 0.85rem;
+            color: #a1a1aa;
+        }
+        .search-info .clear-search { 
+            color: #ef4444; 
+            cursor: pointer; 
+            font-weight: 500;
+            padding: 2px 8px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .search-info .clear-search:hover { 
+            background: rgba(239,68,68,0.1);
+        }
+        .search-info .count { 
+            color: #8B5CF6; 
+            font-weight: 600; 
+        }
+        
+        /* ===== FOLDER PATH ===== */
+        .folder-path { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; padding: 0.75rem 1rem; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .folder-path-label { color: #71717a; font-size: 0.8rem; }
+        .folder-path-value { color: #8B5CF6; font-weight: 600; font-size: 0.95rem; }
+        
+        /* ===== BREADCRUMB ===== */
+        .breadcrumb { display: flex; gap: 0.5rem; margin-bottom: 1rem; color: #a1a1aa; flex-wrap: wrap; padding: 0.5rem 0; }
+        .breadcrumb a { color: #8B5CF6; text-decoration: none; cursor: pointer; }
+        .breadcrumb a:hover { color: #4F46E5; text-decoration: underline; }
+        .breadcrumb-separator { color: #71717a; }
+        
+        /* ===== GRIDS ===== */
+        .folder-grid, .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .folder-card, .file-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1rem; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .folder-card:hover, .file-card:hover { transform: translateY(-5px); border-color: rgba(139,92,246,0.3); background: rgba(139,92,246,0.05); }
+        .folder-icon, .file-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+        .folder-name, .file-name { font-weight: 500; margin-bottom: 0.25rem; word-break: break-word; }
+        .file-size { font-size: 0.75rem; color: #71717a; }
+        .file-date { font-size: 0.65rem; color: #71717a; margin-top: 0.25rem; }
+        .folder-actions, .file-actions { margin-top: 0.75rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
+        .folder-actions .btn-outline, .file-actions .btn-outline { padding: 4px 10px; font-size: 0.7rem; }
+        .folder-actions .btn-danger, .file-actions .btn-danger { padding: 4px 10px; font-size: 0.7rem; }
+        
+        /* ===== EMPTY STATE ===== */
+        .empty-state { text-align: center; padding: 4rem; color: #71717a; grid-column: 1 / -1; }
+        .empty-state-icon { font-size: 4rem; margin-bottom: 1rem; }
+        .empty-state h3 { margin-bottom: 0.5rem; color: #a1a1aa; }
+        .empty-state p { margin-bottom: 1rem; }
+        
+        /* ===== MODAL ===== */
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); justify-content: center; align-items: center; z-index: 1000; }
+        .modal.active { display: flex; animation: fadeIn 0.3s ease; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal-content { background: #1a1a2e; border: 1px solid rgba(139,92,246,0.3); border-radius: 24px; padding: 2rem; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+        .modal-content h3 { margin-bottom: 1.5rem; font-size: 1.4rem; }
+        .modal-content label { display: block; margin-bottom: 0.5rem; color: #a1a1aa; font-size: 0.875rem; }
+        .modal-content input[type="text"],
+        .modal-content input[type="file"] { width: 100%; padding: 12px; margin-bottom: 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; font-size: 0.95rem; transition: all 0.3s; }
+        .modal-content input:focus { outline: none; border-color: #8B5CF6; box-shadow: 0 0 0 3px rgba(139,92,246,0.1); }
+        .modal-content input[type="file"] { padding: 8px; }
+        .modal-content small { color: #71717a; display: block; margin-top: -0.5rem; margin-bottom: 0.5rem; font-size: 0.8rem; }
+        .modal-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; }
+        .modal-actions .btn-outline { padding: 10px 20px; }
+        .modal-actions .btn-primary { padding: 10px 20px; }
+        
+        /* ===== TOAST ===== */
+        .toast { position: fixed; bottom: 30px; right: 30px; padding: 12px 24px; border-radius: 12px; color: white; font-size: 0.9rem; z-index: 10001; animation: slideInRight 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        .toast.info { background: #3b82f6; }
+        .toast.warning { background: #f59e0b; }
+        
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) { 
+            .sidebar { transform: translateX(-100%); } 
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 1rem; }
+            .search-box { width: 100%; }
+            .top-bar { flex-direction: column; align-items: stretch; }
+            .toolbar { flex-direction: column; }
+            .folder-grid, .file-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+            .search-info { flex-wrap: wrap; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon">🔐</div>
+                <span>Alan Vault</span>
+            </div>
+        </div>
+        <div class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">📊 Dashboard</a>
+            <a href="vault.html" class="nav-item active">📁 My Vault</a>
+            <a href="notes.html" class="nav-item">📝 Notes</a>
+            <a href="tasks.html" class="nav-item">✅ Tasks</a>
+            <a href="bookmarks.html" class="nav-item">🔗 Bookmarks</a>
+            <a href="analytics.html" class="nav-item">📈 Analytics</a>
+            <a href="settings.html" class="nav-item">⚙️ Settings</a>
+        </div>
+    </div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content">
+        <div class="top-bar">
+            <!-- SEARCH BOX - Connected to searchFiles() -->
+            <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search files and folders..." onkeyup="searchFiles()">
+            <div class="user-info">
+                <span id="usernameDisplay"></span>
+                <div class="user-avatar" onclick="location.href='profile.html'">👤</div>
+            </div>
+        </div>
+        
+        <!-- ===== TOOLBAR ===== -->
+        <div class="toolbar">
+            <button class="btn-primary" onclick="openModal('folder')">📁 New Folder</button>
+            <button class="btn-primary" onclick="openModal('file')">📤 Upload File</button>
+            <button class="btn-outline" onclick="refreshFiles()">🔄 Refresh</button>
+            <button class="btn-outline" onclick="goToRoot()">🏠 Root</button>
+            <button class="btn-outline" onclick="clearSearch()" style="color: #ef4444; border-color: rgba(239,68,68,0.3);">✕ Clear Search</button>
+        </div>
+        
+        <!-- ===== SEARCH INFO - Shows search results count ===== -->
+        <div id="searchInfo" class="search-info" style="display: none;">
+            <span>🔍 Search results:</span>
+            <span class="count" id="searchCount">0</span>
+            <span>items found</span>
+            <span style="margin-left: auto;">
+                <span class="clear-search" onclick="clearSearch()">✕ Clear</span>
+            </span>
+        </div>
+        
+        <!-- ===== CURRENT LOCATION ===== -->
+        <div class="folder-path">
+            <span class="folder-path-label">📍 Current Location:</span>
+            <span class="folder-path-value" id="currentLocation">Root</span>
+        </div>
+        
+        <div class="breadcrumb" id="breadcrumb"></div>
+        
+        <div id="folderGrid" class="folder-grid"></div>
+        <div id="fileGrid" class="file-grid"></div>
+    </div>
+
+    <!-- ===== MODAL ===== -->
+    <div id="vaultModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">New Folder</h3>
+            <div id="modalBody"></div>
+            <div class="modal-actions">
+                <button class="btn-outline" onclick="closeVaultModal()">Cancel</button>
+                <button class="btn-primary" onclick="saveVaultModal()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script>
+        let currentUser = null;
+        let currentPath = '';
+        let currentModalType = null;
+        let currentEditItem = null;
+        let folders = [];
+        let files = [];
+        let searchQuery = '';
+        
+        // ========================================
+        // INITIALIZATION
+        // ========================================
+        
+        function init() {
+            const user = localStorage.getItem('currentUser');
+            if (!user) { location.href='login.html'; return; }
+            currentUser = JSON.parse(user);
+            document.getElementById('usernameDisplay').textContent = currentUser.username;
+            
+            const data = localStorage.getItem(`vault_folders_${currentUser.id}`);
+            if (data) {
+                const parsed = JSON.parse(data);
+                folders = parsed.folders || [];
+                files = parsed.files || [];
+            }
+            
+            render();
+        }
+        
+        function loadData() {
+            const data = localStorage.getItem(`vault_folders_${currentUser.id}`);
+            if (data) {
+                const parsed = JSON.parse(data);
+                folders = parsed.folders || [];
+                files = parsed.files || [];
+            }
+        }
+        
+        function saveData() {
+            localStorage.setItem(`vault_folders_${currentUser.id}`, JSON.stringify({folders, files}));
+        }
+        
+        // ========================================
+        // GET CURRENT ITEMS WITH SEARCH
+        // ========================================
+        
+        function getCurrentItems() {
+            let currentFolders = folders.filter(f => f.parent === currentPath);
+            let currentFiles = files.filter(f => f.parent === currentPath);
+            
+            // 🔍 APPLY SEARCH FILTER
+            if (searchQuery) {
+                const query = searchQuery.toLowerCase().trim();
+                currentFolders = currentFolders.filter(f => f.name.toLowerCase().includes(query));
+                currentFiles = currentFiles.filter(f => f.name.toLowerCase().includes(query));
+            }
+            
+            return { folders: currentFolders, files: currentFiles };
+        }
+        
+        // ========================================
+        // RENDER
+        // ========================================
+        
+        function render() {
+            const { folders: currentFolders, files: currentFiles } = getCurrentItems();
+            
+            // Update location display
+            document.getElementById('currentLocation').textContent = currentPath || 'Root';
+            
+            // Update search info
+            const totalItems = currentFolders.length + currentFiles.length;
+            const searchInfo = document.getElementById('searchInfo');
+            const searchCount = document.getElementById('searchCount');
+            
+            if (searchQuery) {
+                searchInfo.style.display = 'flex';
+                searchCount.textContent = totalItems;
+            } else {
+                searchInfo.style.display = 'none';
+            }
+            
+            updateBreadcrumb();
+            renderFolders(currentFolders);
+            renderFiles(currentFiles);
+            
+            // Show empty state if nothing
+            const folderGrid = document.getElementById('folderGrid');
+            const fileGrid = document.getElementById('fileGrid');
+            
+            if (!currentFolders.length && !currentFiles.length) {
+                let emptyMessage = 'This folder is empty';
+                let emptyAction = 'Upload files or create a new folder';
+                
+                if (searchQuery) {
+                    emptyMessage = `No results found for "${searchQuery}"`;
+                    emptyAction = 'Try a different search term or clear the search';
+                }
+                
+                const emptyHtml = `
+                    <div class="empty-state" style="text-align:center; padding:4rem; color:#71717a; grid-column:1/-1;">
+                        <div style="font-size:4rem; margin-bottom:1rem;">${searchQuery ? '🔍' : '📂'}</div>
+                        <h3 style="color:#a1a1aa;">${emptyMessage}</h3>
+                        <p style="margin-bottom:1rem;">${emptyAction}</p>
+                        <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+                            ${!searchQuery ? `
+                                <button class="btn-primary" onclick="openModal('folder')">📁 New Folder</button>
+                                <button class="btn-primary" onclick="openModal('file')">📤 Upload File</button>
+                            ` : `
+                                <button class="btn-outline" onclick="clearSearch()">✕ Clear Search</button>
+                            `}
+                        </div>
+                    </div>
+                `;
+                if (!folderGrid.innerHTML) {
+                    folderGrid.innerHTML = emptyHtml;
+                }
+            }
+        }
+        
+        function updateBreadcrumb() {
+            const crumbs = currentPath.split('/').filter(p => p);
+            let html = `<a onclick="navigateTo('')">📁 Root</a>`;
+            let path = '';
+            crumbs.forEach((crumb, i) => {
+                path += '/' + crumb;
+                html += `<span class="breadcrumb-separator"> / </span>`;
+                html += `<a onclick="navigateTo('${path}')">${escapeHtml(crumb)}</a>`;
+            });
+            document.getElementById('breadcrumb').innerHTML = html;
+        }
+        
+        function renderFolders(items) {
+            const container = document.getElementById('folderGrid');
+            if (!items || !items.length) {
+                container.innerHTML = '';
+                return;
+            }
+            container.innerHTML = items.map(f => `
+                <div class="folder-card" onclick="navigateTo('${currentPath}/${f.name}'.replace(/^\/+/,''))">
+                    <div class="folder-icon">📁</div>
+                    <div class="folder-name">${escapeHtml(f.name)}</div>
+                    <div class="folder-actions">
+                        <button class="btn-outline" onclick="event.stopPropagation(); renameItem('folder','${f.id}')">✏️ Rename</button>
+                        <button class="btn-danger" onclick="event.stopPropagation(); deleteItem('folder','${f.id}')">🗑 Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function renderFiles(items) {
+            const container = document.getElementById('fileGrid');
+            if (!items || !items.length) {
+                container.innerHTML = '';
+                return;
+            }
+            container.innerHTML = items.map(f => `
+                <div class="file-card">
+                    <div class="file-icon">📄</div>
+                    <div class="file-name">${escapeHtml(f.name)}</div>
+                    <div class="file-size">${formatBytes(f.size)}</div>
+                    <div class="file-date">📅 ${new Date(f.date || f.uploadDate).toLocaleDateString()}</div>
+                    <div class="file-actions">
+                        <button class="btn-outline" onclick="downloadFile('${f.id}')">📥 Download</button>
+                        <button class="btn-danger" onclick="deleteItem('file','${f.id}')">🗑 Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // ========================================
+        // 🔍 SEARCH FUNCTIONS - WORKING!
+        // ========================================
+        
+        function searchFiles() {
+            const input = document.getElementById('searchInput');
+            searchQuery = input.value;
+            render();
+            
+            // Show toast if search has results
+            const { folders: currentFolders, files: currentFiles } = getCurrentItems();
+            const total = currentFolders.length + currentFiles.length;
+            if (searchQuery && total > 0) {
+                showToast(`🔍 Found ${total} result${total > 1 ? 's' : ''} for "${searchQuery}"`, 'info');
+            } else if (searchQuery && total === 0) {
+                showToast(`No results found for "${searchQuery}"`, 'warning');
+            }
+        }
+        
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            searchQuery = '';
+            render();
+            showToast('Search cleared', 'info');
+            document.getElementById('searchInput').focus();
+        }
+        
+        // ========================================
+        // NAVIGATION
+        // ========================================
+        
+        function navigateTo(path) {
+            currentPath = path;
+            // Don't clear search when navigating
+            render();
+            showToast(`📁 Navigated to: ${path || 'Root'}`, 'info');
+        }
+        
+        function goToRoot() {
+            navigateTo('');
+        }
+        
+        // ========================================
+        // MODAL FUNCTIONS
+        // ========================================
+        
+        function openModal(type, item = null) {
+            currentModalType = type;
+            currentEditItem = item;
+            
+            const modal = document.getElementById('vaultModal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+            
+            if (type === 'folder') {
+                title.textContent = item ? '✏️ Rename Folder' : '📁 New Folder';
+                body.innerHTML = `
+                    <label>Folder Name</label>
+                    <input type="text" id="folderNameInput" placeholder="Enter folder name..." value="${item ? escapeHtml(item.name) : ''}">
+                    <small>📁 Will be created in: ${currentPath || 'Root'}</small>
+                `;
+                setTimeout(() => {
+                    document.getElementById('folderNameInput').focus();
+                    if (item) document.getElementById('folderNameInput').select();
+                }, 100);
+            } else if (type === 'file') {
+                title.textContent = '📤 Upload File';
+                body.innerHTML = `
+                    <label>Select File</label>
+                    <input type="file" id="fileInput">
+                    <small>📂 Will be uploaded to: <strong style="color:#8B5CF6;">${currentPath || 'Root'}</strong></small>
+                `;
+                setTimeout(() => {
+                    document.getElementById('fileInput').focus();
+                }, 100);
+            }
+            
+            modal.classList.add('active');
+        }
+        
+        function closeVaultModal() {
+            document.getElementById('vaultModal').classList.remove('active');
+            currentModalType = null;
+            currentEditItem = null;
+        }
+        
+        function saveVaultModal() {
+            if (currentModalType === 'folder') {
+                const nameInput = document.getElementById('folderNameInput');
+                const name = nameInput ? nameInput.value.trim() : '';
+                
+                if (!name) {
+                    showToast('Please enter a folder name', 'error');
+                    nameInput.style.borderColor = '#ef4444';
+                    setTimeout(() => { nameInput.style.borderColor = ''; }, 2000);
+                    return;
+                }
+                
+                const duplicate = folders.find(f => f.parent === currentPath && f.name === name && f.id !== (currentEditItem ? currentEditItem.id : null));
+                if (duplicate) {
+                    showToast('A folder with this name already exists', 'error');
+                    return;
+                }
+                
+                if (currentEditItem) {
+                    const folder = folders.find(f => f.id === currentEditItem.id);
+                    if (folder) {
+                        folder.name = name;
+                        saveData();
+                        render();
+                        showToast('Folder renamed! ✅', 'success');
+                    }
+                } else {
+                    folders.push({
+                        id: Date.now().toString(),
+                        name: name,
+                        parent: currentPath,
+                        created: new Date().toISOString()
+                    });
+                    saveData();
+                    render();
+                    showToast(`Folder "${name}" created! ✅`, 'success');
+                }
+                
+                closeVaultModal();
+                
+            } else if (currentModalType === 'file') {
+                const fileInput = document.getElementById('fileInput');
+                const file = fileInput ? fileInput.files[0] : null;
+                
+                if (!file) {
+                    showToast('Please select a file to upload', 'error');
+                    return;
+                }
+                
+                const duplicate = files.find(f => f.parent === currentPath && f.name === file.name);
+                if (duplicate) {
+                    if (!confirm(`File "${file.name}" already exists in this folder. Overwrite?`)) {
+                        return;
+                    }
+                    files = files.filter(f => f.id !== duplicate.id);
+                }
+                
+                files.push({
+                    id: Date.now().toString(),
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    parent: currentPath,
+                    data: URL.createObjectURL(file),
+                    date: new Date().toISOString(),
+                    uploadDate: new Date().toISOString()
+                });
+                
+                saveData();
+                render();
+                closeVaultModal();
+                showToast(`File "${file.name}" uploaded to ${currentPath || 'Root'}! ✅`, 'success');
+            }
+        }
+        
+        // ========================================
+        // ITEM OPERATIONS
+        // ========================================
+        
+        function renameItem(type, id) {
+            const item = type === 'folder' ? folders.find(f => f.id === id) : files.find(f => f.id === id);
+            if (item) {
+                openModal(type, item);
+            }
+        }
+        
+        function deleteItem(type, id) {
+            if (!confirm(`Delete this ${type}?`)) return;
+            
+            if (type === 'folder') {
+                const folder = folders.find(f => f.id === id);
+                if (folder) {
+                    const folderPath = currentPath ? `${currentPath}/${folder.name}` : folder.name;
+                    files = files.filter(f => f.parent !== folderPath);
+                    folders = folders.filter(f => f.parent === folderPath);
+                    folders = folders.filter(f => f.id !== id);
+                    saveData();
+                    render();
+                    showToast(`Folder "${folder.name}" deleted`, 'info');
+                }
+            } else {
+                const file = files.find(f => f.id === id);
+                files = files.filter(f => f.id !== id);
+                if (file && file.data && file.data.startsWith('blob:')) {
+                    URL.revokeObjectURL(file.data);
+                }
+                saveData();
+                render();
+                showToast(`File deleted`, 'info');
+            }
+        }
+        
+        function downloadFile(id) {
+            const file = files.find(f => f.id === id);
+            if (file && file.data) {
+                const link = document.createElement('a');
+                link.href = file.data;
+                link.download = file.name;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast(`Downloading "${file.name}"...`, 'success');
+            } else {
+                showToast('File not found', 'error');
+            }
+        }
+        
+        function refreshFiles() {
+            loadData();
+            render();
+            showToast('Files refreshed! 🔄', 'success');
+        }
+        
+        // ========================================
+        // UTILITY FUNCTIONS
+        // ========================================
+        
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        // ========================================
+        // CLOSE MODAL ON ESCAPE & CLICK OUTSIDE
+        // ========================================
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('vaultModal');
+                if (modal.classList.contains('active')) {
+                    closeVaultModal();
+                }
+            }
+        });
+        
+        document.getElementById('vaultModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeVaultModal();
+            }
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const modal = document.getElementById('vaultModal');
+                if (modal.classList.contains('active')) {
+                    const input = modal.querySelector('input[type="text"]');
+                    if (input && document.activeElement === input) {
+                        saveVaultModal();
+                    }
+                }
+            }
+        });
+        
+        // Ctrl+F or Cmd+F to focus search
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+                document.getElementById('searchInput').select();
+            }
+        });
+        
+        // ========================================
+        // START
+        // ========================================
+        
+        document.addEventListener('DOMContentLoaded', init);
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            init();
+        }
+    </script>
+</body>
+</html>

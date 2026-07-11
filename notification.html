@@ -1,0 +1,197 @@
+<!-- notification.html - Notification Toast Component -->
+<div id="notificationContainer" class="notification-container"></div>
+
+<style>
+    .notification-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .notification-toast {
+        background: rgba(26, 26, 46, 0.98);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        border-radius: 12px;
+        padding: 1rem;
+        min-width: 300px;
+        max-width: 400px;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        animation: slideInRight 0.3s ease;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .notification-toast:hover {
+        transform: translateX(-5px);
+        border-color: #8B5CF6;
+    }
+    
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    .notification-toast.exit {
+        animation: slideOutRight 0.3s ease forwards;
+    }
+    
+    @keyframes slideOutRight {
+        to {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+    }
+    
+    .notification-icon {
+        font-size: 1.5rem;
+    }
+    
+    .notification-content {
+        flex: 1;
+    }
+    
+    .notification-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        font-size: 0.9rem;
+    }
+    
+    .notification-message {
+        font-size: 0.8rem;
+        color: #a1a1aa;
+    }
+    
+    .notification-time {
+        font-size: 0.7rem;
+        color: #71717a;
+        margin-top: 0.25rem;
+    }
+    
+    .notification-close {
+        background: transparent;
+        border: none;
+        color: #71717a;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+    
+    .notification-close:hover {
+        color: #ef4444;
+    }
+    
+    /* Notification Types */
+    .notification-toast.success {
+        border-left: 3px solid #10b981;
+    }
+    
+    .notification-toast.error {
+        border-left: 3px solid #ef4444;
+    }
+    
+    .notification-toast.warning {
+        border-left: 3px solid #f59e0b;
+    }
+    
+    .notification-toast.info {
+        border-left: 3px solid #3b82f6;
+    }
+</style>
+
+<script>
+    class NotificationManager {
+        constructor() {
+            this.container = document.getElementById('notificationContainer');
+            this.notifications = [];
+        }
+        
+        show(options) {
+            const {
+                title = 'Notification',
+                message = '',
+                type = 'info',
+                icon = '',
+                duration = 5000,
+                onClick = null
+            } = options;
+            
+            const icons = {
+                success: '✓',
+                error: '✕',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            const notification = document.createElement('div');
+            notification.className = `notification-toast ${type}`;
+            notification.innerHTML = `
+                <div class="notification-icon">${icon || icons[type]}</div>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                    <div class="notification-time">Just now</div>
+                </div>
+                <button class="notification-close">×</button>
+            `;
+            
+            notification.querySelector('.notification-close').addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.remove(notification);
+            });
+            
+            if (onClick) {
+                notification.addEventListener('click', onClick);
+            }
+            
+            this.container.appendChild(notification);
+            
+            if (duration > 0) {
+                setTimeout(() => {
+                    this.remove(notification);
+                }, duration);
+            }
+            
+            return notification;
+        }
+        
+        remove(notification) {
+            notification.classList.add('exit');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }
+        
+        success(message, title = 'Success') {
+            return this.show({ title, message, type: 'success' });
+        }
+        
+        error(message, title = 'Error') {
+            return this.show({ title, message, type: 'error' });
+        }
+        
+        warning(message, title = 'Warning') {
+            return this.show({ title, message, type: 'warning' });
+        }
+        
+        info(message, title = 'Info') {
+            return this.show({ title, message, type: 'info' });
+        }
+    }
+    
+    const notify = new NotificationManager();
+    window.notify = notify;
+</script>

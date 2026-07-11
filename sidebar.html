@@ -1,0 +1,298 @@
+<!-- sidebar.html - Sidebar Component -->
+<aside class="app-sidebar" id="appSidebar">
+    <div class="sidebar-header">
+        <div class="logo">
+            <div class="logo-icon">🔐</div>
+            <span class="logo-text">Alan Vault</span>
+        </div>
+        <button class="sidebar-toggle" onclick="toggleSidebar()">◀</button>
+    </div>
+    
+    <nav class="sidebar-nav">
+        <div class="nav-section">
+            <div class="nav-section-title">Main</div>
+            <a href="dashboard.html" class="nav-link" data-page="dashboard">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            <a href="vault.html" class="nav-link" data-page="vault">
+                <span class="nav-icon">📁</span>
+                <span class="nav-text">My Vault</span>
+            </a>
+            <a href="upload.html" class="nav-link" data-page="upload">
+                <span class="nav-icon">📤</span>
+                <span class="nav-text">Upload</span>
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Workspace</div>
+            <a href="notes.html" class="nav-link" data-page="notes">
+                <span class="nav-icon">📝</span>
+                <span class="nav-text">Notes</span>
+            </a>
+            <a href="tasks.html" class="nav-link" data-page="tasks">
+                <span class="nav-icon">✅</span>
+                <span class="nav-text">Tasks</span>
+            </a>
+            <a href="bookmarks.html" class="nav-link" data-page="bookmarks">
+                <span class="nav-icon">🔗</span>
+                <span class="nav-text">Bookmarks</span>
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Insights</div>
+            <a href="analytics.html" class="nav-link" data-page="analytics">
+                <span class="nav-icon">📈</span>
+                <span class="nav-text">Analytics</span>
+            </a>
+            <a href="activity.html" class="nav-link" data-page="activity">
+                <span class="nav-icon">📋</span>
+                <span class="nav-text">Activity</span>
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-section-title">Settings</div>
+            <a href="profile.html" class="nav-link" data-page="profile">
+                <span class="nav-icon">👤</span>
+                <span class="nav-text">Profile</span>
+            </a>
+            <a href="settings.html" class="nav-link" data-page="settings">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-text">Settings</span>
+            </a>
+        </div>
+    </nav>
+    
+    <div class="sidebar-footer">
+        <div class="storage-info">
+            <div class="storage-label">Storage</div>
+            <div class="storage-bar">
+                <div class="storage-used" id="storageUsedBar"></div>
+            </div>
+            <div class="storage-text" id="storageText">0 GB / 5 GB</div>
+        </div>
+        <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+</aside>
+
+<style>
+    .app-sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 280px;
+        height: 100vh;
+        background: rgba(10, 10, 15, 0.95);
+        backdrop-filter: blur(20px);
+        border-right: 1px solid rgba(139, 92, 246, 0.2);
+        display: flex;
+        flex-direction: column;
+        z-index: 100;
+        transition: transform 0.3s;
+    }
+    
+    .sidebar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+    
+    .sidebar-toggle {
+        background: rgba(139, 92, 246, 0.2);
+        border: none;
+        border-radius: 8px;
+        padding: 0.25rem 0.5rem;
+        cursor: pointer;
+        color: #a1a1aa;
+        transition: all 0.3s;
+    }
+    
+    .sidebar-toggle:hover {
+        background: rgba(139, 92, 246, 0.4);
+        color: white;
+    }
+    
+    .sidebar-nav {
+        flex: 1;
+        padding: 1.5rem;
+        overflow-y: auto;
+    }
+    
+    .nav-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .nav-section-title {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #71717a;
+        margin-bottom: 0.75rem;
+        padding-left: 0.5rem;
+    }
+    
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.6rem 0.75rem;
+        margin-bottom: 0.25rem;
+        border-radius: 12px;
+        color: #a1a1aa;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .nav-link:hover {
+        background: rgba(139, 92, 246, 0.1);
+        color: #8B5CF6;
+    }
+    
+    .nav-link.active {
+        background: rgba(79, 70, 229, 0.2);
+        color: #8B5CF6;
+    }
+    
+    .nav-icon {
+        font-size: 1.1rem;
+        width: 24px;
+    }
+    
+    .sidebar-footer {
+        padding: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .storage-info {
+        background: rgba(139, 92, 246, 0.1);
+        border-radius: 12px;
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    .storage-label {
+        font-size: 0.7rem;
+        color: #a1a1aa;
+        margin-bottom: 0.5rem;
+    }
+    
+    .storage-bar {
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 0.5rem 0;
+    }
+    
+    .storage-used {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #4F46E5, #8B5CF6);
+        transition: width 0.3s;
+    }
+    
+    .storage-text {
+        font-size: 0.7rem;
+        color: #71717a;
+    }
+    
+    .logout-btn {
+        width: 100%;
+        padding: 0.6rem;
+        background: rgba(239, 68, 68, 0.2);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 8px;
+        color: #ef4444;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .logout-btn:hover {
+        background: rgba(239, 68, 68, 0.3);
+    }
+    
+    /* Collapsed Sidebar */
+    .app-sidebar.collapsed {
+        width: 80px;
+    }
+    
+    .app-sidebar.collapsed .logo-text,
+    .app-sidebar.collapsed .nav-text,
+    .app-sidebar.collapsed .nav-section-title,
+    .app-sidebar.collapsed .storage-label,
+    .app-sidebar.collapsed .storage-text,
+    .app-sidebar.collapsed .sidebar-toggle {
+        display: none;
+    }
+    
+    .app-sidebar.collapsed .nav-link {
+        justify-content: center;
+        padding: 0.6rem;
+    }
+    
+    .app-sidebar.collapsed .storage-bar {
+        width: 40px;
+        margin: 0 auto;
+    }
+    
+    /* Mobile */
+    @media (max-width: 768px) {
+        .app-sidebar {
+            transform: translateX(-100%);
+        }
+        
+        .app-sidebar.active {
+            transform: translateX(0);
+        }
+    }
+</style>
+
+<script>
+    function toggleSidebar() {
+        document.getElementById('appSidebar').classList.toggle('collapsed');
+    }
+    
+    function updateStorageDisplay() {
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const vault = JSON.parse(localStorage.getItem(`vault_${user.id}`) || '{"files":[]}');
+        const totalSize = vault.files.reduce((sum, f) => sum + (f.size || 0), 0);
+        const usedGB = (totalSize / (1024 * 1024 * 1024)).toFixed(2);
+        const percent = Math.min((totalSize / (5 * 1024 * 1024 * 1024)) * 100, 100);
+        
+        document.getElementById('storageUsedBar').style.width = `${percent}%`;
+        document.getElementById('storageText').textContent = `${usedGB} GB / 5 GB`;
+    }
+    
+    function logout() {
+        if (confirm('Are you sure you want to logout?')) {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('loggedIn');
+            window.location.href = 'login.html';
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        updateStorageDisplay();
+        
+        // Highlight current page
+        const currentPath = window.location.pathname.split('/').pop();
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            }
+        });
+    });
+</script>

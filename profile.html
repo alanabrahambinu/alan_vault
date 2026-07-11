@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Alan Vault</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon/android-chrome-512x512.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <meta name="theme-color" content="#4F46E5">
+    
+    <link rel="stylesheet" href="theme.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: white; transition: background 0.3s, color 0.3s; }
+        .animated-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 20% 50%, rgba(79,70,229,0.15) 0%, transparent 50%); }
+        
+        /* ===== SIDEBAR ===== */
+        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: rgba(10,10,15,0.95); backdrop-filter: blur(20px); border-right: 1px solid rgba(139,92,246,0.2); z-index: 100; transition: transform 0.3s; }
+        body.light .sidebar { background: rgba(255,255,255,0.95); border-right: 1px solid rgba(0,0,0,0.1); }
+        body.purple .sidebar { background: rgba(15,7,23,0.95); border-right: 1px solid rgba(139,92,246,0.2); }
+        body.ocean .sidebar { background: rgba(8,47,73,0.95); border-right: 1px solid rgba(14,165,233,0.2); }
+        body.forest .sidebar { background: rgba(6,78,59,0.95); border-right: 1px solid rgba(16,185,129,0.2); }
+        body.sunset .sidebar { background: rgba(67,20,7,0.95); border-right: 1px solid rgba(249,115,22,0.2); }
+        
+        .sidebar-header { padding: 2rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        body.light .sidebar-header { border-bottom: 1px solid rgba(0,0,0,0.05); }
+        
+        .logo { display: flex; align-items: center; gap: 12px; font-size: 1.3rem; font-weight: 700; }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #4F46E5, #8B5CF6); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .sidebar-nav { padding: 1.5rem; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #a1a1aa; text-decoration: none; border-radius: 12px; transition: all 0.3s; margin-bottom: 0.5rem; }
+        .nav-item:hover, .nav-item.active { background: rgba(139,92,246,0.15); color: #8B5CF6; }
+        body.light .nav-item { color: #475569; }
+        body.light .nav-item:hover, body.light .nav-item.active { background: rgba(139,92,246,0.1); }
+        
+        /* ===== MAIN CONTENT ===== */
+        .main-content { margin-left: 280px; padding: 2rem; transition: margin-left 0.3s; }
+        
+        .top-bar { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        body.light .top-bar { background: rgba(255,255,255,0.8); border: 1px solid rgba(0,0,0,0.05); }
+        
+        .user-info { display: flex; align-items: center; gap: 1rem; }
+        .user-avatar { width: 40px; height: 40px; background: linear-gradient(135deg, #4F46E5, #8B5CF6); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.3s; }
+        .user-avatar:hover { transform: scale(1.05); }
+        
+        /* ===== PROFILE HEADER ===== */
+        .profile-header { display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem; flex-wrap: wrap; }
+        
+        .profile-avatar-wrapper {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            flex-shrink: 0;
+        }
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4F46E5, #8B5CF6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            object-fit: cover;
+            border: 3px solid rgba(139,92,246,0.3);
+            transition: all 0.3s;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .profile-avatar:hover { transform: scale(1.02); border-color: #8B5CF6; }
+        
+        .avatar-edit-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #4F46E5, #8B5CF6);
+            border: 2px solid #0a0a0f;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            color: white;
+            box-shadow: 0 4px 15px rgba(79,70,229,0.4);
+        }
+        .avatar-edit-btn:hover { transform: scale(1.1); }
+        
+        .profile-info h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .profile-info p { color: #71717a; }
+        
+        /* ===== FORM ===== */
+        .glass-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; padding: 2rem; margin-bottom: 1.5rem; transition: all 0.3s; }
+        body.light .glass-card { background: rgba(255,255,255,0.8); border: 1px solid rgba(0,0,0,0.05); }
+        body.purple .glass-card { background: rgba(139,92,246,0.05); border: 1px solid rgba(139,92,246,0.2); }
+        body.ocean .glass-card { background: rgba(14,165,233,0.05); border: 1px solid rgba(14,165,233,0.2); }
+        body.forest .glass-card { background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2); }
+        body.sunset .glass-card { background: rgba(249,115,22,0.05); border: 1px solid rgba(249,115,22,0.2); }
+        
+        .glass-card h2 { margin-bottom: 1.5rem; font-size: 1.3rem; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; color: #a1a1aa; font-size: 0.875rem; }
+        input, textarea { width: 100%; padding: 0.75rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; font-size: 0.9rem; transition: all 0.3s; }
+        body.light input, body.light textarea { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.1); color: #0f172a; }
+        input:focus, textarea:focus { outline: none; border-color: #8B5CF6; box-shadow: 0 0 0 3px rgba(139,92,246,0.1); }
+        textarea { resize: vertical; min-height: 80px; font-family: inherit; }
+        
+        .btn-save { padding: 0.75rem 2rem; background: linear-gradient(135deg, #4F46E5, #8B5CF6); border: none; border-radius: 12px; color: white; cursor: pointer; transition: all 0.3s; }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(79,70,229,0.4); }
+        
+        .btn-danger { padding: 0.75rem 2rem; background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; color: #ef4444; cursor: pointer; transition: all 0.3s; }
+        .btn-danger:hover { background: rgba(239,68,68,0.3); transform: translateY(-2px); }
+        
+        /* ===== STATS ===== */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .stat-item { text-align: center; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 16px; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: #8B5CF6; }
+        .stat-label { font-size: 0.875rem; color: #71717a; }
+        
+        /* ===== TOAST ===== */
+        .toast { position: fixed; bottom: 30px; right: 30px; padding: 12px 24px; border-radius: 12px; color: white; font-size: 0.9rem; z-index: 10001; animation: slideInRight 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        .toast.info { background: #3b82f6; }
+        .toast.warning { background: #f59e0b; }
+        
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        /* ===== COMPACT MODE ===== */
+        body.compact .glass-card { padding: 1rem; }
+        body.compact .main-content { padding: 1rem; }
+        body.compact .top-bar { padding: 0.75rem 1rem; }
+        body.compact .profile-avatar-wrapper { width: 80px; height: 80px; }
+        body.compact .profile-avatar { width: 80px; height: 80px; font-size: 2rem; }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 1rem; }
+            .profile-header { flex-direction: column; text-align: center; }
+            .profile-avatar-wrapper { width: 100px; height: 100px; }
+            .profile-avatar { width: 100px; height: 100px; font-size: 2.5rem; }
+            .form-row { grid-template-columns: 1fr; }
+            .top-bar { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon">🔐</div>
+                <span>Alan Vault</span>
+            </div>
+        </div>
+        <div class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">📊 Dashboard</a>
+            <a href="vault.html" class="nav-item">📁 My Vault</a>
+            <a href="notes.html" class="nav-item">📝 Notes</a>
+            <a href="tasks.html" class="nav-item">✅ Tasks</a>
+            <a href="bookmarks.html" class="nav-item">🔗 Bookmarks</a>
+            <a href="analytics.html" class="nav-item">📈 Analytics</a>
+            <a href="settings.html" class="nav-item">⚙️ Settings</a>
+            <a href="profile.html" class="nav-item active">👤 Profile</a>
+        </div>
+    </div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content">
+        <!-- ===== TOP BAR ===== -->
+        <div class="top-bar">
+            <h2>👤 Profile</h2>
+            <div class="user-info">
+                <span id="usernameDisplay"></span>
+                <div class="user-avatar" onclick="location.href='profile.html'">👤</div>
+            </div>
+        </div>
+
+        <!-- ===== PROFILE HEADER WITH PICTURE ===== -->
+        <div class="profile-header">
+            <div class="profile-avatar-wrapper">
+                <div class="profile-avatar" id="profileAvatar" onclick="document.getElementById('avatarInput').click()">
+                    <img id="avatarImage" src="" alt="Profile Picture" style="display:none;">
+                    <span id="avatarPlaceholder">👤</span>
+                </div>
+                <div class="avatar-edit-btn" onclick="document.getElementById('avatarInput').click()" title="Change Profile Picture">
+                    📷
+                </div>
+                <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="uploadProfilePicture(event)">
+            </div>
+            <div class="profile-info">
+                <h1 id="profileName">Loading...</h1>
+                <p id="profileEmail">Loading...</p>
+                <p>Member since <span id="memberSince">Loading...</span></p>
+            </div>
+        </div>
+
+        <!-- ===== PERSONAL INFORMATION ===== -->
+        <div class="glass-card">
+            <h2>📝 Personal Information</h2>
+            <form id="profileForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="fullName" placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="username" placeholder="Username">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="email" placeholder="Email address" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="phone" placeholder="+1 234 567 8900">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Job Title</label>
+                        <input type="text" id="jobTitle" placeholder="e.g., Product Manager">
+                    </div>
+                    <div class="form-group">
+                        <label>Company</label>
+                        <input type="text" id="company" placeholder="Your company">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Bio</label>
+                    <textarea id="bio" rows="3" placeholder="Tell us about yourself..."></textarea>
+                </div>
+                <button type="submit" class="btn-save">💾 Save Changes</button>
+            </form>
+        </div>
+
+        <!-- ===== STATISTICS ===== -->
+        <div class="glass-card">
+            <h2>📊 Account Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalFiles">0</div>
+                    <div class="stat-label">Files Stored</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalNotes">0</div>
+                    <div class="stat-label">Notes Created</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalTasks">0</div>
+                    <div class="stat-label">Tasks Completed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="storageUsed">0 GB</div>
+                    <div class="stat-label">Storage Used</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DANGER ZONE ===== -->
+        <div class="glass-card" style="border-color: rgba(239,68,68,0.3);">
+            <h2 style="color: #ef4444;">⚠️ Danger Zone</h2>
+            <p style="color: #71717a; margin-bottom: 1rem;">Once you delete your account, there is no going back. Please be certain.</p>
+            <button class="btn-danger" onclick="deleteAccount()">🗑️ Delete Account</button>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        
+        // ========================================
+        // INITIALIZATION
+        // ========================================
+        
+        function init() {
+            const user = localStorage.getItem('currentUser');
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = JSON.parse(user);
+            document.getElementById('usernameDisplay').textContent = currentUser.username;
+            loadProfile();
+            loadStats();
+            loadProfilePicture();
+            
+            // Apply theme
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.className = savedTheme;
+            
+            // Apply compact mode
+            const settings = JSON.parse(localStorage.getItem(`settings_${currentUser.id}`) || '{}');
+            if (settings.compactMode) {
+                document.body.classList.add('compact');
+            }
+        }
+        
+        // ========================================
+        // PROFILE PICTURE - WORKING
+        // ========================================
+        
+        function uploadProfilePicture(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('Image too large. Max 2MB allowed.', 'error');
+                return;
+            }
+            
+            if (!file.type.startsWith('image/')) {
+                showToast('Please select an image file.', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageData = e.target.result;
+                const profile = JSON.parse(localStorage.getItem(`profile_${currentUser.id}`) || '{}');
+                profile.avatar = imageData;
+                localStorage.setItem(`profile_${currentUser.id}`, JSON.stringify(profile));
+                displayProfilePicture(imageData);
+                showToast('Profile picture updated! ✅', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function displayProfilePicture(imageData) {
+            const avatar = document.getElementById('profileAvatar');
+            const img = document.getElementById('avatarImage');
+            const placeholder = document.getElementById('avatarPlaceholder');
+            
+            if (imageData) {
+                img.src = imageData;
+                img.style.display = 'block';
+                placeholder.style.display = 'none';
+                avatar.style.background = 'transparent';
+            } else {
+                img.style.display = 'none';
+                placeholder.style.display = 'block';
+                avatar.style.background = 'linear-gradient(135deg, #4F46E5, #8B5CF6)';
+            }
+        }
+        
+        function loadProfilePicture() {
+            const profile = JSON.parse(localStorage.getItem(`profile_${currentUser.id}`) || '{}');
+            if (profile.avatar) {
+                displayProfilePicture(profile.avatar);
+            }
+        }
+        
+        // ========================================
+        // PROFILE DATA - WORKING
+        // ========================================
+        
+        function loadProfile() {
+            const profile = JSON.parse(localStorage.getItem(`profile_${currentUser.id}`) || '{}');
+            
+            document.getElementById('profileName').textContent = profile.fullName || currentUser.username;
+            document.getElementById('profileEmail').textContent = currentUser.email;
+            document.getElementById('memberSince').textContent = profile.memberSince || new Date().toLocaleDateString();
+            
+            document.getElementById('fullName').value = profile.fullName || currentUser.username;
+            document.getElementById('username').value = profile.username || currentUser.username;
+            document.getElementById('email').value = currentUser.email;
+            document.getElementById('phone').value = profile.phone || '';
+            document.getElementById('jobTitle').value = profile.jobTitle || '';
+            document.getElementById('company').value = profile.company || '';
+            document.getElementById('bio').value = profile.bio || '';
+        }
+        
+        function loadStats() {
+            const vault = JSON.parse(localStorage.getItem(`vault_${currentUser.id}`) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+            const totalSize = vault.files.reduce((sum, f) => sum + (f.size || 0), 0);
+            const usedGB = (totalSize / (1024 * 1024 * 1024)).toFixed(1);
+            
+            document.getElementById('totalFiles').textContent = vault.files.length;
+            document.getElementById('totalNotes').textContent = vault.notes.length;
+            document.getElementById('totalTasks').textContent = vault.tasks.filter(t => t.completed).length;
+            document.getElementById('storageUsed').textContent = `${usedGB} GB`;
+        }
+        
+        // ========================================
+        // SAVE PROFILE - WORKING!
+        // ========================================
+        
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const fullName = document.getElementById('fullName').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const jobTitle = document.getElementById('jobTitle').value.trim();
+            const company = document.getElementById('company').value.trim();
+            const bio = document.getElementById('bio').value.trim();
+            
+            // Validate
+            if (!fullName) {
+                showToast('Please enter your full name', 'error');
+                document.getElementById('fullName').style.borderColor = '#ef4444';
+                setTimeout(() => { document.getElementById('fullName').style.borderColor = ''; }, 2000);
+                return;
+            }
+            
+            const profile = {
+                fullName: fullName,
+                username: username || fullName,
+                phone: phone,
+                jobTitle: jobTitle,
+                company: company,
+                bio: bio,
+                memberSince: new Date().toLocaleDateString()
+            };
+            
+            // Keep existing avatar
+            const existingProfile = JSON.parse(localStorage.getItem(`profile_${currentUser.id}`) || '{}');
+            if (existingProfile.avatar) {
+                profile.avatar = existingProfile.avatar;
+            }
+            
+            localStorage.setItem(`profile_${currentUser.id}`, JSON.stringify(profile));
+            
+            // Update current user
+            currentUser.username = profile.username;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // Update display
+            document.getElementById('profileName').textContent = profile.fullName;
+            document.getElementById('usernameDisplay').textContent = profile.username;
+            
+            showToast('Profile updated successfully! ✅', 'success');
+            loadProfile();
+        });
+        
+        // ========================================
+        // DELETE ACCOUNT - WORKING!
+        // ========================================
+        
+        function deleteAccount() {
+            if (!confirm('⚠️ Are you absolutely sure? This action cannot be undone!')) return;
+            
+            // Second confirmation with password
+            const confirmText = prompt('Type "DELETE" to confirm account deletion:');
+            if (confirmText !== 'DELETE') {
+                showToast('Account deletion cancelled', 'info');
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const filteredUsers = users.filter(u => u.id !== currentUser.id);
+            localStorage.setItem('users', JSON.stringify(filteredUsers));
+            
+            // Remove all user data
+            localStorage.removeItem(`vault_${currentUser.id}`);
+            localStorage.removeItem(`profile_${currentUser.id}`);
+            localStorage.removeItem(`settings_${currentUser.id}`);
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('loggedIn');
+            
+            showToast('🗑️ Account deleted. Redirecting...', 'warning');
+            
+            setTimeout(() => {
+                window.location.href = 'signup.html';
+            }, 2000);
+        }
+        
+        // ========================================
+        // TOAST NOTIFICATION - WORKING!
+        // ========================================
+        
+        function showToast(message, type = 'info') {
+            // Remove existing toast
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        // ========================================
+        // KEYBOARD SHORTCUTS
+        // ========================================
+        
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+S to save profile
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                document.getElementById('profileForm').dispatchEvent(new Event('submit'));
+            }
+        });
+        
+        // ========================================
+        // START
+        // ========================================
+        
+        document.addEventListener('DOMContentLoaded', init);
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            init();
+        }
+    </script>
+</body>
+</html>

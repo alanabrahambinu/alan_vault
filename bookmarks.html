@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookmarks - Alan Vault</title>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Alan Vault</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon/android-chrome-512x512.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <meta name="theme-color" content="#4F46E5">
+    
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: white; }
+        .animated-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 20% 50%, rgba(79,70,229,0.15) 0%, transparent 50%); }
+        
+        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: rgba(10,10,15,0.95); backdrop-filter: blur(20px); border-right: 1px solid rgba(139,92,246,0.2); }
+        .sidebar-header { padding: 2rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .logo { display: flex; align-items: center; gap: 12px; font-size: 1.3rem; font-weight: 700; }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #4F46E5, #8B5CF6); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .sidebar-nav { padding: 1.5rem; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #a1a1aa; text-decoration: none; border-radius: 12px; transition: all 0.3s; margin-bottom: 0.5rem; }
+        .nav-item:hover, .nav-item.active { background: rgba(139,92,246,0.15); color: #8B5CF6; }
+        
+        .main-content { margin-left: 280px; padding: 2rem; }
+        .top-bar { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .search-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 50px; width: 300px; color: white; }
+        
+        .bookmarks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
+        .bookmark-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 1.5rem; transition: all 0.3s; }
+        .bookmark-card:hover { transform: translateY(-5px); border-color: rgba(139,92,246,0.3); background: rgba(139,92,246,0.05); }
+        .bookmark-favicon { font-size: 2rem; margin-bottom: 1rem; }
+        .bookmark-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .bookmark-url { color: #8B5CF6; font-size: 0.75rem; word-break: break-all; margin-bottom: 1rem; }
+        .bookmark-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+        
+        .btn-primary { background: linear-gradient(135deg, #4F46E5, #8B5CF6); padding: 10px 20px; border: none; border-radius: 12px; color: white; cursor: pointer; }
+        .btn-icon { padding: 6px 12px; background: rgba(139,92,246,0.2); border: none; border-radius: 8px; color: #8B5CF6; cursor: pointer; }
+        .btn-danger { background: rgba(239,68,68,0.2); color: #ef4444; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); justify-content: center; align-items: center; z-index: 1000; }
+        .modal.active { display: flex; }
+        .modal-content { background: #1a1a2e; border: 1px solid rgba(139,92,246,0.3); border-radius: 24px; padding: 2rem; width: 90%; max-width: 500px; }
+        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 12px; margin: 10px 0; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; }
+        
+        @media (max-width: 768px) { .sidebar { transform: translateX(-100%); } .main-content { margin-left: 0; } }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header"><div class="logo"><div class="logo-icon">🔐</div><span>Alan Vault</span></div></div>
+        <div class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">📊 Dashboard</a>
+            <a href="vault.html" class="nav-item">📁 My Vault</a>
+            <a href="notes.html" class="nav-item">📝 Notes</a>
+            <a href="tasks.html" class="nav-item">✅ Tasks</a>
+            <a href="bookmarks.html" class="nav-item active">🔗 Bookmarks</a>
+            <a href="analytics.html" class="nav-item">📈 Analytics</a>
+            <a href="settings.html" class="nav-item">⚙️ Settings</a>
+        </div>
+    </div>
+    <div class="main-content">
+        <div class="top-bar">
+            <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search bookmarks..." onkeyup="filterBookmarks()">
+            <div class="user-info"><span id="usernameDisplay"></span><div class="user-avatar" style="width:40px;height:40px;background:linear-gradient(135deg,#4F46E5,#8B5CF6);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;" onclick="location.href='profile.html'">👤</div></div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+            <h1>🔗 Bookmarks</h1>
+            <button class="btn-primary" onclick="openBookmarkModal()">+ Add Bookmark</button>
+        </div>
+        
+        <div class="bookmarks-grid" id="bookmarksGrid"></div>
+    </div>
+    
+    <div id="modal" class="modal"><div class="modal-content"><h3 id="modalTitle">Add Bookmark</h3><div id="modalBody"></div><div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;"><button class="btn-icon" onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="saveBookmark()">Save</button></div></div></div>
+    
+    <script>
+        let currentUser = null, currentEditId = null, bookmarks = [], categories = ['Work', 'Personal', 'Learning', 'Entertainment', 'Development'];
+        
+        function init() { const user = localStorage.getItem('currentUser'); if (!user) { location.href='login.html'; return; } currentUser = JSON.parse(user); document.getElementById('usernameDisplay').textContent = currentUser.username; loadBookmarks(); renderBookmarks(); }
+        
+        function loadBookmarks() { const vault = JSON.parse(localStorage.getItem(`vault_${currentUser.id}`) || '{"bookmarks":[]}'); bookmarks = vault.bookmarks || []; }
+        
+        function saveBookmarks() { const vault = JSON.parse(localStorage.getItem(`vault_${currentUser.id}`) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}'); vault.bookmarks = bookmarks; localStorage.setItem(`vault_${currentUser.id}`, JSON.stringify(vault)); renderBookmarks(); }
+        
+        function getFavicon(url) { try { const domain = new URL(url).hostname; return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`; } catch(e) { return ''; } }
+        
+        function renderBookmarks() { const query = document.getElementById('searchInput').value.toLowerCase(); let filtered = bookmarks; if(query) filtered = bookmarks.filter(b => b.title.toLowerCase().includes(query) || b.url.toLowerCase().includes(query)); const container = document.getElementById('bookmarksGrid'); if(!filtered.length) { container.innerHTML = '<div style="text-align:center; padding:4rem; color:#71717a;"><div style="font-size:4rem; margin-bottom:1rem;">🔗</div><p>No bookmarks yet. Click "Add Bookmark" to get started!</p></div>'; return; } container.innerHTML = filtered.map((b, i) => `<div class="bookmark-card"><div class="bookmark-favicon"><img src="${getFavicon(b.url)}" onerror="this.style.display=\'none\'" style="width:32px;height:32px;"> 🔗</div><div class="bookmark-title">${escapeHtml(b.title)}</div><div class="bookmark-url">${escapeHtml(b.url)}</div><div style="font-size:0.7rem; color:#71717a; margin-bottom:0.5rem;">Category: ${escapeHtml(b.category)}</div><div class="bookmark-actions"><button class="btn-icon" onclick="window.open('${escapeHtml(b.url)}','_blank')">🔗 Visit</button><button class="btn-icon" onclick="editBookmark(${bookmarks.indexOf(b)})">✏️ Edit</button><button class="btn-icon btn-danger" onclick="deleteBookmark(${bookmarks.indexOf(b)})">🗑 Delete</button></div></div>`).join(''); }
+        
+        function openBookmarkModal(bookmark=null) { currentEditId = bookmark ? bookmarks.indexOf(bookmark) : null; const title = document.getElementById('modalTitle'); const body = document.getElementById('modalBody'); title.textContent = bookmark ? 'Edit Bookmark' : 'Add Bookmark'; body.innerHTML = `<input type="text" id="bookmarkTitle" placeholder="Bookmark title" value="${bookmark ? escapeHtml(bookmark.title) : ''}"><input type="url" id="bookmarkUrl" placeholder="https://example.com" value="${bookmark ? escapeHtml(bookmark.url) : ''}"><select id="bookmarkCategory">${categories.map(c => `<option value="${c}" ${bookmark && bookmark.category === c ? 'selected' : ''}>${c}</option>`).join('')}</select><textarea id="bookmarkNotes" rows="2" placeholder="Notes (optional)">${bookmark ? escapeHtml(bookmark.notes || '') : ''}</textarea>`; document.getElementById('modal').classList.add('active'); }
+        
+        function saveBookmark() { const title = document.getElementById('bookmarkTitle').value; const url = document.getElementById('bookmarkUrl').value; const category = document.getElementById('bookmarkCategory').value; const notes = document.getElementById('bookmarkNotes').value; if(!title || !url) { alert('Please enter both title and URL'); return; } if(currentEditId !== null) { bookmarks[currentEditId] = {...bookmarks[currentEditId], title, url, category, notes, updated: new Date().toISOString()}; } else { bookmarks.unshift({ id: Date.now(), title, url, category, notes, created: new Date().toISOString() }); } saveBookmarks(); closeModal(); }
+        
+        function editBookmark(i) { openBookmarkModal(bookmarks[i]); }
+        function deleteBookmark(i) { if(confirm('Delete this bookmark?')) { bookmarks.splice(i,1); saveBookmarks(); } }
+        function filterBookmarks() { renderBookmarks(); }
+        function closeModal() { document.getElementById('modal').classList.remove('active'); currentEditId = null; }
+        function escapeHtml(t){ const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+        init();
+    </script>
+</body>
+</html>

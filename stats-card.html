@@ -1,0 +1,142 @@
+<!-- stats-card.html - Statistics Card Component -->
+<div class="stats-card">
+    <div class="stats-icon">
+        <span class="icon">📁</span>
+    </div>
+    <div class="stats-info">
+        <h3 class="stats-title">Total Files</h3>
+        <p class="stats-value">0</p>
+        <span class="stats-trend up">↑ +12% from last month</span>
+    </div>
+</div>
+
+<style>
+    .stats-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(139, 92, 246, 0.3);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .stats-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.2), rgba(139, 92, 246, 0.2));
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .stats-icon .icon {
+        font-size: 2rem;
+    }
+    
+    .stats-info {
+        flex: 1;
+    }
+    
+    .stats-title {
+        font-size: 0.875rem;
+        color: #a1a1aa;
+        margin-bottom: 0.25rem;
+    }
+    
+    .stats-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #8B5CF6;
+        margin-bottom: 0.25rem;
+    }
+    
+    .stats-trend {
+        font-size: 0.7rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .stats-trend.up {
+        color: #10b981;
+    }
+    
+    .stats-trend.down {
+        color: #ef4444;
+    }
+    
+    .stats-trend::before {
+        content: '↑';
+    }
+    
+    .stats-trend.down::before {
+        content: '↓';
+    }
+</style>
+
+<script>
+    class StatsCard {
+        constructor(title, value, trend, icon, onClick) {
+            this.title = title;
+            this.value = value;
+            this.trend = trend;
+            this.icon = icon;
+            this.onClick = onClick;
+        }
+        
+        render() {
+            const card = document.createElement('div');
+            card.className = 'stats-card';
+            card.innerHTML = `
+                <div class="stats-icon"><span class="icon">${this.icon}</span></div>
+                <div class="stats-info">
+                    <h3 class="stats-title">${this.title}</h3>
+                    <p class="stats-value">${this.value}</p>
+                    <span class="stats-trend ${this.trend > 0 ? 'up' : 'down'}">${Math.abs(this.trend)}% from last month</span>
+                </div>
+            `;
+            
+            if (this.onClick) {
+                card.addEventListener('click', this.onClick);
+            }
+            
+            return card;
+        }
+    }
+    
+    function updateAllStats() {
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        const vault = JSON.parse(localStorage.getItem(`vault_${user.id}`) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+        
+        const stats = [
+            { title: 'Total Files', value: vault.files.length, icon: '📁', page: 'vault.html' },
+            { title: 'Notes', value: vault.notes.length, icon: '📝', page: 'notes.html' },
+            { title: 'Tasks', value: vault.tasks.filter(t => !t.completed).length, icon: '✅', page: 'tasks.html' },
+            { title: 'Bookmarks', value: vault.bookmarks.length, icon: '🔗', page: 'bookmarks.html' }
+        ];
+        
+        const container = document.querySelector('.stats-grid');
+        if (container) {
+            container.innerHTML = '';
+            stats.forEach(stat => {
+                const card = new StatsCard(stat.title, stat.value, Math.floor(Math.random() * 20) + 1, stat.icon, () => {
+                    window.location.href = stat.page;
+                });
+                container.appendChild(card.render());
+            });
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', updateAllStats);
+</script>

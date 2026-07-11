@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - Alan Vault</title>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Alan Vault</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon/android-chrome-512x512.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <meta name="theme-color" content="#4F46E5">
+    
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0f;
+            color: white;
+        }
+
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 50%, rgba(79, 70, 229, 0.15) 0%, transparent 50%);
+        }
+
+        .navbar {
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: white;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #4F46E5, #8B5CF6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .results-header {
+            margin-bottom: 2rem;
+        }
+
+        .results-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .results-header p {
+            color: #71717a;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            color: #a1a1aa;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .tab.active {
+            color: #8B5CF6;
+            border-bottom: 2px solid #8B5CF6;
+        }
+
+        .results-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .result-card:hover {
+            border-color: rgba(139, 92, 246, 0.3);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #8B5CF6;
+        }
+
+        .result-description {
+            color: #a1a1aa;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-meta {
+            color: #71717a;
+            font-size: 0.75rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 4rem;
+            color: #71717a;
+        }
+
+        .no-results-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .search-container {
+                max-width: 100%;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    
+    <div class="navbar">
+        <div class="nav-content">
+            <a href="dashboard.html" class="logo">
+                <div class="logo-icon">🔐</div>
+                <span>Alan Vault</span>
+            </a>
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search files, notes, tasks, bookmarks..." onkeyup="performSearch()">
+            </div>
+            <a href="profile.html" style="color: #a1a1aa; text-decoration: none;">👤 Profile</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="results-header">
+            <h1>Search Results</h1>
+            <p id="resultCount">Found 0 results</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="filterResults('all')">All</button>
+            <button class="tab" onclick="filterResults('files')">Files</button>
+            <button class="tab" onclick="filterResults('notes')">Notes</button>
+            <button class="tab" onclick="filterResults('tasks')">Tasks</button>
+            <button class="tab" onclick="filterResults('bookmarks')">Bookmarks</button>
+        </div>
+
+        <div id="resultsContainer" class="results-grid"></div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let allResults = [];
+        let currentFilter = 'all';
+        
+        function init() {
+            const user = localStorage.getItem('currentUser');
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = JSON.parse(user);
+            
+            // Get search query from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const query = urlParams.get('q');
+            if (query) {
+                document.getElementById('searchInput').value = query;
+                performSearch();
+            }
+        }
+        
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            if (!query) {
+                document.getElementById('resultsContainer').innerHTML = '<div class="no-results"><div class="no-results-icon">🔍</div><h3>Enter a search term</h3><p>Search your files, notes, tasks, and bookmarks</p></div>';
+                document.getElementById('resultCount').textContent = 'Enter a search term';
+                return;
+            }
+            
+            const vault = JSON.parse(localStorage.getItem(`vault_${currentUser.id}`) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+            
+            allResults = [
+                ...vault.files.filter(f => f.name.toLowerCase().includes(query)).map(f => ({ ...f, type: 'file', icon: '📄' })),
+                ...vault.notes.filter(n => n.title.toLowerCase().includes(query) || n.content.toLowerCase().includes(query)).map(n => ({ ...n, type: 'note', icon: '📝' })),
+                ...vault.tasks.filter(t => t.title.toLowerCase().includes(query)).map(t => ({ ...t, type: 'task', icon: '✅' })),
+                ...vault.bookmarks.filter(b => b.title.toLowerCase().includes(query) || b.url.toLowerCase().includes(query)).map(b => ({ ...b, type: 'bookmark', icon: '🔗' }))
+            ];
+            
+            document.getElementById('resultCount').textContent = `Found ${allResults.length} results for "${query}"`;
+            filterResults(currentFilter);
+        }
+        
+        function filterResults(type) {
+            currentFilter = type;
+            
+            // Update active tab
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.textContent.toLowerCase() === type || (type === 'all' && tab.textContent === 'All')) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            let filtered = allResults;
+            if (type !== 'all') {
+                filtered = allResults.filter(r => r.type === type);
+            }
+            
+            const container = document.getElementById('resultsContainer');
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="no-results"><div class="no-results-icon">🔍</div><h3>No results found</h3><p>Try different keywords or browse your vault</p></div>';
+                return;
+            }
+            
+            container.innerHTML = filtered.map(result => `
+                <div class="result-card" onclick="navigateTo('${result.type}', '${result.id || ''}')">
+                    <div class="result-title">${result.icon} ${escapeHtml(result.name || result.title)}</div>
+                    <div class="result-description">${result.content ? escapeHtml(result.content.substring(0, 150)) + (result.content.length > 150 ? '...' : '') : (result.url ? escapeHtml(result.url) : '')}</div>
+                    <div class="result-meta">
+                        <span>📁 ${result.type}</span>
+                        <span>📅 ${new Date(result.date || result.created || result.updated).toLocaleDateString()}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function navigateTo(type, id) {
+            // Navigate to appropriate page
+            window.location.href = `${type}.html`;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        init();
+    </script>
+</body>
+</html>

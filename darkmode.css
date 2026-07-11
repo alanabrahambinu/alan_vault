@@ -1,0 +1,222 @@
+/* ========================================
+   ALAN VAULT - DARK MODE
+   Theme Toggle & Color Schemes
+   ======================================== */
+
+/* Base Dark Theme */
+[data-theme="dark"] {
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #0f0f15;
+    --bg-tertiary: #15151d;
+    --bg-card: rgba(255, 255, 255, 0.03);
+    --bg-card-hover: rgba(255, 255, 255, 0.05);
+    --bg-glass: rgba(10, 10, 15, 0.8);
+    
+    --text-primary: #ffffff;
+    --text-secondary: #a1a1aa;
+    --text-tertiary: #71717a;
+    --text-muted: #52525b;
+    
+    --border-light: rgba(255, 255, 255, 0.05);
+    --border-medium: rgba(255, 255, 255, 0.1);
+    --border-heavy: rgba(255, 255, 255, 0.15);
+    
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 16px 64px rgba(0, 0, 0, 0.6);
+}
+
+/* Light Theme */
+[data-theme="light"] {
+    --bg-primary: #f8fafc;
+    --bg-secondary: #f1f5f9;
+    --bg-tertiary: #e2e8f0;
+    --bg-card: rgba(0, 0, 0, 0.02);
+    --bg-card-hover: rgba(0, 0, 0, 0.04);
+    --bg-glass: rgba(255, 255, 255, 0.8);
+    
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-tertiary: #64748b;
+    --text-muted: #94a3b8;
+    
+    --border-light: rgba(0, 0, 0, 0.05);
+    --border-medium: rgba(0, 0, 0, 0.1);
+    --border-heavy: rgba(0, 0, 0, 0.15);
+    
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 16px 64px rgba(0, 0, 0, 0.12);
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    position: relative;
+    width: 60px;
+    height: 30px;
+    background: var(--bg-tertiary);
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    border: 1px solid var(--border-medium);
+}
+
+.theme-toggle::before {
+    content: '🌙';
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    top: 1px;
+    left: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: transform var(--transition-base);
+}
+
+[data-theme="light"] .theme-toggle::before {
+    content: '☀️';
+    transform: translateX(29px);
+}
+
+/* Theme Transition */
+* {
+    transition: background-color var(--transition-base),
+                border-color var(--transition-base),
+                color var(--transition-fast),
+                box-shadow var(--transition-base);
+}
+
+/* Theme Specific Styles */
+[data-theme="dark"] .glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .stat-card {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="light"] .stat-card {
+    background: white;
+    box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+    background: white;
+    border-color: #e2e8f0;
+    color: #0f172a;
+}
+
+[data-theme="light"] input:focus,
+[data-theme="light"] textarea:focus,
+[data-theme="light"] select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Code Blocks */
+[data-theme="dark"] pre,
+[data-theme="dark"] code {
+    background: rgba(255, 255, 255, 0.05);
+    color: #e2e8f0;
+}
+
+[data-theme="light"] pre,
+[data-theme="light"] code {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+/* Tables */
+[data-theme="dark"] table tr {
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] table tr {
+    border-bottom-color: #e2e8f0;
+}
+
+/* Scrollbar */
+[data-theme="dark"] ::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-track {
+    background: #e2e8f0;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+}
+
+/* Selection Color */
+[data-theme="light"] ::selection {
+    background: var(--primary);
+    color: white;
+}
+
+/* Theme Presets */
+.theme-preset-dark {
+    --primary: #4F46E5;
+    --secondary: #8B5CF6;
+}
+
+.theme-preset-light {
+    --primary: #4F46E5;
+    --secondary: #8B5CF6;
+}
+
+.theme-preset-amber {
+    --primary: #d97706;
+    --secondary: #f59e0b;
+    --gradient-primary: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+}
+
+.theme-preset-emerald {
+    --primary: #059669;
+    --secondary: #10b981;
+    --gradient-primary: linear-gradient(135deg, #059669 0%, #10b981 100%);
+}
+
+.theme-preset-rose {
+    --primary: #e11d48;
+    --secondary: #f43f5e;
+    --gradient-primary: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%);
+}
+
+/* System Preference Detection */
+@media (prefers-color-scheme: dark) {
+    [data-theme="auto"] {
+        --bg-primary: #0a0a0f;
+        --text-primary: #ffffff;
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    [data-theme="auto"] {
+        --bg-primary: #f8fafc;
+        --text-primary: #0f172a;
+    }
+}

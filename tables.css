@@ -1,0 +1,237 @@
+/* ========================================
+   ALAN VAULT - TABLE STYLES
+   Data Tables & Grids
+   ======================================== */
+
+/* Table Container */
+.table-container {
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+}
+
+/* Base Table */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-sm);
+}
+
+/* Table Header */
+.table thead tr {
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.table th {
+    padding: var(--spacing-md);
+    text-align: left;
+    font-weight: var(--font-semibold);
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+/* Table Body */
+.table tbody tr {
+    border-bottom: 1px solid var(--border-light);
+    transition: all var(--transition-fast);
+}
+
+.table tbody tr:hover {
+    background: rgba(139, 92, 246, 0.05);
+}
+
+.table td {
+    padding: var(--spacing-md);
+    color: var(--text-primary);
+}
+
+/* Table Variants */
+.table-striped tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.table-bordered {
+    border-collapse: separate;
+}
+
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid var(--border-light);
+}
+
+.table-borderless th,
+.table-borderless td {
+    border: none;
+}
+
+.table-hover tbody tr:hover {
+    background: rgba(139, 92, 246, 0.05);
+}
+
+/* Table Sizes */
+.table-sm th,
+.table-sm td {
+    padding: var(--spacing-sm);
+}
+
+.table-lg th,
+.table-lg td {
+    padding: var(--spacing-lg);
+}
+
+/* Table Actions */
+.table-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+/* Sortable Table */
+.sortable-header {
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.sortable-header:hover {
+    color: var(--primary);
+}
+
+.sort-icon {
+    font-size: var(--font-size-xs);
+    opacity: 0.5;
+}
+
+.sortable-header.asc .sort-icon {
+    opacity: 1;
+    transform: rotate(180deg);
+}
+
+.sortable-header.desc .sort-icon {
+    opacity: 1;
+}
+
+/* Responsive Table */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Card Table (Mobile) */
+@media (max-width: 768px) {
+    .table-card-view thead {
+        display: none;
+    }
+    
+    .table-card-view tbody tr {
+        display: block;
+        margin-bottom: var(--spacing-md);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+        padding: var(--spacing-md);
+    }
+    
+    .table-card-view td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-sm) 0;
+        border: none;
+    }
+    
+    .table-card-view td::before {
+        content: attr(data-label);
+        font-weight: var(--font-semibold);
+        color: var(--text-secondary);
+    }
+}
+
+/* Data Table */
+.data-table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.data-table-search {
+    position: relative;
+    width: 300px;
+}
+
+.data-table-search input {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-sm) calc(var(--spacing-md) * 2);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+}
+
+.data-table-search::before {
+    content: '🔍';
+    position: absolute;
+    left: var(--spacing-sm);
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.data-table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--spacing-lg);
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.data-table-info {
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
+}
+
+.data-table-pagination {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.pagination-btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.pagination-btn:hover,
+.pagination-btn.active {
+    background: var(--gradient-primary);
+    color: white;
+    border-color: transparent;
+}
+
+/* Selection Checkbox */
+.table-select {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+/* Empty State */
+.table-empty {
+    text-align: center;
+    padding: var(--spacing-3xl) !important;
+    color: var(--text-tertiary);
+}
+
+.table-empty-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-md);
+}

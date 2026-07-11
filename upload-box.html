@@ -1,0 +1,343 @@
+<!-- upload-box.html - Upload Box Component -->
+<div class="upload-box">
+    <div class="upload-zone" id="uploadZone">
+        <div class="upload-icon">☁️</div>
+        <h3>Drag & Drop Files Here</h3>
+        <p>or click to browse</p>
+        <span class="upload-hint">Maximum file size: 100MB</span>
+        <input type="file" id="fileInput" multiple style="display: none;">
+    </div>
+    
+    <div class="upload-queue" id="uploadQueue" style="display: none;">
+        <div class="queue-header">
+            <h4>Upload Queue</h4>
+            <button class="clear-queue" onclick="clearQueue()">Clear All</button>
+        </div>
+        <div class="queue-list" id="queueList"></div>
+    </div>
+</div>
+
+<style>
+    .upload-box {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 24px;
+        padding: 2rem;
+    }
+    
+    .upload-zone {
+        border: 2px dashed rgba(139, 92, 246, 0.3);
+        border-radius: 20px;
+        padding: 3rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .upload-zone:hover {
+        border-color: #8B5CF6;
+        background: rgba(139, 92, 246, 0.05);
+        transform: scale(1.02);
+    }
+    
+    .upload-zone.drag-over {
+        border-color: #8B5CF6;
+        background: rgba(139, 92, 246, 0.1);
+        transform: scale(1.05);
+    }
+    
+    .upload-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+    
+    .upload-zone h3 {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .upload-zone p {
+        color: #a1a1aa;
+        margin-bottom: 1rem;
+    }
+    
+    .upload-hint {
+        font-size: 0.75rem;
+        color: #71717a;
+    }
+    
+    .upload-queue {
+        margin-top: 2rem;
+    }
+    
+    .queue-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .clear-queue {
+        background: rgba(239, 68, 68, 0.2);
+        border: none;
+        border-radius: 8px;
+        padding: 0.25rem 0.75rem;
+        color: #ef4444;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .clear-queue:hover {
+        background: rgba(239, 68, 68, 0.4);
+    }
+    
+    .queue-list {
+        max-height: 300px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .queue-item {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        animation: fadeInUp 0.3s ease;
+    }
+    
+    .queue-item-icon {
+        font-size: 1.5rem;
+    }
+    
+    .queue-item-info {
+        flex: 1;
+    }
+    
+    .queue-item-name {
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+    }
+    
+    .queue-item-size {
+        font-size: 0.7rem;
+        color: #71717a;
+    }
+    
+    .queue-item-progress {
+        width: 100%;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 0.5rem;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #4F46E5, #8B5CF6);
+        transition: width 0.3s;
+    }
+    
+    .queue-item-status {
+        font-size: 0.8rem;
+    }
+    
+    .queue-item-status.success {
+        color: #10b981;
+    }
+    
+    .queue-item-status.error {
+        color: #ef4444;
+    }
+    
+    .queue-item-remove {
+        background: transparent;
+        border: none;
+        color: #71717a;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .queue-item-remove:hover {
+        color: #ef4444;
+    }
+</style>
+
+<script>
+    class UploadBox {
+        constructor() {
+            this.uploadZone = document.getElementById('uploadZone');
+            this.fileInput = document.getElementById('fileInput');
+            this.queueContainer = document.getElementById('uploadQueue');
+            this.queueList = document.getElementById('queueList');
+            this.queue = [];
+            this.init();
+        }
+        
+        init() {
+            this.uploadZone.addEventListener('click', () => this.fileInput.click());
+            this.uploadZone.addEventListener('dragover', (e) => this.handleDragOver(e));
+            this.uploadZone.addEventListener('dragleave', (e) => this.handleDragLeave(e));
+            this.uploadZone.addEventListener('drop', (e) => this.handleDrop(e));
+            this.fileInput.addEventListener('change', (e) => this.handleFiles(e.target.files));
+        }
+        
+        handleDragOver(e) {
+            e.preventDefault();
+            this.uploadZone.classList.add('drag-over');
+        }
+        
+        handleDragLeave(e) {
+            this.uploadZone.classList.remove('drag-over');
+        }
+        
+        handleDrop(e) {
+            e.preventDefault();
+            this.uploadZone.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            this.handleFiles(files);
+        }
+        
+        handleFiles(files) {
+            for (let file of files) {
+                if (file.size > 100 * 1024 * 1024) {
+                    this.showNotification(`File ${file.name} exceeds 100MB limit`, 'error');
+                    continue;
+                }
+                this.addToQueue(file);
+            }
+            this.showQueue();
+        }
+        
+        addToQueue(file) {
+            const item = {
+                id: Date.now() + Math.random(),
+                file: file,
+                name: file.name,
+                size: file.size,
+                progress: 0,
+                status: 'pending'
+            };
+            this.queue.push(item);
+            this.renderQueue();
+            this.uploadFile(item);
+        }
+        
+        async uploadFile(item) {
+            item.status = 'uploading';
+            this.renderQueue();
+            
+            // Simulate upload progress
+            for (let i = 0; i <= 100; i += 10) {
+                await this.sleep(100);
+                item.progress = i;
+                this.renderQueue();
+            }
+            
+            // Save to localStorage
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const vault = JSON.parse(localStorage.getItem(`vault_${user.id}`) || '{"files":[]}');
+            vault.files.push({
+                id: item.id,
+                name: item.name,
+                size: item.size,
+                type: item.file.type,
+                date: new Date().toISOString(),
+                data: URL.createObjectURL(item.file)
+            });
+            localStorage.setItem(`vault_${user.id}`, JSON.stringify(vault));
+            
+            item.status = 'success';
+            this.renderQueue();
+            
+            setTimeout(() => {
+                this.removeFromQueue(item.id);
+            }, 2000);
+        }
+        
+        removeFromQueue(id) {
+            this.queue = this.queue.filter(i => i.id !== id);
+            this.renderQueue();
+            if (this.queue.length === 0) {
+                this.hideQueue();
+            }
+        }
+        
+        clearQueue() {
+            this.queue = [];
+            this.renderQueue();
+            this.hideQueue();
+        }
+        
+        renderQueue() {
+            if (this.queue.length === 0) {
+                this.queueList.innerHTML = '';
+                return;
+            }
+            
+            this.queueList.innerHTML = this.queue.map(item => `
+                <div class="queue-item">
+                    <div class="queue-item-icon">📄</div>
+                    <div class="queue-item-info">
+                        <div class="queue-item-name">${this.escapeHtml(item.name)}</div>
+                        <div class="queue-item-size">${this.formatBytes(item.size)}</div>
+                        <div class="queue-item-progress">
+                            <div class="progress-fill" style="width: ${item.progress}%"></div>
+                        </div>
+                    </div>
+                    <div class="queue-item-status ${item.status}">
+                        ${item.status === 'pending' ? '⏳' : item.status === 'uploading' ? `${item.progress}%` : item.status === 'success' ? '✓' : '✕'}
+                    </div>
+                    <button class="queue-item-remove" onclick="window.uploadBox.removeFromQueue(${item.id})">✕</button>
+                </div>
+            `).join('');
+        }
+        
+        showQueue() {
+            this.queueContainer.style.display = 'block';
+        }
+        
+        hideQueue() {
+            this.queueContainer.style.display = 'none';
+        }
+        
+        showNotification(message, type) {
+            if (window.notify) {
+                window.notify[type](message);
+            } else {
+                alert(message);
+            }
+        }
+        
+        sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        window.uploadBox = new UploadBox();
+    });
+</script>

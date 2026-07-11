@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alan Vault - Favicon Generator</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #0a0a0f;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 800px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+        h1 { color: #8B5CF6; margin-bottom: 1rem; }
+        code { background: #1a1a2e; padding: 0.2rem 0.4rem; border-radius: 4px; }
+        pre { background: #1a1a2e; padding: 1rem; border-radius: 8px; overflow-x: auto; }
+        .icon-preview {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            justify-content: center;
+        }
+        .icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #4F46E5, #8B5CF6);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 0 20px rgba(79,70,229,0.3);
+        }
+        .icon-sm { width: 32px; height: 32px; font-size: 18px; border-radius: 8px; }
+        .icon-lg { width: 180px; height: 180px; font-size: 80px; border-radius: 32px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Alan Vault Favicon</h1>
+        <p>Create a file named <code>favicon.ico</code> and place it in your root directory.</p>
+        
+        <div class="icon-preview">
+            <div class="icon icon-lg">🔐</div>
+        </div>
+        
+        <h2>📁 Recommended Favicon Files Structure:</h2>
+        <pre>
+/assets/
+  └── icons/
+      ├── favicon.ico           (16x16, 32x32, 48x48)
+      ├── icon-72x72.png
+      ├── icon-96x96.png
+      ├── icon-128x128.png
+      ├── icon-144x144.png
+      ├── icon-152x152.png
+      ├── icon-192x192.png
+      ├── icon-384x384.png
+      ├── icon-512x512.png
+      ├── apple-touch-icon.png  (180x180)
+      ├── mask-icon.svg         (SVG for Safari)
+      └── favicon.svg           (SVG version)
+        </pre>
+
+        <h2>🎨 SVG Favicon Code:</h2>
+        <p>Save this as <code>favicon.svg</code> in your assets folder:</p>
+        <pre>&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"&gt;
+  &lt;defs&gt;
+    &lt;linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"&gt;
+      &lt;stop offset="0%" style="stop-color:#4F46E5" /&gt;
+      &lt;stop offset="100%" style="stop-color:#8B5CF6" /&gt;
+    &lt;/linearGradient&gt;
+  &lt;/defs&gt;
+  &lt;rect width="100" height="100" rx="20" fill="url(#grad)" /&gt;
+  &lt;text x="50" y="68" font-size="50" text-anchor="middle" fill="white" font-family="Arial"&gt;🔐&lt;/text&gt;
+&lt;/svg&gt;</pre>
+
+        <h2>🔗 HTML Head Links to Add:</h2>
+        <pre>&lt;!-- Favicon --&gt;
+&lt;link rel="icon" type="image/x-icon" href="/favicon.ico"&gt;
+&lt;link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png"&gt;
+&lt;link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png"&gt;
+&lt;link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png"&gt;
+&lt;link rel="manifest" href="/manifest.json"&gt;
+&lt;link rel="mask-icon" href="/assets/icons/safari-pinned-tab.svg" color="#4F46E5"&gt;
+&lt;meta name="msapplication-TileColor" content="#4F46E5"&gt;
+&lt;meta name="theme-color" content="#4F46E5"&gt;</pre>
+
+        <h2>📝 How to Generate Favicon Files:</h2>
+        <ol>
+            <li>Use an online favicon generator like <a href="https://realfavicongenerator.net" target="_blank" style="color:#8B5CF6;">realfavicongenerator.net</a></li>
+            <li>Upload the SVG code above or create a 512x512 PNG icon</li>
+            <li>Download the generated favicon package</li>
+            <li>Extract and place files in your <code>/assets/icons/</code> folder</li>
+            <li>Copy <code>favicon.ico</code> to your root directory</li>
+        </ol>
+        
+        <div class="icon-preview">
+            <div class="icon">🔐</div>
+            <div class="icon icon-sm">🔐</div>
+            <div class="icon" style="width: 48px; height: 48px; font-size: 24px;">🔐</div>
+            <div class="icon" style="width: 32px; height: 32px; font-size: 18px; border-radius: 8px;">🔐</div>
+        </div>
+        
+        <p style="margin-top: 2rem; color: #71717a; text-align: center;">
+            ⚡ For quick setup, create a simple <code>favicon.ico</code> by converting a PNG using online tools.
+        </p>
+    </div>
+</body>
+</html>

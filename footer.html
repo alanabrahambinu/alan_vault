@@ -1,0 +1,204 @@
+<!-- footer.html - Footer Component -->
+<footer class="site-footer">
+    <div class="footer-container">
+        <div class="footer-grid">
+            <div class="footer-section">
+                <div class="footer-logo">
+                    <div class="logo-icon">🔐</div>
+                    <span>Alan Vault</span>
+                </div>
+                <p class="footer-description">Secure cloud platform for modern workspace. Store, manage, and access your data with military-grade encryption.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">🐙</a>
+                    <a href="#" class="social-link">🐦</a>
+                    <a href="#" class="social-link">📘</a>
+                    <a href="#" class="social-link">💼</a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="vault.html">Secure Vault</a></li>
+                    <li><a href="notes.html">Smart Notes</a></li>
+                    <li><a href="tasks.html">Task Manager</a></li>
+                    <li><a href="bookmarks.html">Bookmarks</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">API Reference</a></li>
+                    <li><a href="#">Status</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Security</a></li>
+                    <li><a href="#">GDPR</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2024 Alan Vault. All rights reserved.</p>
+            <div class="footer-badges">
+                <span class="badge">🔒 256-bit Encryption</span>
+                <span class="badge">⭐ 99.99% Uptime</span>
+                <span class="badge">🌍 Global CDN</span>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+    .site-footer {
+        background: linear-gradient(180deg, rgba(10, 10, 15, 0.95), #0a0a0f);
+        border-top: 1px solid rgba(139, 92, 246, 0.2);
+        margin-top: 4rem;
+        padding: 3rem 2rem 1.5rem;
+    }
+    
+    .footer-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .footer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .footer-logo {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .logo-icon {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, #4F46E5, #8B5CF6);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+    
+    .footer-description {
+        color: #a1a1aa;
+        font-size: 0.875rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    
+    .social-links {
+        display: flex;
+        gap: 0.75rem;
+    }
+    
+    .social-link {
+        width: 36px;
+        height: 36px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: #a1a1aa;
+        transition: all 0.3s;
+    }
+    
+    .social-link:hover {
+        background: rgba(139, 92, 246, 0.2);
+        color: #8B5CF6;
+        transform: translateY(-3px);
+    }
+    
+    .footer-section h4 {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        color: #8B5CF6;
+    }
+    
+    .footer-section ul {
+        list-style: none;
+    }
+    
+    .footer-section li {
+        margin-bottom: 0.5rem;
+    }
+    
+    .footer-section a {
+        color: #a1a1aa;
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: all 0.3s;
+    }
+    
+    .footer-section a:hover {
+        color: #8B5CF6;
+        transform: translateX(3px);
+        display: inline-block;
+    }
+    
+    .footer-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        color: #71717a;
+        font-size: 0.875rem;
+    }
+    
+    .footer-badges {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .badge {
+        padding: 0.25rem 0.75rem;
+        background: rgba(139, 92, 246, 0.1);
+        border-radius: 50px;
+        font-size: 0.75rem;
+    }
+    
+    @media (max-width: 768px) {
+        .footer-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .footer-bottom {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>

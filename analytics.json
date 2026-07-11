@@ -1,0 +1,212 @@
+{
+  "pageViews": [
+    {
+      "path": "/dashboard.html",
+      "title": "Dashboard",
+      "count": 245,
+      "uniqueVisitors": 45,
+      "avgTimeOnPage": 185,
+      "lastViewed": "2024-06-11T10:00:00.000Z"
+    },
+    {
+      "path": "/vault.html",
+      "title": "My Vault",
+      "count": 189,
+      "uniqueVisitors": 38,
+      "avgTimeOnPage": 320,
+      "lastViewed": "2024-06-11T09:30:00.000Z"
+    },
+    {
+      "path": "/notes.html",
+      "title": "Notes",
+      "count": 167,
+      "uniqueVisitors": 35,
+      "avgTimeOnPage": 245,
+      "lastViewed": "2024-06-11T08:45:00.000Z"
+    },
+    {
+      "path": "/tasks.html",
+      "title": "Tasks",
+      "count": 134,
+      "uniqueVisitors": 32,
+      "avgTimeOnPage": 210,
+      "lastViewed": "2024-06-10T16:20:00.000Z"
+    },
+    {
+      "path": "/bookmarks.html",
+      "title": "Bookmarks",
+      "count": 98,
+      "uniqueVisitors": 28,
+      "avgTimeOnPage": 95,
+      "lastViewed": "2024-06-10T14:15:00.000Z"
+    },
+    {
+      "path": "/profile.html",
+      "title": "Profile",
+      "count": 76,
+      "uniqueVisitors": 25,
+      "avgTimeOnPage": 120,
+      "lastViewed": "2024-06-10T11:30:00.000Z"
+    },
+    {
+      "path": "/settings.html",
+      "title": "Settings",
+      "count": 54,
+      "uniqueVisitors": 22,
+      "avgTimeOnPage": 85,
+      "lastViewed": "2024-06-09T15:45:00.000Z"
+    }
+  ],
+  "events": [
+    {
+      "event": "file_upload",
+      "count": 45,
+      "uniqueUsers": 15,
+      "lastOccurred": "2024-06-11T09:00:00.000Z",
+      "trend": "up",
+      "percentageChange": 12.5
+    },
+    {
+      "event": "file_download",
+      "count": 89,
+      "uniqueUsers": 22,
+      "lastOccurred": "2024-06-11T08:30:00.000Z",
+      "trend": "up",
+      "percentageChange": 8.3
+    },
+    {
+      "event": "note_created",
+      "count": 34,
+      "uniqueUsers": 12,
+      "lastOccurred": "2024-06-10T16:00:00.000Z",
+      "trend": "stable",
+      "percentageChange": 0
+    },
+    {
+      "event": "task_created",
+      "count": 28,
+      "uniqueUsers": 10,
+      "lastOccurred": "2024-06-10T14:30:00.000Z",
+      "trend": "down",
+      "percentageChange": -5.2
+    },
+    {
+      "event": "task_completed",
+      "count": 42,
+      "uniqueUsers": 14,
+      "lastOccurred": "2024-06-11T10:15:00.000Z",
+      "trend": "up",
+      "percentageChange": 15.8
+    },
+    {
+      "event": "bookmark_added",
+      "count": 23,
+      "uniqueUsers": 8,
+      "lastOccurred": "2024-06-09T11:00:00.000Z",
+      "trend": "stable",
+      "percentageChange": 0
+    },
+    {
+      "event": "search_performed",
+      "count": 156,
+      "uniqueUsers": 35,
+      "lastOccurred": "2024-06-11T09:45:00.000Z",
+      "trend": "up",
+      "percentageChange": 22.4
+    }
+  ],
+  "userActivity": [
+    {
+      "date": "2024-06-04",
+      "activeUsers": 18,
+      "newUsers": 1,
+      "events": 145,
+      "avgSessionDuration": 420
+    },
+    {
+      "date": "2024-06-05",
+      "activeUsers": 22,
+      "newUsers": 2,
+      "events": 178,
+      "avgSessionDuration": 485
+    },
+    {
+      "date": "2024-06-06",
+      "activeUsers": 25,
+      "newUsers": 1,
+      "events": 210,
+      "avgSessionDuration": 510
+    },
+    {
+      "date": "2024-06-07",
+      "activeUsers": 28,
+      "newUsers": 0,
+      "events": 245,
+      "avgSessionDuration": 535
+    },
+    {
+      "date": "2024-06-08",
+      "activeUsers": 32,
+      "newUsers": 1,
+      "events": 278,
+      "avgSessionDuration": 560
+    },
+    {
+      "date": "2024-06-09",
+      "activeUsers": 35,
+      "newUsers": 0,
+      "events": 302,
+      "avgSessionDuration": 590
+    },
+    {
+      "date": "2024-06-10",
+      "activeUsers": 38,
+      "newUsers": 1,
+      "events": 335,
+      "avgSessionDuration": 615
+    },
+    {
+      "date": "2024-06-11",
+      "activeUsers": 42,
+      "newUsers": 0,
+      "events": 189,
+      "avgSessionDuration": 340
+    }
+  ],
+  "storage": {
+    "totalStorage": 23068672,
+    "byUser": {
+      "user_1734567890124": 19922944,
+      "user_1734567890125": 8192,
+      "user_1734567890126": 1048576
+    },
+    "byType": {
+      "documents": 5242880,
+      "images": 1048576,
+      "archives": 15728640,
+      "other": 1048576
+    },
+    "trend": {
+      "last7Days": 5242880,
+      "projectedNext30Days": 20971520,
+      "growthRate": 8.5
+    }
+  },
+  "performance": {
+    "avgPageLoadTime": 1.85,
+    "avgApiResponseTime": 0.32,
+    "errorRate": 0.8,
+    "uptime": 99.95,
+    "serverLoad": 45
+  },
+  "summary": {
+    "totalUsers": 5,
+    "activeUsers": 4,
+    "totalEvents": 1345,
+    "totalStorage": 23068672,
+    "dailyAvgUsers": 32,
+    "peakHour": "10:00-11:00",
+    "mostActiveDay": "Monday",
+    "popularFeature": "File Upload"
+  }
+}

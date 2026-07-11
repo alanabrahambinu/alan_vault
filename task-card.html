@@ -1,0 +1,205 @@
+<!-- task-card.html - Task Card Component -->
+<div class="task-card-component">
+    <div class="task-checkbox">
+        <input type="checkbox" id="taskCheck">
+        <label for="taskCheck"></label>
+    </div>
+    <div class="task-content">
+        <h4 class="task-title">Complete project documentation</h4>
+        <div class="task-meta">
+            <span class="task-priority high">High Priority</span>
+            <span class="task-due-date">Due: Dec 20, 2024</span>
+        </div>
+    </div>
+    <div class="task-actions">
+        <button class="task-action edit" title="Edit">✏️</button>
+        <button class="task-action delete" title="Delete">🗑️</button>
+    </div>
+</div>
+
+<style>
+    .task-card-component {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.3s;
+    }
+    
+    .task-card-component:hover {
+        background: rgba(139, 92, 246, 0.05);
+        border-color: rgba(139, 92, 246, 0.3);
+        transform: translateX(5px);
+    }
+    
+    .task-checkbox {
+        position: relative;
+    }
+    
+    .task-checkbox input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+    
+    .task-checkbox label {
+        display: block;
+        width: 22px;
+        height: 22px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .task-checkbox input:checked + label {
+        background: #10b981;
+        border-color: #10b981;
+    }
+    
+    .task-checkbox input:checked + label::after {
+        content: '✓';
+        display: block;
+        text-align: center;
+        color: white;
+        font-size: 14px;
+        line-height: 18px;
+    }
+    
+    .task-content {
+        flex: 1;
+    }
+    
+    .task-title {
+        font-size: 0.95rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    
+    .task-title.completed {
+        text-decoration: line-through;
+        color: #71717a;
+    }
+    
+    .task-meta {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .task-priority {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.6rem;
+        border-radius: 50px;
+    }
+    
+    .task-priority.high {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+    }
+    
+    .task-priority.medium {
+        background: rgba(245, 158, 11, 0.2);
+        color: #f59e0b;
+    }
+    
+    .task-priority.low {
+        background: rgba(16, 185, 129, 0.2);
+        color: #10b981;
+    }
+    
+    .task-due-date {
+        font-size: 0.7rem;
+        color: #71717a;
+    }
+    
+    .task-actions {
+        display: flex;
+        gap: 0.5rem;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    
+    .task-card-component:hover .task-actions {
+        opacity: 1;
+    }
+    
+    .task-action {
+        background: rgba(139, 92, 246, 0.2);
+        border: none;
+        border-radius: 6px;
+        padding: 0.25rem 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 0.8rem;
+    }
+    
+    .task-action:hover {
+        background: rgba(139, 92, 246, 0.4);
+    }
+    
+    .task-action.delete:hover {
+        background: rgba(239, 68, 68, 0.4);
+    }
+</style>
+
+<script>
+    class TaskCard {
+        constructor(task, index, onToggle, onEdit, onDelete) {
+            this.task = task;
+            this.index = index;
+            this.onToggle = onToggle;
+            this.onEdit = onEdit;
+            this.onDelete = onDelete;
+        }
+        
+        render() {
+            const card = document.createElement('div');
+            card.className = 'task-card-component';
+            card.innerHTML = `
+                <div class="task-checkbox">
+                    <input type="checkbox" id="task_${this.index}" ${this.task.completed ? 'checked' : ''}>
+                    <label for="task_${this.index}"></label>
+                </div>
+                <div class="task-content">
+                    <h4 class="task-title ${this.task.completed ? 'completed' : ''}">${this.escapeHtml(this.task.title)}</h4>
+                    <div class="task-meta">
+                        <span class="task-priority ${this.task.priority?.toLowerCase()}">${this.task.priority || 'Medium'} Priority</span>
+                        <span class="task-due-date">Due: ${this.task.dueDate || 'No due date'}</span>
+                    </div>
+                </div>
+                <div class="task-actions">
+                    <button class="task-action edit" data-action="edit">✏️</button>
+                    <button class="task-action delete" data-action="delete">🗑️</button>
+                </div>
+            `;
+            
+            const checkbox = card.querySelector('input');
+            checkbox.addEventListener('change', () => {
+                if (this.onToggle) this.onToggle(this.index);
+            });
+            
+            card.querySelector('[data-action="edit"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (this.onEdit) this.onEdit(this.index);
+            });
+            
+            card.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (this.onDelete && confirm('Delete this task?')) this.onDelete(this.index);
+            });
+            
+            return card;
+        }
+        
+        escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    }
+</script>

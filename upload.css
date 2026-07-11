@@ -1,0 +1,228 @@
+/* ========================================
+   ALAN VAULT - UPLOAD STYLES
+   File Upload Interface
+   ======================================== */
+
+/* Upload Container */
+.upload-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--spacing-xl);
+}
+
+/* Drop Zone */
+.drop-zone {
+    background: var(--bg-card);
+    border: 2px dashed var(--border-medium);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-3xl);
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.drop-zone:hover {
+    border-color: var(--primary);
+    background: rgba(79, 70, 229, 0.05);
+}
+
+.drop-zone.drag-over {
+    border-color: var(--primary);
+    background: rgba(79, 70, 229, 0.1);
+    transform: scale(1.02);
+}
+
+.drop-zone-icon {
+    font-size: 4rem;
+    margin-bottom: var(--spacing-lg);
+    animation: float 3s ease-in-out infinite;
+}
+
+.drop-zone-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--spacing-sm);
+}
+
+.drop-zone-subtitle {
+    color: var(--text-tertiary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.drop-zone-hint {
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
+    margin-top: var(--spacing-md);
+}
+
+/* File Input */
+.file-input {
+    display: none;
+}
+
+/* Upload Queue */
+.upload-queue {
+    margin-top: var(--spacing-xl);
+}
+
+.queue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.queue-title {
+    font-size: var(--font-size-md);
+    font-weight: var(--font-semibold);
+}
+
+.queue-clear {
+    font-size: var(--font-size-sm);
+    color: var(--danger);
+    cursor: pointer;
+}
+
+.queue-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.queue-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    animation: fadeInUp var(--transition-base);
+}
+
+.queue-item-icon {
+    font-size: 2rem;
+}
+
+.queue-item-info {
+    flex: 1;
+}
+
+.queue-item-name {
+    font-weight: var(--font-medium);
+    margin-bottom: var(--spacing-xs);
+}
+
+.queue-item-size {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+}
+
+.queue-item-progress {
+    width: 100%;
+    height: 4px;
+    background: var(--border-medium);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin-top: var(--spacing-xs);
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--gradient-primary);
+    transition: width var(--transition-base);
+}
+
+.queue-item-status {
+    font-size: var(--font-size-sm);
+}
+
+.queue-item-status.success {
+    color: var(--success);
+}
+
+.queue-item-status.error {
+    color: var(--danger);
+}
+
+.queue-item-remove {
+    cursor: pointer;
+    color: var(--text-tertiary);
+    transition: color var(--transition-fast);
+}
+
+.queue-item-remove:hover {
+    color: var(--danger);
+}
+
+/* Upload Options */
+.upload-options {
+    margin-top: var(--spacing-xl);
+    padding: var(--spacing-lg);
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.option-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.option-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+/* Upload Complete */
+.upload-complete {
+    margin-top: var(--spacing-xl);
+    padding: var(--spacing-lg);
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    animation: fadeInUp var(--transition-base);
+}
+
+.complete-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.complete-text {
+    color: var(--success);
+    margin-bottom: var(--spacing-md);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .upload-container {
+        padding: var(--spacing-md);
+    }
+    
+    .drop-zone {
+        padding: var(--spacing-xl);
+    }
+    
+    .drop-zone-icon {
+        font-size: 3rem;
+    }
+    
+    .queue-item {
+        flex-wrap: wrap;
+    }
+}

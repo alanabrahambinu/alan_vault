@@ -1,0 +1,97 @@
+{
+  "notes": [
+    {
+      "id": "note_1734567891001",
+      "title": "Welcome to Alan Vault",
+      "content": "# Welcome to Alan Vault\n\nThis is your secure cloud platform. Here you can:\n\n- Store files securely\n- Create notes\n- Manage tasks\n- Save bookmarks\n\n## Getting Started\n\n1. Upload your first file\n2. Create a new note\n3. Add some tasks\n4. Save important bookmarks\n\nEnjoy your secure digital workspace!",
+      "category": "general",
+      "tags": ["welcome", "getting-started"],
+      "pinned": true,
+      "favorite": true,
+      "color": null,
+      "userId": "user_1734567890124",
+      "createdAt": "2024-06-01T10:00:00.000Z",
+      "updatedAt": "2024-06-10T14:30:00.000Z",
+      "wordCount": 85,
+      "characterCount": 485,
+      "version": 2
+    },
+    {
+      "id": "note_1734567891002",
+      "title": "Project Ideas",
+      "content": "# Project Ideas for Q3\n\n## Web Development\n- Build a portfolio website\n- Create a React dashboard\n- Develop a mobile app\n\n## Learning Goals\n- Learn TypeScript\n- Master Node.js\n- Study AI/ML basics\n\n## Personal Projects\n- Garden planning app\n- Recipe organizer\n- Fitness tracker\n\n## Deadlines\n- [ ] Complete research by end of month\n- [ ] Start development next week\n- [ ] Launch beta in 2 months",
+      "category": "ideas",
+      "tags": ["projects", "goals", "planning"],
+      "pinned": true,
+      "favorite": true,
+      "color": "#f59e0b",
+      "userId": "user_1734567890124",
+      "createdAt": "2024-06-05T09:20:00.000Z",
+      "updatedAt": "2024-06-09T16:45:00.000Z",
+      "wordCount": 95,
+      "characterCount": 520,
+      "version": 3
+    },
+    {
+      "id": "note_1734567891003",
+      "title": "Meeting Notes - Product Sync",
+      "content": "# Product Sync Meeting - June 10, 2024\n\n## Attendees\n- John (Product Manager)\n- Sarah (Lead Developer)\n- Mike (Designer)\n\n## Discussion Points\n1. Q3 roadmap review\n2. Feature prioritization\n3. Resource allocation\n\n## Action Items\n- [ ] Finalize requirements by Friday\n- [ ] Design mockups due next Tuesday\n- [ ] Development starts next month\n\n## Next Meeting\n- Date: June 17, 2024\n- Time: 10:00 AM",
+      "category": "work",
+      "tags": ["meeting", "work", "product"],
+      "pinned": false,
+      "favorite": true,
+      "color": "#4F46E5",
+      "userId": "user_1734567890124",
+      "createdAt": "2024-06-10T11:00:00.000Z",
+      "updatedAt": "2024-06-10T11:00:00.000Z",
+      "wordCount": 85,
+      "characterCount": 480,
+      "version": 1
+    },
+    {
+      "id": "note_1734567891004",
+      "title": "Shopping List",
+      "content": "# Weekly Shopping\n\n## Groceries\n- [ ] Apples\n- [ ] Bananas\n- [ ] Bread\n- [ ] Milk\n- [ ] Eggs\n- [ ] Coffee\n\n## Household Items\n- [ ] Dish soap\n- [ ] Laundry detergent\n- [ ] Paper towels\n\n## To Buy This Week\n- Birthday gift for Mom\n- New headphones\n- Office supplies",
+      "category": "personal",
+      "tags": ["shopping", "personal"],
+      "pinned": false,
+      "favorite": false,
+      "color": "#10b981",
+      "userId": "user_1734567890125",
+      "createdAt": "2024-06-08T18:30:00.000Z",
+      "updatedAt": "2024-06-09T10:15:00.000Z",
+      "wordCount": 65,
+      "characterCount": 380,
+      "version": 2
+    },
+    {
+      "id": "note_1734567891005",
+      "title": "JavaScript Tips & Tricks",
+      "content": "# Useful JavaScript Tips\n\n## Array Methods\n```javascript\nconst numbers = [1, 2, 3, 4, 5];\nconst doubled = numbers.map(n => n * 2);\nconst evens = numbers.filter(n => n % 2 === 0);\nconst sum = numbers.reduce((a, b) => a + b, 0);\n```\n\n## Async/Await\n```javascript\nasync function fetchData() {\n  try {\n    const response = await fetch('/api/data');\n    const data = await response.json();\n    return data;\n  } catch (error) {\n    console.error('Error:', error);\n  }\n}\n```\n\n## Useful Links\n- [MDN Web Docs](https://developer.mozilla.org)\n- [JavaScript.info](https://javascript.info)",
+      "category": "learning",
+      "tags": ["javascript", "coding", "tutorial"],
+      "pinned": false,
+      "favorite": true,
+      "color": "#06b6d4",
+      "userId": "user_1734567890126",
+      "createdAt": "2024-06-07T14:00:00.000Z",
+      "updatedAt": "2024-06-09T09:30:00.000Z",
+      "wordCount": 120,
+      "characterCount": 650,
+      "version": 2
+    }
+  ],
+  "stats": {
+    "totalNotes": 5,
+    "pinnedNotes": 2,
+    "favoriteNotes": 4,
+    "categories": {
+      "general": 1,
+      "ideas": 1,
+      "work": 1,
+      "personal": 1,
+      "learning": 1
+    },
+    "totalWords": 450
+  }
+}

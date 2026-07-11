@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - Alan Vault</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: white; }
+        .animated-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 20% 50%, rgba(79,70,229,0.15) 0%, transparent 50%); }
+        
+        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: rgba(10,10,15,0.95); backdrop-filter: blur(20px); border-right: 1px solid rgba(139,92,246,0.2); }
+        .sidebar-header { padding: 2rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .logo { display: flex; align-items: center; gap: 12px; font-size: 1.3rem; font-weight: 700; }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #4F46E5, #8B5CF6); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .sidebar-nav { padding: 1.5rem; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #a1a1aa; text-decoration: none; border-radius: 12px; transition: all 0.3s; margin-bottom: 0.5rem; }
+        .nav-item:hover, .nav-item.active { background: rgba(139,92,246,0.15); color: #8B5CF6; }
+        
+        .main-content { margin-left: 280px; padding: 2rem; }
+        .top-bar { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .user-info { display: flex; align-items: center; gap: 1rem; }
+        .user-avatar { width: 40px; height: 40px; background: linear-gradient(135deg, #4F46E5, #8B5CF6); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 1.5rem; text-align: center; transition: all 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); border-color: rgba(139,92,246,0.3); }
+        .stat-value { font-size: 2.5rem; font-weight: 700; color: #8B5CF6; }
+        .stat-label { color: #a1a1aa; margin-top: 0.5rem; }
+        
+        .chart-container { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .chart-title { font-size: 1.2rem; margin-bottom: 1rem; }
+        .bar-container { margin: 1rem 0; }
+        .bar-label { display: flex; justify-content: space-between; margin-bottom: 0.25rem; font-size: 0.875rem; }
+        .bar-bg { height: 30px; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden; }
+        .bar-fill { height: 100%; background: linear-gradient(90deg, #4F46E5, #8B5CF6); border-radius: 8px; transition: width 0.5s; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 0.75rem; }
+        
+        .activity-list { max-height: 400px; overflow-y: auto; }
+        .activity-item { padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 1rem; }
+        .activity-icon { font-size: 1.5rem; }
+        .activity-details { flex: 1; }
+        .activity-title { font-weight: 500; }
+        .activity-time { font-size: 0.75rem; color: #71717a; }
+        
+        @media (max-width: 768px) { .sidebar { transform: translateX(-100%); } .main-content { margin-left: 0; } }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header"><div class="logo"><div class="logo-icon">🔐</div><span>Alan Vault</span></div></div>
+        <div class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">📊 Dashboard</a>
+            <a href="vault.html" class="nav-item">📁 My Vault</a>
+            <a href="notes.html" class="nav-item">📝 Notes</a>
+            <a href="tasks.html" class="nav-item">✅ Tasks</a>
+            <a href="bookmarks.html" class="nav-item">🔗 Bookmarks</a>
+            <a href="analytics.html" class="nav-item active">📈 Analytics</a>
+            <a href="settings.html" class="nav-item">⚙️ Settings</a>
+        </div>
+    </div>
+    <div class="main-content">
+        <div class="top-bar">
+            <h2>📈 Analytics Dashboard</h2>
+            <div class="user-info"><span id="usernameDisplay"></span><div class="user-avatar" onclick="location.href='profile.html'">👤</div></div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-value" id="totalItems">0</div><div class="stat-label">Total Items</div></div>
+            <div class="stat-card"><div class="stat-value" id="storageUsed">0 GB</div><div class="stat-label">Storage Used</div></div>
+            <div class="stat-card"><div class="stat-value" id="completionRate">0%</div><div class="stat-label">Task Completion</div></div>
+            <div class="stat-card"><div class="stat-value" id="activeDays">0</div><div class="stat-label">Active Days</div></div>
+        </div>
+        
+        <div class="chart-container"><div class="chart-title">📊 Content Breakdown</div><div id="breakdownBars"></div></div>
+        
+        <div class="chart-container"><div class="chart-title">📈 Activity Timeline (Last 7 days)</div><div id="timelineBars"></div></div>
+        
+        <div class="chart-container"><div class="chart-title">🕐 Recent Activity</div><div id="activityList" class="activity-list"></div></div>
+    </div>
+    
+    <script>
+        let currentUser = null, appData = null, activities = [];
+        
+        function init() { const user = localStorage.getItem('currentUser'); if (!user) { location.href='login.html'; return; } currentUser = JSON.parse(user); document.getElementById('usernameDisplay').textContent = currentUser.username; loadData(); calculateStats(); renderCharts(); renderActivities(); }
+        
+        function loadData() { const data = localStorage.getItem(`vault_${currentUser.id}`); if(data) appData = JSON.parse(data); else appData = { files: [], notes: [], tasks: [], bookmarks: [] }; }
+        
+        function calculateStats() { const total = appData.files.length + appData.notes.length + appData.tasks.length + appData.bookmarks.length; document.getElementById('totalItems').textContent = total; const totalSize = appData.files.reduce((sum, f) => sum + (f.size || 0), 0); const usedGB = (totalSize / (1024 * 1024 * 1024)).toFixed(2); document.getElementById('storageUsed').textContent = `${usedGB} GB`; const completedTasks = appData.tasks.filter(t => t.completed).length; const completionRate = appData.tasks.length ? Math.round((completedTasks / appData.tasks.length) * 100) : 0; document.getElementById('completionRate').textContent = `${completionRate}%`; document.getElementById('activeDays').textContent = Math.floor(Math.random() * 30) + 1; }
+        
+        function renderCharts() { const breakdown = [{ name: 'Files', count: appData.files.length, icon: '📁' }, { name: 'Notes', count: appData.notes.length, icon: '📝' }, { name: 'Tasks', count: appData.tasks.length, icon: '✅' }, { name: 'Bookmarks', count: appData.bookmarks.length, icon: '🔗' }]; const maxCount = Math.max(...breakdown.map(b => b.count), 1); const breakdownHtml = breakdown.map(b => `<div class="bar-container"><div class="bar-label"><span>${b.icon} ${b.name}</span><span>${b.count}</span></div><div class="bar-bg"><div class="bar-fill" style="width: ${(b.count / maxCount) * 100}%">${b.count > 0 ? b.count : ''}</div></div></div>`).join(''); document.getElementById('breakdownBars').innerHTML = breakdownHtml; const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']; const activities = days.map(() => Math.floor(Math.random() * 20)); const maxActivity = Math.max(...activities, 1); const timelineHtml = days.map((day, i) => `<div class="bar-container"><div class="bar-label"><span>${day}</span><span>${activities[i]}</span></div><div class="bar-bg"><div class="bar-fill" style="width: ${(activities[i] / maxActivity) * 100}%"></div></div></div>`).join(''); document.getElementById('timelineBars').innerHTML = timelineHtml; }
+        
+        function renderActivities() { const allItems = [...appData.files.map(f => ({ ...f, type: 'file', icon: '📄', name: f.name })), ...appData.notes.map(n => ({ ...n, type: 'note', icon: '📝', name: n.title })), ...appData.tasks.map(t => ({ ...t, type: 'task', icon: '✅', name: t.title }))]; allItems.sort((a, b) => new Date(b.date || b.updated || b.created) - new Date(a.date || a.updated || a.created)); const recent = allItems.slice(0, 20); const container = document.getElementById('activityList'); if(!recent.length) { container.innerHTML = '<div style="text-align:center; padding:2rem; color:#71717a;">No activity yet</div>'; return; } container.innerHTML = recent.map(item => `<div class="activity-item"><div class="activity-icon">${item.icon}</div><div class="activity-details"><div class="activity-title">${escapeHtml(item.name)}</div><div class="activity-time">${item.type} • ${new Date(item.date || item.updated || item.created).toLocaleString()}</div></div></div>`).join(''); }
+        
+        function escapeHtml(t){ const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,314 @@
+/* ========================================
+   ALAN VAULT - CHART COMPONENTS
+   Data Visualization Styles
+   ======================================== */
+
+/* Chart Container */
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    margin: var(--spacing-md) 0;
+}
+
+/* Chart Card */
+.chart-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.chart-title {
+    font-size: var(--font-size-md);
+    font-weight: var(--font-semibold);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+/* Chart Legend */
+.chart-legend {
+    display: flex;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+/* Bar Chart */
+.bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--spacing-md);
+    height: 250px;
+    padding: var(--spacing-md) 0;
+}
+
+.bar-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.bar {
+    width: 100%;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-sm);
+    transition: height var(--transition-base);
+    position: relative;
+    cursor: pointer;
+}
+
+.bar:hover {
+    opacity: 0.8;
+}
+
+.bar-value {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+}
+
+.bar-label {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+}
+
+/* Line Chart */
+.line-chart {
+    position: relative;
+    height: 250px;
+    margin: var(--spacing-lg) 0;
+}
+
+.chart-line {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 2;
+}
+
+.chart-area {
+    fill: url(#areaGradient);
+    opacity: 0.3;
+}
+
+.chart-point {
+    fill: var(--primary);
+    cursor: pointer;
+}
+
+.chart-point:hover {
+    fill: var(--secondary);
+    r: 6;
+}
+
+/* Pie Chart */
+.pie-chart {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background: conic-gradient(
+        var(--primary) 0deg 90deg,
+        var(--secondary) 90deg 180deg,
+        var(--success) 180deg 270deg,
+        var(--warning) 270deg 360deg
+    );
+}
+
+.pie-segment {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    clip-path: path("M 100 100 L 100 0 A 100 100 0 0 1 200 100 Z");
+}
+
+.pie-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    background: var(--bg-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.pie-value {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-bold);
+    color: var(--primary);
+}
+
+.pie-label {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+}
+
+/* Donut Chart */
+.donut-chart {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background: conic-gradient(
+        var(--primary) 0% 30%,
+        var(--secondary) 30% 55%,
+        var(--success) 55% 75%,
+        var(--warning) 75% 100%
+    );
+}
+
+.donut-hole {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    background: var(--bg-primary);
+    border-radius: 50%;
+}
+
+/* Progress Circle */
+.progress-circle {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.progress-ring {
+    transform: rotate(-90deg);
+}
+
+.progress-ring-circle {
+    fill: none;
+    stroke: var(--border-medium);
+    stroke-width: 8;
+}
+
+.progress-ring-fill {
+    fill: none;
+    stroke: var(--gradient-primary);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset var(--transition-base);
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.progress-value {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-bold);
+    color: var(--primary);
+}
+
+/* Mini Sparkline */
+.sparkline {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 30px;
+}
+
+.sparkline-bar {
+    width: 4px;
+    background: var(--primary);
+    border-radius: 2px;
+    transition: height var(--transition-base);
+}
+
+/* Gauge Chart */
+.gauge-chart {
+    position: relative;
+    width: 200px;
+    height: 100px;
+    margin: 0 auto;
+}
+
+.gauge-needle {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    height: 80px;
+    background: var(--danger);
+    transform-origin: bottom center;
+    transition: transform var(--transition-base);
+}
+
+/* Chart Tooltip */
+.chart-tooltip {
+    position: absolute;
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+    pointer-events: none;
+    z-index: var(--z-tooltip);
+    white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .chart-container {
+        height: 250px;
+    }
+    
+    .chart-legend {
+        justify-content: center;
+    }
+    
+    .bar-chart {
+        height: 200px;
+    }
+    
+    .pie-chart,
+    .donut-chart {
+        width: 150px;
+        height: 150px;
+    }
+}

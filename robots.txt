@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+
+Allow: /index.html
+Allow: /dashboard.html
+Allow: /login.html
+Allow: /signup.html
+Allow: /notes.html
+Allow: /tasks.html
+Allow: /bookmarks.html
+Allow: /vault.html
+Allow: /profile.html
+Allow: /settings.html
+Allow: /analytics.html
+
+Disallow: /admin.html
+Disallow: /admin-login.html
+Disallow: /api/
+Disallow: /database/
+Disallow: /uploads/
+
+Sitemap: https://alanvault.com/sitemap.xml

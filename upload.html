@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Files - Alan Vault</title>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Alan Vault</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon/android-chrome-512x512.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <meta name="theme-color" content="#4F46E5">
+    
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: white; }
+        .animated-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 20% 50%, rgba(79,70,229,0.15) 0%, transparent 50%); }
+        
+        .container { max-width: 800px; margin: 2rem auto; padding: 2rem; }
+        .upload-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border: 1px solid rgba(139,92,246,0.2); border-radius: 32px; padding: 3rem; text-align: center; }
+        .upload-zone { border: 2px dashed rgba(139,92,246,0.3); border-radius: 24px; padding: 3rem; margin: 2rem 0; transition: all 0.3s; cursor: pointer; }
+        .upload-zone.drag-over { border-color: #8B5CF6; background: rgba(139,92,246,0.05); }
+        .upload-icon { font-size: 4rem; margin-bottom: 1rem; }
+        .upload-list { margin-top: 2rem; }
+        .upload-item { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .progress-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-top: 0.5rem; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #4F46E5, #8B5CF6); width: 0%; transition: width 0.3s; }
+        .btn-primary { background: linear-gradient(135deg, #4F46E5, #8B5CF6); padding: 12px 24px; border: none; border-radius: 12px; color: white; cursor: pointer; }
+        .btn-outline { background: transparent; border: 1px solid rgba(139,92,246,0.5); color: #8B5CF6; padding: 10px 20px; border-radius: 12px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    <div class="container">
+        <div class="upload-card">
+            <h1>📤 Upload Files</h1>
+            <p style="color: #a1a1aa; margin-top: 0.5rem;">Drag & drop or click to select files</p>
+            
+            <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">☁️</div>
+                <p>Drag & drop files here or click to browse</p>
+                <p style="color: #71717a; font-size: 0.875rem; margin-top: 0.5rem;">Maximum file size: 100MB</p>
+                <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFiles(this.files)">
+            </div>
+            
+            <div id="uploadList" class="upload-list"></div>
+            
+            <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+                <a href="vault.html" class="btn-outline">← Back to Vault</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentUser = null;
+        
+        function init() {
+            const user = localStorage.getItem('currentUser');
+            if (!user) { location.href = 'login.html'; return; }
+            currentUser = JSON.parse(user);
+            setupDragDrop();
+        }
+        
+        function setupDragDrop() {
+            const dropZone = document.getElementById('dropZone');
+            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+            dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('drag-over'); });
+            dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); handleFiles(e.dataTransfer.files); });
+        }
+        
+        function handleFiles(files) {
+            for (let file of files) { uploadFile(file); }
+        }
+        
+        function uploadFile(file) {
+            if (file.size > 100 * 1024 * 1024) { showError(file.name, 'File too large (max 100MB)'); return; }
+            
+            const uploadId = Date.now();
+            addUploadItem(uploadId, file.name, file.size);
+            
+            // Simulate upload with progress
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                updateProgress(uploadId, progress);
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    completeUpload(uploadId, file);
+                }
+            }, 200);
+        }
+        
+        function addUploadItem(id, name, size) {
+            const container = document.getElementById('uploadList');
+            const item = document.createElement('div');
+            item.className = 'upload-item';
+            item.id = `upload_${id}`;
+            item.innerHTML = `
+                <div style="flex:1">
+                    <div>📄 ${escapeHtml(name)}</div>
+                    <div class="progress-bar"><div class="progress-fill" id="progress_${id}"></div></div>
+                    <div style="font-size:0.75rem; color:#71717a;">${formatBytes(size)}</div>
+                </div>
+                <div id="status_${id}" style="color:#8B5CF6;">Uploading...</div>
+            `;
+            container.insertBefore(item, container.firstChild);
+        }
+        
+        function updateProgress(id, percent) {
+            const progressBar = document.getElementById(`progress_${id}`);
+            if (progressBar) progressBar.style.width = `${percent}%`;
+        }
+        
+        function completeUpload(id, file) {
+            const statusDiv = document.getElementById(`status_${id}`);
+            if (statusDiv) {
+                statusDiv.innerHTML = '✓ Complete';
+                statusDiv.style.color = '#10b981';
+            }
+            
+            // Save to vault
+            const vaultKey = `vault_${currentUser.id}`;
+            const vault = JSON.parse(localStorage.getItem(vaultKey) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+            vault.files.push({
+                id: Date.now().toString(),
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                date: new Date().toISOString(),
+                data: URL.createObjectURL(file)
+            });
+            localStorage.setItem(vaultKey, JSON.stringify(vault));
+        }
+        
+        function showError(name, message) { console.error(`${name}: ${message}`); }
+        function formatBytes(b){ if(b===0) return '0 Bytes'; const k=1024; const i=Math.floor(Math.log(b)/Math.log(k)); return parseFloat((b/Math.pow(k,i)).toFixed(2))+' '+['Bytes','KB','MB','GB'][i]; }
+        function escapeHtml(t){ const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+        
+        init();
+    </script>
+</body>
+</html>
