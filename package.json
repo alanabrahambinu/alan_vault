@@ -4,8 +4,7 @@
   "description": "Alan Vault - Secure Cloud Platform for Modern Workspace",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node server.js"
   },
   "keywords": [
     "cloud-storage",
@@ -41,8 +40,5 @@
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.0",
     "dotenv": "^16.0.3"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.22"
   }
 }
