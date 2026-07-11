@@ -1,33 +1,11 @@
 {
   "name": "alan-vault",
   "version": "2.0.0",
-  "description": "Alan Vault - Secure Cloud Platform for Modern Workspace",
+  "description": "Alan Vault - Secure Cloud Platform",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "keywords": [
-    "cloud-storage",
-    "file-management",
-    "notes",
-    "tasks",
-    "bookmarks",
-    "productivity",
-    "secure",
-    "encryption",
-    "pwa",
-    "offline-first"
-  ],
-  "author": "Alan Vault Team",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/alanabrahambinu/alan_vault.git"
-  },
-  "bugs": {
-    "url": "https://github.com/alanabrahambinu/alan_vault/issues"
-  },
-  "homepage": "https://alanvault.com",
   "engines": {
     "node": "18.x"
   },
