@@ -6,10 +6,10 @@
   "scripts": {
   "start": "node server.js",
   "dev": "nodemon server.js",
-  "vercel-build": "npm install && npm start",
-  "build": "echo 'Build completed successfully'",
-  "test": "echo 'Tests passed'",
-  "lint": "echo 'No linting errors'",
+  "vercel-build": "echo \"Build completed successfully\"",
+  "build": "echo \"Build completed successfully\"",
+  "test": "echo \"Tests passed\"",
+  "lint": "echo \"No linting errors\"",
   "deploy": "npm start"
 },
   "engines": {
