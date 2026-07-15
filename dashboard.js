@@ -3,6 +3,30 @@
    Main Dashboard Logic & Data Management
    ======================================== */
 
+// ========================================
+// CONFIGURATION
+// ========================================
+
+const CONFIG = {
+    STORAGE_KEYS: {
+        USER_DATA: 'currentUser',
+        VAULT_PREFIX: 'vault_',
+        THEME: 'theme',
+        SETTINGS: 'settings_'
+    },
+    LIMITS: {
+        STORAGE_LIMIT: 5 * 1024 * 1024 * 1024, // 5GB
+        MAX_FILE_SIZE: 100 * 1024 * 1024, // 100MB
+    },
+    API: {
+        BASE_URL: window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api'
+    }
+};
+
+// ========================================
+// DASHBOARD CONTROLLER CLASS
+// ========================================
+
 class DashboardController {
     constructor() {
         this.currentUser = null;
@@ -13,9 +37,11 @@ class DashboardController {
     }
     
     async init() {
-        // Check authentication
+        // Check authentication - try Supabase token first
+        const token = localStorage.getItem('authToken');
         const user = localStorage.getItem(CONFIG.STORAGE_KEYS.USER_DATA);
-        if (!user) {
+        
+        if (!token || !user) {
             window.location.href = 'login.html';
             return;
         }
@@ -30,19 +56,46 @@ class DashboardController {
     
     async loadData() {
         try {
-            // Load vault data
-            const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${this.currentUser.id}`;
-            const data = localStorage.getItem(vaultKey);
+            const token = localStorage.getItem('authToken');
+            const userId = this.currentUser.id;
             
-            if (data) {
-                this.vaultData = JSON.parse(data);
-            } else {
+            // Try to load from Supabase API first
+            try {
+                const [filesData, notesData, tasksData, bookmarksData] = await Promise.all([
+                    this.fetchFromAPI('/api/files/list', token),
+                    this.fetchFromAPI('/api/notes/list', token),
+                    this.fetchFromAPI('/api/tasks/list', token),
+                    this.fetchFromAPI('/api/bookmarks/list', token)
+                ]);
+                
                 this.vaultData = {
-                    files: [],
-                    notes: [],
-                    tasks: [],
-                    bookmarks: []
+                    files: filesData.files || [],
+                    notes: notesData.notes || [],
+                    tasks: tasksData.tasks || [],
+                    bookmarks: bookmarksData.bookmarks || []
                 };
+                
+                // Update localStorage cache
+                const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${userId}`;
+                localStorage.setItem(vaultKey, JSON.stringify(this.vaultData));
+                
+            } catch (apiError) {
+                console.log('API fetch failed, using localStorage fallback:', apiError.message);
+                
+                // Fallback to localStorage
+                const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${userId}`;
+                const data = localStorage.getItem(vaultKey);
+                
+                if (data) {
+                    this.vaultData = JSON.parse(data);
+                } else {
+                    this.vaultData = {
+                        files: [],
+                        notes: [],
+                        tasks: [],
+                        bookmarks: []
+                    };
+                }
             }
             
             // Update all dashboard components
@@ -63,6 +116,20 @@ class DashboardController {
         }
     }
     
+    async fetchFromAPI(endpoint, token) {
+        const response = await fetch(`${CONFIG.API.BASE_URL}${endpoint}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+        
+        return await response.json();
+    }
+    
     updateStats() {
         // Update statistics counters with animation
         this.animateCounter('totalFiles', this.vaultData.files.length);
@@ -80,7 +147,10 @@ class DashboardController {
         // Update storage used
         const totalSize = this.vaultData.files.reduce((sum, f) => sum + (f.size || 0), 0);
         const usedGB = (totalSize / (1024 * 1024 * 1024)).toFixed(1);
-        document.getElementById('storageUsed').textContent = `${usedGB} GB`;
+        const storageUsedEl = document.getElementById('storageUsed');
+        if (storageUsedEl) {
+            storageUsedEl.textContent = `${usedGB} GB`;
+        }
         
         // Update progress bar
         const percentUsed = (totalSize / CONFIG.LIMITS.STORAGE_LIMIT) * 100;
@@ -120,7 +190,7 @@ class DashboardController {
     updateUserDisplay() {
         const usernameElements = document.querySelectorAll('#usernameDisplay, .user-name, .welcome-name');
         usernameElements.forEach(el => {
-            if (el) el.textContent = this.currentUser.username;
+            if (el) el.textContent = this.currentUser.username || this.currentUser.name || 'User';
         });
         
         // Update welcome message based on time of day
@@ -132,7 +202,7 @@ class DashboardController {
             else if (hour < 18) greeting = 'Good afternoon';
             else greeting = 'Good evening';
             
-            welcomeEl.textContent = `${greeting}, ${this.currentUser.username}!`;
+            welcomeEl.textContent = `${greeting}, ${this.currentUser.username || 'User'}!`;
         }
     }
     
@@ -166,28 +236,82 @@ class DashboardController {
             { icon: '✅', label: 'New Task', action: () => window.location.href = 'tasks.html?new=true', color: '#10b981' },
             { icon: '🔗', label: 'Add Bookmark', action: () => window.location.href = 'bookmarks.html?new=true', color: '#f59e0b' },
             { icon: '📁', label: 'New Folder', action: () => this.createFolder(), color: '#3b82f6' },
-            { icon: '🔍', label: 'Search', action: () => document.getElementById('globalSearch')?.focus(), color: '#ec4899' }
+            { icon: '🔍', label: 'Search', action: () => document.getElementById('globalSearch')?.focus(), color: '#ec4899' },
+            { icon: '🔄', label: 'Sync', action: () => this.syncData(), color: '#8B5CF6' }
         ];
         
         actionsContainer.innerHTML = actions.map(action => `
-            <div class="quick-action-card" onclick="${action.action.toString().match(/function[^{]*\{([^}]*)\}/)?.[1] || '() => ' + action.action.toString()}" 
-                 style="background: linear-gradient(135deg, ${action.color}20, ${action.color}10); border: 1px solid ${action.color}30; border-radius: 16px; padding: 1rem; text-align: center; cursor: pointer; transition: all 0.3s;">
+            <div class="quick-action-card" data-action="${action.label}" style="
+                background: linear-gradient(135deg, ${action.color}20, ${action.color}10);
+                border: 1px solid ${action.color}30;
+                border-radius: 16px;
+                padding: 1rem;
+                text-align: center;
+                cursor: pointer;
+                transition: all 0.3s;
+                min-width: 100px;
+            ">
                 <div style="font-size: 2rem; margin-bottom: 0.5rem;">${action.icon}</div>
-                <div style="font-size: 0.875rem; color: var(--text-secondary);">${action.label}</div>
+                <div style="font-size: 0.875rem; color: var(--text-secondary, #a1a1aa);">${action.label}</div>
             </div>
         `).join('');
         
-        // Add hover effect
-        document.querySelectorAll('.quick-action-card').forEach(card => {
+        // Add click handlers
+        document.querySelectorAll('.quick-action-card').forEach((card, index) => {
+            card.addEventListener('click', () => {
+                const action = actions[index];
+                if (action && action.action) {
+                    action.action();
+                }
+            });
+            
             card.addEventListener('mouseenter', () => {
                 card.style.transform = 'translateY(-5px)';
-                card.style.boxShadow = 'var(--shadow-md)';
+                card.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
             });
             card.addEventListener('mouseleave', () => {
                 card.style.transform = 'translateY(0)';
                 card.style.boxShadow = 'none';
             });
         });
+    }
+    
+    async syncData() {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            this.showNotification('Please login first', 'error');
+            return;
+        }
+        
+        try {
+            this.showNotification('Syncing data...', 'info');
+            
+            // Get local data
+            const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${this.currentUser.id}`;
+            const localData = JSON.parse(localStorage.getItem(vaultKey) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+            
+            // Send to server
+            const response = await fetch('/api/migrate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ data: localData })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                this.showNotification(`Sync complete! ${result.count || 0} items synced.`, 'success');
+                await this.loadData();
+            } else {
+                this.showNotification(result.error || 'Sync failed', 'error');
+            }
+        } catch (error) {
+            console.error('Sync error:', error);
+            this.showNotification('Sync failed. Please try again.', 'error');
+        }
     }
     
     createFolder() {
@@ -207,10 +331,10 @@ class DashboardController {
         
         // Combine all activities
         const activities = [
-            ...this.vaultData.files.map(f => ({ ...f, type: 'file', icon: '📄', action: 'uploaded', name: f.name, date: f.date })),
-            ...this.vaultData.notes.map(n => ({ ...n, type: 'note', icon: '📝', action: 'updated', name: n.title, date: n.updated })),
-            ...this.vaultData.tasks.map(t => ({ ...t, type: 'task', icon: '✅', action: t.completed ? 'completed' : 'created', name: t.title, date: t.updated || t.created })),
-            ...this.vaultData.bookmarks.map(b => ({ ...b, type: 'bookmark', icon: '🔗', action: 'added', name: b.title, date: b.created }))
+            ...this.vaultData.files.map(f => ({ ...f, type: 'file', icon: '📄', action: 'uploaded', name: f.name, date: f.date || f.uploaded_at || f.created_at })),
+            ...this.vaultData.notes.map(n => ({ ...n, type: 'note', icon: '📝', action: 'updated', name: n.title, date: n.updated || n.updated_at || n.created_at })),
+            ...this.vaultData.tasks.map(t => ({ ...t, type: 'task', icon: '✅', action: t.completed ? 'completed' : 'created', name: t.title, date: t.updated || t.updated_at || t.created_at || t.created })),
+            ...this.vaultData.bookmarks.map(b => ({ ...b, type: 'bookmark', icon: '🔗', action: 'added', name: b.title, date: b.created || b.created_at }))
         ];
         
         // Sort by date (newest first)
@@ -219,7 +343,7 @@ class DashboardController {
         
         if (recentActivities.length === 0) {
             container.innerHTML = `
-                <div style="text-align: center; padding: 3rem; color: var(--text-tertiary);">
+                <div style="text-align: center; padding: 3rem; color: var(--text-tertiary, #71717a);">
                     <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
                     <p>No recent activity</p>
                     <p style="font-size: 0.875rem;">Start by uploading files or creating notes</p>
@@ -238,6 +362,7 @@ class DashboardController {
                 border-radius: 12px;
                 transition: all 0.3s;
                 cursor: pointer;
+                margin-bottom: 0.5rem;
             ">
                 <div class="activity-icon" style="
                     width: 40px;
@@ -251,9 +376,9 @@ class DashboardController {
                 ">${activity.icon}</div>
                 <div class="activity-content" style="flex: 1;">
                     <div class="activity-title" style="font-weight: 500; margin-bottom: 0.25rem;">
-                        ${activity.action} ${this.escapeHtml(activity.name)}
+                        ${activity.action} ${this.escapeHtml(activity.name || 'Untitled')}
                     </div>
-                    <div class="activity-time" style="font-size: 0.7rem; color: var(--text-tertiary);">
+                    <div class="activity-time" style="font-size: 0.7rem; color: var(--text-tertiary, #71717a);">
                         ${this.formatRelativeTime(activity.date)}
                     </div>
                 </div>
@@ -281,7 +406,11 @@ class DashboardController {
     }
     
     formatRelativeTime(dateString) {
+        if (!dateString) return 'Just now';
+        
         const date = new Date(dateString);
+        if (isNaN(date.getTime())) return 'Just now';
+        
         const now = new Date();
         const diffMs = now - date;
         const diffMins = Math.floor(diffMs / 60000);
@@ -320,6 +449,11 @@ class DashboardController {
             if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
                 e.preventDefault();
                 this.refresh();
+            }
+            // Ctrl/Cmd + S - Sync data
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                this.syncData();
             }
         });
         
@@ -361,8 +495,10 @@ class DashboardController {
     }
     
     showNotification(message, type) {
-        if (window.notify) {
+        if (window.notify && window.notify[type]) {
             window.notify[type](message);
+        } else if (window.showToast) {
+            window.showToast(message, type);
         } else {
             console.log(`[${type}] ${message}`);
         }
@@ -386,7 +522,23 @@ class DashboardController {
     }
 }
 
+// ========================================
+// INITIALIZATION
+// ========================================
+
 // Initialize dashboard when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     window.dashboard = new DashboardController();
 });
+
+// Handle logout
+window.logoutUser = function() {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('loggedIn');
+    window.location.href = 'login.html';
+};
+
+console.log('📊 Dashboard controller loaded (Supabase Ready)');
+console.log('🌐 Using Supabase API with local fallback');
+console.log('💡 Quick actions: Ctrl+R to refresh, Ctrl+S to sync');

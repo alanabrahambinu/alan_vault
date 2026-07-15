@@ -693,7 +693,7 @@
 
     <script>
         // ========================================
-        // COMPLETE FIXED JAVASCRIPT
+        // COMPLETE FIXED JAVASCRIPT WITH SUPABASE
         // ========================================
         
         // ========================================
@@ -838,6 +838,74 @@
         }
 
         // ========================================
+        // API CALLS TO BACKEND
+        // ========================================
+        
+        async function apiCall(endpoint, options = {}) {
+            try {
+                const response = await fetch(endpoint, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(options.headers || {})
+                    }
+                });
+                
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.message || data.error || 'Request failed');
+                }
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        async function loginUser(email, password) {
+            try {
+                // Try Supabase API first
+                const data = await apiCall('/api/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, password })
+                });
+                
+                if (data.token) {
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    return { success: true, user: data.user };
+                }
+                return { success: false, error: 'Invalid response from server' };
+                
+            } catch (error) {
+                console.log('Supabase login failed, trying local fallback:', error.message);
+                
+                // Fallback to local storage
+                const users = getUsers();
+                const user = users.find(u => u.email === email && u.password === password);
+                
+                if (user) {
+                    user.lastLogin = new Date().toISOString();
+                    saveUsers(users);
+                    
+                    const sessionUser = {
+                        id: user.id,
+                        username: user.username,
+                        email: user.email,
+                        role: user.role || 'user'
+                    };
+                    
+                    localStorage.setItem('currentUser', JSON.stringify(sessionUser));
+                    localStorage.setItem('loggedIn', 'true');
+                    
+                    return { success: true, user: sessionUser };
+                }
+                
+                return { success: false, error: 'Invalid credentials' };
+            }
+        }
+
+        // ========================================
         // FORM HANDLER
         // ========================================
         
@@ -850,7 +918,7 @@
         initDefaultUsers();
 
         // Form submission
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const email = document.getElementById('email').value.trim();
@@ -869,57 +937,42 @@
                 return;
             }
             
-            // Get users
-            const users = getUsers();
-            console.log('Users in system:', users.length);
+            // Disable button
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = 'Signing in...';
+            loginBtn.style.opacity = '0.7';
             
-            // Find user
-            const user = users.find(u => u.email === email && u.password === password);
-            
-            if (user) {
-                // Check if user is active
-                if (user.status === 'suspended') {
-                    showError('Your account has been suspended. Please contact support.');
-                    return;
-                }
+            try {
+                const result = await loginUser(email, password);
                 
-                // Update last login
-                user.lastLogin = new Date().toISOString();
-                saveUsers(users);
-                
-                // Store session
-                const sessionUser = {
-                    id: user.id,
-                    username: user.username,
-                    email: user.email,
-                    role: user.role || 'user'
-                };
-                
-                localStorage.setItem('currentUser', JSON.stringify(sessionUser));
-                localStorage.setItem('loggedIn', 'true');
-                
-                if (rememberMe) {
-                    localStorage.setItem('rememberMe', 'true');
+                if (result.success) {
+                    if (rememberMe) {
+                        localStorage.setItem('rememberMe', 'true');
+                        localStorage.setItem('saved_email', email);
+                    } else {
+                        localStorage.removeItem('rememberMe');
+                        localStorage.removeItem('saved_email');
+                    }
+                    
+                    showSuccess('✓ Login successful! Redirecting...');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
+                    
                 } else {
-                    localStorage.removeItem('rememberMe');
+                    showError('❌ ' + (result.error || 'Invalid credentials. Please try again.'));
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = 'Sign In →';
+                    loginBtn.style.opacity = '1';
                 }
                 
-                // Show success
-                showSuccess('✓ Login successful! Redirecting...');
-                
-                // Redirect
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
-                
-            } else {
-                // Check if user exists but password is wrong
-                const userExists = users.find(u => u.email === email);
-                if (userExists) {
-                    showError('❌ Invalid password. Please try again.');
-                } else {
-                    showError('❌ No account found with this email. Please <a href="signup.html" style="color:#8B5CF6;">sign up</a>');
-                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('❌ Network error. Please check your connection and try again.');
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = 'Sign In →';
+                loginBtn.style.opacity = '1';
             }
         });
 
@@ -954,11 +1007,6 @@
             successDiv.style.display = 'block';
             successDiv.classList.add('show');
             
-            // Disable button
-            loginBtn.disabled = true;
-            loginBtn.innerHTML = 'Redirecting...';
-            loginBtn.style.opacity = '0.7';
-            
             setTimeout(() => {
                 successDiv.classList.remove('show');
                 setTimeout(() => {
@@ -972,8 +1020,6 @@
         // ========================================
         
         document.addEventListener('keydown', function(e) {
-            // Enter key submits form (already handled by form)
-            // Escape key clears inputs
             if (e.key === 'Escape') {
                 document.getElementById('email').value = '';
                 document.getElementById('password').value = '';
@@ -986,21 +1032,25 @@
         // ========================================
         
         document.addEventListener('DOMContentLoaded', function() {
-            // Auto-focus email field
             document.getElementById('email').focus();
             
-            // Load saved email
             const savedEmail = localStorage.getItem('saved_email');
             if (savedEmail) {
                 document.getElementById('email').value = savedEmail;
                 document.getElementById('rememberMe').checked = true;
-                // Focus password
                 document.getElementById('password').focus();
+            }
+            
+            // Check if already logged in
+            const token = localStorage.getItem('authToken');
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (token && user.id) {
+                window.location.href = 'dashboard.html';
             }
         });
 
         // ========================================
-        // ADD SHAKE ANIMATION
+        // ADD SHAKE ANIMATION & TOAST STYLES
         // ========================================
         
         const style = document.createElement('style');
@@ -1040,15 +1090,15 @@
         // CONSOLE DEBUG INFO
         // ========================================
         
-        console.log('🔐 Alan Vault Login Page');
+        console.log('🔐 Alan Vault Login Page (Supabase Ready)');
         console.log('📧 Available users:', getUsers().map(u => ({
             username: u.username,
-            email: u.email,
-            password: u.password
+            email: u.email
         })));
         console.log('💡 Default credentials:');
         console.log('   Admin: admin@alanvault.com / admin123');
         console.log('   Demo: demo@example.com / demo123');
+        console.log('🌐 Using Supabase API with local fallback');
     </script>
 </body>
 </html>

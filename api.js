@@ -3,6 +3,70 @@
    REST API Communication Layer
    ======================================== */
 
+// ========================================
+// CONFIGURATION
+// ========================================
+
+const CONFIG = {
+    API: {
+        BASE_URL: window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000/api' 
+            : '/api',
+        TIMEOUT: 30000,
+        RETRY_ATTEMPTS: 3,
+        RETRY_DELAY: 1000
+    },
+    STORAGE_KEYS: {
+        AUTH_TOKEN: 'authToken',
+        USER_DATA: 'currentUser',
+        VAULT_PREFIX: 'vault_'
+    },
+    ENDPOINTS: {
+        AUTH: {
+            LOGIN: '/auth/login',
+            SIGNUP: '/auth/signup',
+            LOGOUT: '/auth/logout',
+            VERIFY: '/auth/verify'
+        },
+        FILES: {
+            LIST: '/files/list',
+            UPLOAD: '/files/upload',
+            DELETE: '/files/delete',
+            RENAME: '/files/rename'
+        },
+        NOTES: {
+            LIST: '/notes/list',
+            CREATE: '/notes/create',
+            UPDATE: '/notes/update',
+            DELETE: '/notes/delete'
+        },
+        TASKS: {
+            LIST: '/tasks/list',
+            CREATE: '/tasks/create',
+            UPDATE: '/tasks/update',
+            DELETE: '/tasks/delete'
+        },
+        BOOKMARKS: {
+            LIST: '/bookmarks/list',
+            CREATE: '/bookmarks/create',
+            DELETE: '/bookmarks/delete'
+        },
+        USER: {
+            PROFILE: '/user/profile',
+            UPDATE: '/user/update',
+            DELETE: '/user/delete'
+        },
+        ADMIN: {
+            USERS: '/admin/users',
+            DELETE_USER: '/users'
+        }
+    }
+};
+
+// ========================================
+// API SERVICE CLASS
+// ========================================
+
 class APIService {
     constructor() {
         this.baseURL = CONFIG.API.BASE_URL;
@@ -19,6 +83,12 @@ class APIService {
     init() {
         this.setupDefaultHeaders();
         this.loadAuthToken();
+        this.setupSupabaseFallback();
+    }
+    
+    setupSupabaseFallback() {
+        // Check if Supabase is available via server
+        this.useSupabase = true;
     }
     
     setupDefaultHeaders() {
@@ -79,7 +149,7 @@ class APIService {
                 }
                 
                 if (!response.ok) {
-                    throw new Error(data.message || `HTTP ${response.status}`);
+                    throw new Error(data.message || data.error || `HTTP ${response.status}`);
                 }
                 
                 return {
@@ -99,11 +169,44 @@ class APIService {
             }
         }
         
+        // If all retries fail, try localStorage fallback for GET requests
+        if (options.method === 'GET' || !options.method) {
+            const fallbackData = this.getLocalFallback(endpoint);
+            if (fallbackData) {
+                console.log('Using localStorage fallback for:', endpoint);
+                return {
+                    success: true,
+                    data: fallbackData,
+                    status: 200,
+                    fromFallback: true
+                };
+            }
+        }
+        
         return {
             success: false,
-            error: lastError.message,
-            status: lastError.status || 500
+            error: lastError ? lastError.message : 'Request failed',
+            status: lastError ? lastError.status || 500 : 500
         };
+    }
+    
+    getLocalFallback(endpoint) {
+        const user = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USER_DATA) || '{}');
+        if (!user.id) return null;
+        
+        const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${user.id}`;
+        const vault = JSON.parse(localStorage.getItem(vaultKey) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+        
+        if (endpoint.includes('/files/list')) return { files: vault.files || [] };
+        if (endpoint.includes('/notes/list')) return { notes: vault.notes || [] };
+        if (endpoint.includes('/tasks/list')) return { tasks: vault.tasks || [] };
+        if (endpoint.includes('/bookmarks/list')) return { bookmarks: vault.bookmarks || [] };
+        if (endpoint.includes('/admin/users')) {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            return { users: users };
+        }
+        
+        return null;
     }
     
     async fetchWithTimeout(url, options) {
@@ -124,7 +227,6 @@ class APIService {
     }
     
     buildURL(endpoint) {
-        // Remove leading slash if present
         const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
         return `${this.baseURL}/${cleanEndpoint}`;
     }
@@ -199,7 +301,11 @@ class APIService {
             
             xhr.addEventListener('load', () => {
                 if (xhr.status === 200) {
-                    resolve(JSON.parse(xhr.response));
+                    try {
+                        resolve(JSON.parse(xhr.response));
+                    } catch (e) {
+                        resolve({ success: true, message: 'Upload complete' });
+                    }
                 } else {
                     reject(new Error(`Upload failed: ${xhr.status}`));
                 }
@@ -208,7 +314,7 @@ class APIService {
             xhr.addEventListener('error', () => reject(new Error('Network error')));
             
             xhr.open('POST', this.buildURL(endpoint));
-            xhr.setRequestHeader('Authorization', this.defaultHeaders['Authorization']);
+            xhr.setRequestHeader('Authorization', this.defaultHeaders['Authorization'] || '');
             xhr.send(formData);
         });
     }
@@ -231,22 +337,68 @@ class APIService {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
     
-    // Auth endpoints
+    // ========================================
+    // AUTH ENDPOINTS
+    // ========================================
+    
     async login(email, password) {
-        const response = await this.post(CONFIG.ENDPOINTS.AUTH.LOGIN, { email, password });
-        if (response.success && response.data.token) {
-            this.setAuthToken(response.data.token);
+        try {
+            const response = await this.post(CONFIG.ENDPOINTS.AUTH.LOGIN, { email, password });
+            if (response.success && response.data.token) {
+                this.setAuthToken(response.data.token);
+                if (response.data.user) {
+                    localStorage.setItem(CONFIG.STORAGE_KEYS.USER_DATA, JSON.stringify(response.data.user));
+                }
+            }
+            return response;
+        } catch (error) {
+            console.error('Login error:', error);
+            // Fallback to localStorage
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const user = users.find(u => u.email === email && u.password === password);
+            if (user) {
+                const token = 'local_' + Date.now();
+                this.setAuthToken(token);
+                localStorage.setItem(CONFIG.STORAGE_KEYS.USER_DATA, JSON.stringify({
+                    id: user.id,
+                    username: user.username,
+                    email: user.email,
+                    role: user.role || 'user'
+                }));
+                return { success: true, data: { token, user } };
+            }
+            return { success: false, error: 'Invalid credentials' };
         }
-        return response;
     }
     
     async signup(userData) {
-        return this.post(CONFIG.ENDPOINTS.AUTH.SIGNUP, userData);
+        try {
+            const response = await this.post(CONFIG.ENDPOINTS.AUTH.SIGNUP, userData);
+            return response;
+        } catch (error) {
+            console.error('Signup error:', error);
+            // Fallback to localStorage
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            if (users.find(u => u.email === userData.email)) {
+                return { success: false, error: 'Email already registered' };
+            }
+            const newUser = {
+                id: 'user_' + Date.now(),
+                ...userData,
+                role: 'user',
+                status: 'active',
+                createdAt: new Date().toISOString()
+            };
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            return { success: true, data: { user: newUser } };
+        }
     }
     
     async logout() {
         const response = await this.post(CONFIG.ENDPOINTS.AUTH.LOGOUT);
         this.setAuthToken(null);
+        localStorage.removeItem(CONFIG.STORAGE_KEYS.USER_DATA);
         return response;
     }
     
@@ -254,10 +406,24 @@ class APIService {
         return this.get(CONFIG.ENDPOINTS.AUTH.VERIFY);
     }
     
-    // File endpoints
+    // ========================================
+    // FILE ENDPOINTS
+    // ========================================
+    
     async getFiles(folderId = null) {
         const params = folderId ? { folderId } : {};
-        return this.get(CONFIG.ENDPOINTS.FILES.LIST, params);
+        const response = await this.get(CONFIG.ENDPOINTS.FILES.LIST, params);
+        if (response.success && response.data.files) {
+            // Cache to localStorage
+            const user = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USER_DATA) || '{}');
+            if (user.id) {
+                const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${user.id}`;
+                const vault = JSON.parse(localStorage.getItem(vaultKey) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+                vault.files = response.data.files;
+                localStorage.setItem(vaultKey, JSON.stringify(vault));
+            }
+        }
+        return response;
     }
     
     async uploadFile(file, onProgress) {
@@ -265,20 +431,54 @@ class APIService {
     }
     
     async deleteFile(fileId) {
-        return this.delete(`${CONFIG.ENDPOINTS.FILES.DELETE}/${fileId}`);
+        const response = await this.delete(`${CONFIG.ENDPOINTS.FILES.DELETE}/${fileId}`);
+        if (response.success) {
+            // Update local cache
+            const user = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USER_DATA) || '{}');
+            if (user.id) {
+                const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${user.id}`;
+                const vault = JSON.parse(localStorage.getItem(vaultKey) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+                vault.files = vault.files.filter(f => f.id !== fileId);
+                localStorage.setItem(vaultKey, JSON.stringify(vault));
+            }
+        }
+        return response;
     }
     
     async renameFile(fileId, newName) {
         return this.put(`${CONFIG.ENDPOINTS.FILES.RENAME}/${fileId}`, { name: newName });
     }
     
-    // Note endpoints
+    // ========================================
+    // NOTE ENDPOINTS
+    // ========================================
+    
     async getNotes() {
-        return this.get(CONFIG.ENDPOINTS.NOTES.LIST);
+        const response = await this.get(CONFIG.ENDPOINTS.NOTES.LIST);
+        if (response.success && response.data.notes) {
+            const user = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USER_DATA) || '{}');
+            if (user.id) {
+                const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${user.id}`;
+                const vault = JSON.parse(localStorage.getItem(vaultKey) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+                vault.notes = response.data.notes;
+                localStorage.setItem(vaultKey, JSON.stringify(vault));
+            }
+        }
+        return response;
     }
     
     async createNote(noteData) {
-        return this.post(CONFIG.ENDPOINTS.NOTES.CREATE, noteData);
+        const response = await this.post(CONFIG.ENDPOINTS.NOTES.CREATE, noteData);
+        if (response.success) {
+            const user = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USER_DATA) || '{}');
+            if (user.id) {
+                const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${user.id}`;
+                const vault = JSON.parse(localStorage.getItem(vaultKey) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+                vault.notes.push(response.data.note);
+                localStorage.setItem(vaultKey, JSON.stringify(vault));
+            }
+        }
+        return response;
     }
     
     async updateNote(noteId, noteData) {
@@ -286,16 +486,49 @@ class APIService {
     }
     
     async deleteNote(noteId) {
-        return this.delete(`${CONFIG.ENDPOINTS.NOTES.DELETE}/${noteId}`);
+        const response = await this.delete(`${CONFIG.ENDPOINTS.NOTES.DELETE}/${noteId}`);
+        if (response.success) {
+            const user = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USER_DATA) || '{}');
+            if (user.id) {
+                const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${user.id}`;
+                const vault = JSON.parse(localStorage.getItem(vaultKey) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+                vault.notes = vault.notes.filter(n => n.id !== noteId);
+                localStorage.setItem(vaultKey, JSON.stringify(vault));
+            }
+        }
+        return response;
     }
     
-    // Task endpoints
+    // ========================================
+    // TASK ENDPOINTS
+    // ========================================
+    
     async getTasks() {
-        return this.get(CONFIG.ENDPOINTS.TASKS.LIST);
+        const response = await this.get(CONFIG.ENDPOINTS.TASKS.LIST);
+        if (response.success && response.data.tasks) {
+            const user = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USER_DATA) || '{}');
+            if (user.id) {
+                const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${user.id}`;
+                const vault = JSON.parse(localStorage.getItem(vaultKey) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+                vault.tasks = response.data.tasks;
+                localStorage.setItem(vaultKey, JSON.stringify(vault));
+            }
+        }
+        return response;
     }
     
     async createTask(taskData) {
-        return this.post(CONFIG.ENDPOINTS.TASKS.CREATE, taskData);
+        const response = await this.post(CONFIG.ENDPOINTS.TASKS.CREATE, taskData);
+        if (response.success) {
+            const user = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USER_DATA) || '{}');
+            if (user.id) {
+                const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${user.id}`;
+                const vault = JSON.parse(localStorage.getItem(vaultKey) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+                vault.tasks.push(response.data.task);
+                localStorage.setItem(vaultKey, JSON.stringify(vault));
+            }
+        }
+        return response;
     }
     
     async updateTask(taskId, taskData) {
@@ -303,23 +536,69 @@ class APIService {
     }
     
     async deleteTask(taskId) {
-        return this.delete(`${CONFIG.ENDPOINTS.TASKS.DELETE}/${taskId}`);
+        const response = await this.delete(`${CONFIG.ENDPOINTS.TASKS.DELETE}/${taskId}`);
+        if (response.success) {
+            const user = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USER_DATA) || '{}');
+            if (user.id) {
+                const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${user.id}`;
+                const vault = JSON.parse(localStorage.getItem(vaultKey) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+                vault.tasks = vault.tasks.filter(t => t.id !== taskId);
+                localStorage.setItem(vaultKey, JSON.stringify(vault));
+            }
+        }
+        return response;
     }
     
-    // Bookmark endpoints
+    // ========================================
+    // BOOKMARK ENDPOINTS
+    // ========================================
+    
     async getBookmarks() {
-        return this.get(CONFIG.ENDPOINTS.BOOKMARKS.LIST);
+        const response = await this.get(CONFIG.ENDPOINTS.BOOKMARKS.LIST);
+        if (response.success && response.data.bookmarks) {
+            const user = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USER_DATA) || '{}');
+            if (user.id) {
+                const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${user.id}`;
+                const vault = JSON.parse(localStorage.getItem(vaultKey) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+                vault.bookmarks = response.data.bookmarks;
+                localStorage.setItem(vaultKey, JSON.stringify(vault));
+            }
+        }
+        return response;
     }
     
     async createBookmark(bookmarkData) {
-        return this.post(CONFIG.ENDPOINTS.BOOKMARKS.CREATE, bookmarkData);
+        const response = await this.post(CONFIG.ENDPOINTS.BOOKMARKS.CREATE, bookmarkData);
+        if (response.success) {
+            const user = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USER_DATA) || '{}');
+            if (user.id) {
+                const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${user.id}`;
+                const vault = JSON.parse(localStorage.getItem(vaultKey) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+                vault.bookmarks.push(response.data.bookmark);
+                localStorage.setItem(vaultKey, JSON.stringify(vault));
+            }
+        }
+        return response;
     }
     
     async deleteBookmark(bookmarkId) {
-        return this.delete(`${CONFIG.ENDPOINTS.BOOKMARKS.DELETE}/${bookmarkId}`);
+        const response = await this.delete(`${CONFIG.ENDPOINTS.BOOKMARKS.DELETE}/${bookmarkId}`);
+        if (response.success) {
+            const user = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.USER_DATA) || '{}');
+            if (user.id) {
+                const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${user.id}`;
+                const vault = JSON.parse(localStorage.getItem(vaultKey) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+                vault.bookmarks = vault.bookmarks.filter(b => b.id !== bookmarkId);
+                localStorage.setItem(vaultKey, JSON.stringify(vault));
+            }
+        }
+        return response;
     }
     
-    // User endpoints
+    // ========================================
+    // USER ENDPOINTS
+    // ========================================
+    
     async getProfile() {
         return this.get(CONFIG.ENDPOINTS.USER.PROFILE);
     }
@@ -331,8 +610,44 @@ class APIService {
     async deleteAccount() {
         return this.delete(CONFIG.ENDPOINTS.USER.DELETE);
     }
+    
+    // ========================================
+    // ADMIN ENDPOINTS
+    // ========================================
+    
+    async getUsers() {
+        const response = await this.get(CONFIG.ENDPOINTS.ADMIN.USERS);
+        if (response.success && response.data.users) {
+            localStorage.setItem('users', JSON.stringify(response.data.users));
+        }
+        return response;
+    }
+    
+    async deleteUser(userId) {
+        const response = await this.delete(`${CONFIG.ENDPOINTS.ADMIN.DELETE_USER}/${userId}`);
+        if (response.success) {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            localStorage.setItem('users', JSON.stringify(users.filter(u => u.id !== userId)));
+        }
+        return response;
+    }
+    
+    // ========================================
+    // MIGRATION
+    // ========================================
+    
+    async migrateData(data) {
+        return this.post('/migrate', { data });
+    }
 }
 
-// Initialize API service
+// ========================================
+// INITIALIZE API SERVICE
+// ========================================
+
 const API = new APIService();
 window.API = API;
+
+console.log('🌐 API Service loaded (Supabase Ready)');
+console.log('📡 API Base URL:', CONFIG.API.BASE_URL);
+console.log('💡 Using localStorage fallback when API fails');

@@ -434,6 +434,30 @@
             20%, 40%, 60%, 80% { transform: translateX(5px); }
         }
 
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: white;
+            font-size: 0.9rem;
+            z-index: 10001;
+            animation: slideInRight 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            max-width: 90vw;
+        }
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        .toast.info { background: #3b82f6; }
+        .toast.warning { background: #f59e0b; }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
         /* ========================================
            RESPONSIVE BREAKPOINTS
            ======================================== */
@@ -631,7 +655,7 @@
 
     <script>
         // ========================================
-        // COMPLETE FIXED JAVASCRIPT
+        // COMPLETE FIXED JAVASCRIPT WITH SUPABASE
         // ========================================
         
         // ========================================
@@ -687,6 +711,26 @@
         }
 
         // ========================================
+        // TOAST NOTIFICATION
+        // ========================================
+        
+        function showToast(message, type = 'info') {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ========================================
         // PASSWORD STRENGTH CHECKER
         // ========================================
         
@@ -734,6 +778,104 @@
         });
 
         // ========================================
+        // API CALL TO BACKEND
+        // ========================================
+        
+        async function apiCall(endpoint, options = {}) {
+            try {
+                const response = await fetch(endpoint, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(options.headers || {})
+                    }
+                });
+                
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.message || data.error || 'Request failed');
+                }
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        async function signupUser(username, email, password) {
+            try {
+                // Try Supabase API first
+                const data = await apiCall('/api/auth/signup', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, email, password })
+                });
+                
+                return { success: true, data };
+                
+            } catch (error) {
+                console.log('Supabase signup failed, trying local fallback:', error.message);
+                
+                // Fallback to localStorage
+                const users = getUsers();
+                if (users.find(u => u.email === email)) {
+                    return { success: false, error: 'Email already registered' };
+                }
+                
+                if (users.find(u => u.username === username)) {
+                    return { success: false, error: 'Username already taken' };
+                }
+                
+                const newUser = {
+                    id: generateId(),
+                    username,
+                    email,
+                    password,
+                    role: 'user',
+                    status: 'active',
+                    verified: false,
+                    createdAt: new Date().toISOString(),
+                    lastLogin: null,
+                    storageUsed: 0,
+                    plan: 'free'
+                };
+                
+                users.push(newUser);
+                saveUsers(users);
+                
+                // Create vault
+                const vaultKey = `vault_${newUser.id}`;
+                localStorage.setItem(vaultKey, JSON.stringify({
+                    files: [],
+                    notes: [],
+                    tasks: [],
+                    bookmarks: []
+                }));
+                
+                // Create settings
+                const settingsKey = `settings_${newUser.id}`;
+                localStorage.setItem(settingsKey, JSON.stringify({
+                    theme: 'dark',
+                    compactMode: false,
+                    emailNotifications: true,
+                    pushNotifications: true,
+                    taskReminders: true,
+                    sessionTimeout: '60'
+                }));
+                
+                // Create profile
+                const profileKey = `profile_${newUser.id}`;
+                localStorage.setItem(profileKey, JSON.stringify({
+                    fullName: username,
+                    username: username,
+                    email: email,
+                    memberSince: new Date().toLocaleDateString()
+                }));
+                
+                return { success: true, data: { user: newUser } };
+            }
+        }
+
+        // ========================================
         // FORM HANDLER
         // ========================================
         
@@ -742,7 +884,7 @@
         const successDiv = document.getElementById('successMessage');
         const signupBtn = document.getElementById('signupBtn');
 
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const firstName = document.getElementById('firstName').value.trim();
@@ -828,100 +970,41 @@
             }
             
             // ========================================
-            // CHECK EXISTING USERS
+            // CREATE USER - TRY API FIRST
             // ========================================
-            
-            const users = getUsers();
-            
-            // Check email
-            if (users.find(u => u.email === email)) {
-                showError('An account already exists with this email');
-                document.getElementById('email').style.animation = 'shake 0.3s ease';
-                setTimeout(() => {
-                    document.getElementById('email').style.animation = '';
-                }, 300);
-                return;
-            }
-            
-            // Check username
-            if (users.find(u => u.username === username)) {
-                showError('Username already taken');
-                document.getElementById('username').style.animation = 'shake 0.3s ease';
-                setTimeout(() => {
-                    document.getElementById('username').style.animation = '';
-                }, 300);
-                return;
-            }
-            
-            // ========================================
-            // CREATE USER
-            // ========================================
-            
-            const newUser = {
-                id: generateId(),
-                username: fullName,
-                email: email,
-                password: password,
-                role: 'user',
-                status: 'active',
-                verified: false,
-                createdAt: new Date().toISOString(),
-                lastLogin: null,
-                storageUsed: 0,
-                plan: 'free'
-            };
-            
-            // Save user
-            users.push(newUser);
-            saveUsers(users);
-            console.log('User created:', newUser.username);
-            
-            // Create vault for new user
-            const vaultKey = `vault_${newUser.id}`;
-            const emptyVault = {
-                files: [],
-                notes: [],
-                tasks: [],
-                bookmarks: []
-            };
-            localStorage.setItem(vaultKey, JSON.stringify(emptyVault));
-            console.log('Vault created for:', newUser.username);
-            
-            // Create settings
-            const settingsKey = `settings_${newUser.id}`;
-            localStorage.setItem(settingsKey, JSON.stringify({
-                theme: 'dark',
-                compactMode: false,
-                emailNotifications: true,
-                pushNotifications: true,
-                taskReminders: true,
-                sessionTimeout: '60'
-            }));
-            
-            // Create profile
-            const profileKey = `profile_${newUser.id}`;
-            localStorage.setItem(profileKey, JSON.stringify({
-                fullName: fullName,
-                username: username,
-                email: email,
-                memberSince: new Date().toLocaleDateString()
-            }));
-            
-            // Show success
-            showSuccess('✓ Account created successfully! Redirecting to login...');
             
             // Disable button
             signupBtn.disabled = true;
-            signupBtn.innerHTML = 'Creating...';
+            signupBtn.innerHTML = 'Creating account...';
             signupBtn.style.opacity = '0.7';
             
-            // Store email for verification
-            sessionStorage.setItem('verifyEmail', email);
-            
-            // Redirect to login
-            setTimeout(() => {
-                window.location.href = 'login.html';
-            }, 2000);
+            try {
+                const result = await signupUser(username, email, password);
+                
+                if (result.success) {
+                    showSuccess('✅ Account created successfully! Redirecting to login...');
+                    
+                    // Store email for verification
+                    sessionStorage.setItem('verifyEmail', email);
+                    
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                    
+                } else {
+                    showError('❌ ' + (result.error || 'Registration failed. Please try again.'));
+                    signupBtn.disabled = false;
+                    signupBtn.innerHTML = 'Create Free Account →';
+                    signupBtn.style.opacity = '1';
+                }
+                
+            } catch (error) {
+                console.error('Signup error:', error);
+                showError('❌ Network error. Please check your connection and try again.');
+                signupBtn.disabled = false;
+                signupBtn.innerHTML = 'Create Free Account →';
+                signupBtn.style.opacity = '1';
+            }
         });
 
         // ========================================
@@ -977,15 +1060,23 @@
         
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('firstName').focus();
+            
+            // Check if already logged in
+            const token = localStorage.getItem('authToken');
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (token && user.id) {
+                window.location.href = 'dashboard.html';
+            }
         });
 
         // ========================================
         // CONSOLE DEBUG INFO
         // ========================================
         
-        console.log('📝 Alan Vault Signup Page');
+        console.log('📝 Alan Vault Signup Page (Supabase Ready)');
         console.log('👤 Existing users:', getUsers().length);
         console.log('💡 Sign up to create your account!');
+        console.log('🌐 Using Supabase API with local fallback');
     </script>
 </body>
 </html>

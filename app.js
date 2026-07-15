@@ -3,6 +3,44 @@
    Core Application Bootstrap & Management
    ======================================== */
 
+// ========================================
+// CONFIGURATION
+// ========================================
+
+const CONFIG = {
+    APP_NAME: 'Alan Vault',
+    APP_VERSION: '2.0.0',
+    STORAGE_KEYS: {
+        AUTH_TOKEN: 'authToken',
+        USER_DATA: 'currentUser',
+        VAULT_PREFIX: 'vault_',
+        THEME: 'theme',
+        SETTINGS: 'settings_',
+        SESSION_ID: 'session_id'
+    },
+    FEATURES: {
+        FILE_ENCRYPTION: true,
+        OFFLINE_MODE: true,
+        ANALYTICS: true,
+        TWO_FACTOR: false
+    },
+    SECURITY: {
+        SESSION_TIMEOUT: 24 * 60 * 60 * 1000 // 24 hours
+    },
+    STORAGE: {
+        FREE: 5 * 1024 * 1024 * 1024 // 5GB
+    },
+    API: {
+        BASE_URL: window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000/api' 
+            : '/api'
+    }
+};
+
+// ========================================
+// ALAN VAULT APP CLASS
+// ========================================
+
 class AlanVaultApp {
     constructor() {
         this.initialized = false;
@@ -10,6 +48,7 @@ class AlanVaultApp {
         this.components = {};
         this.listeners = [];
         this.startTime = Date.now();
+        this.syncInterval = null;
         this.init();
     }
     
@@ -52,11 +91,47 @@ class AlanVaultApp {
             // Show welcome message for logged in users
             if (this.currentUser) {
                 this.showWelcomeMessage();
+                this.startAutoSync();
             }
             
         } catch (error) {
             console.error('Initialization failed:', error);
             this.showError('Failed to initialize application. Please refresh the page.');
+        }
+    }
+    
+    startAutoSync() {
+        // Auto sync every 30 seconds
+        if (this.syncInterval) clearInterval(this.syncInterval);
+        this.syncInterval = setInterval(() => {
+            if (this.currentUser && navigator.onLine) {
+                this.syncData();
+            }
+        }, 30000);
+    }
+    
+    async syncData() {
+        try {
+            const token = localStorage.getItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN);
+            if (!token || !this.currentUser) return;
+            
+            const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${this.currentUser.id}`;
+            const localData = JSON.parse(localStorage.getItem(vaultKey) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+            
+            const response = await fetch(`${CONFIG.API.BASE_URL}/migrate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ data: localData })
+            });
+            
+            if (response.ok) {
+                console.log('🔄 Data synced to server');
+            }
+        } catch (error) {
+            console.log('Sync skipped (offline or API unavailable)');
         }
     }
     
@@ -93,16 +168,31 @@ class AlanVaultApp {
             this.analytics = window.analytics;
             this.analytics.trackPageView();
         }
+        
+        // Initialize API service
+        if (window.API) {
+            this.api = window.API;
+        }
     }
     
     async checkAuthentication() {
-        const token = localStorage.getItem(CONFIG?.STORAGE_KEYS?.AUTH_TOKEN || 'auth_token');
-        const userData = localStorage.getItem(CONFIG?.STORAGE_KEYS?.USER_DATA || 'currentUser');
+        const token = localStorage.getItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN);
+        const userData = localStorage.getItem(CONFIG.STORAGE_KEYS.USER_DATA);
         const loggedIn = localStorage.getItem('loggedIn') === 'true';
         
         if (token && userData && loggedIn) {
             try {
-                // Verify token (mock verification for now)
+                // Try to verify token with API
+                if (this.api) {
+                    const response = await this.api.verifyToken();
+                    if (response && response.success) {
+                        this.currentUser = JSON.parse(userData);
+                        this.dispatchEvent('auth:logged-in', { user: this.currentUser });
+                        return;
+                    }
+                }
+                
+                // Fallback: check if token is valid locally
                 const isValid = await this.verifyToken(token);
                 if (isValid) {
                     this.currentUser = JSON.parse(userData);
@@ -112,7 +202,9 @@ class AlanVaultApp {
                 }
             } catch (error) {
                 console.error('Token verification failed:', error);
-                this.clearAuth();
+                // If API fails, assume token is valid if it exists
+                this.currentUser = JSON.parse(userData);
+                this.dispatchEvent('auth:logged-in', { user: this.currentUser });
             }
         }
         
@@ -144,13 +236,19 @@ class AlanVaultApp {
     }
     
     clearAuth() {
-        localStorage.removeItem(CONFIG?.STORAGE_KEYS?.AUTH_TOKEN || 'auth_token');
-        localStorage.removeItem(CONFIG?.STORAGE_KEYS?.USER_DATA || 'currentUser');
-        localStorage.removeItem(CONFIG?.STORAGE_KEYS?.SESSION_ID || 'session_id');
+        localStorage.removeItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN);
+        localStorage.removeItem(CONFIG.STORAGE_KEYS.USER_DATA);
+        localStorage.removeItem(CONFIG.STORAGE_KEYS.SESSION_ID);
         localStorage.removeItem('session_expiry');
         localStorage.removeItem('loggedIn');
         this.currentUser = null;
         this.dispatchEvent('auth:logged-out');
+        
+        // Broadcast logout to other tabs
+        try {
+            localStorage.setItem('logout_event', Date.now().toString());
+            setTimeout(() => localStorage.removeItem('logout_event'), 100);
+        } catch (e) {}
     }
     
     initializeUI() {
@@ -208,7 +306,7 @@ class AlanVaultApp {
                     tooltip.className = 'custom-tooltip';
                     tooltip.textContent = tooltipText;
                     tooltip.style.cssText = `
-                        position: absolute;
+                        position: fixed;
                         background: #1a1a2e;
                         color: white;
                         padding: 4px 8px;
@@ -245,7 +343,7 @@ class AlanVaultApp {
         // Close modal on escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                const openModal = document.querySelector('.modal.active');
+                const openModal = document.querySelector('.modal.active, .modal-overlay.active');
                 if (openModal && window.closeModal) {
                     window.closeModal();
                 }
@@ -254,7 +352,7 @@ class AlanVaultApp {
         
         // Close modal on overlay click
         document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
+            if (e.target.classList.contains('modal-overlay')) {
                 if (window.closeModal) window.closeModal();
             }
         });
@@ -274,7 +372,7 @@ class AlanVaultApp {
         if (this.currentUser) {
             const usernameElements = document.querySelectorAll('#usernameDisplay, .username-display, .user-name');
             usernameElements.forEach(el => {
-                if (el) el.textContent = this.currentUser.username;
+                if (el) el.textContent = this.currentUser.username || this.currentUser.name || 'User';
             });
             
             // Update avatar if exists
@@ -291,21 +389,54 @@ class AlanVaultApp {
     async loadUserData() {
         if (!this.currentUser) return;
         
-        // Load vault data
-        const vaultKey = `vault_${this.currentUser.id}`;
+        // Try to load from API first
+        if (this.api) {
+            try {
+                const [files, notes, tasks, bookmarks] = await Promise.all([
+                    this.api.getFiles(),
+                    this.api.getNotes(),
+                    this.api.getTasks(),
+                    this.api.getBookmarks()
+                ]);
+                
+                if (files.success || notes.success || tasks.success || bookmarks.success) {
+                    this.vaultData = {
+                        files: files.success ? files.data.files || [] : [],
+                        notes: notes.success ? notes.data.notes || [] : [],
+                        tasks: tasks.success ? tasks.data.tasks || [] : [],
+                        bookmarks: bookmarks.success ? bookmarks.data.bookmarks || [] : []
+                    };
+                    
+                    // Cache to localStorage
+                    const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${this.currentUser.id}`;
+                    localStorage.setItem(vaultKey, JSON.stringify(this.vaultData));
+                    
+                    this.dispatchEvent('data:loaded', { data: this.vaultData, source: 'api' });
+                    return;
+                }
+            } catch (error) {
+                console.log('API load failed, using localStorage fallback');
+            }
+        }
+        
+        // Fallback to localStorage
+        const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${this.currentUser.id}`;
         const vaultData = localStorage.getItem(vaultKey);
         
         if (vaultData) {
             try {
                 this.vaultData = JSON.parse(vaultData);
-                this.dispatchEvent('data:loaded', { data: this.vaultData });
+                this.dispatchEvent('data:loaded', { data: this.vaultData, source: 'local' });
             } catch (e) {
                 console.error('Failed to parse vault data:', e);
+                this.vaultData = { files: [], notes: [], tasks: [], bookmarks: [] };
             }
+        } else {
+            this.vaultData = { files: [], notes: [], tasks: [], bookmarks: [] };
         }
         
         // Load settings
-        const settingsKey = `settings_${this.currentUser.id}`;
+        const settingsKey = `${CONFIG.STORAGE_KEYS.SETTINGS}${this.currentUser.id}`;
         const settingsData = localStorage.getItem(settingsKey);
         if (settingsData) {
             try {
@@ -387,7 +518,7 @@ class AlanVaultApp {
         // Handle back/forward navigation
         window.addEventListener('popstate', () => this.handlePageRouting());
         
-        // Handle clicks on nav links for SPA-like behavior
+        // Handle clicks on nav links
         document.addEventListener('click', (e) => {
             const link = e.target.closest('a');
             if (link && link.href && link.href.startsWith(window.location.origin)) {
@@ -401,7 +532,6 @@ class AlanVaultApp {
     }
     
     shouldHandleClientNavigation(path) {
-        // Don't handle external links or downloads
         if (path.includes('.pdf') || path.includes('.zip')) return false;
         return true;
     }
@@ -449,7 +579,6 @@ class AlanVaultApp {
     }
     
     handleBeforeUnload(e) {
-        // Check for unsaved changes
         if (this.hasUnsavedChanges()) {
             e.preventDefault();
             e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
@@ -458,24 +587,23 @@ class AlanVaultApp {
     }
     
     hasUnsavedChanges() {
-        // Check if any editor has unsaved changes
         if (window.noteEditor && window.noteEditor.isDirty) return true;
         if (window.taskEditor && window.taskEditor.isDirty) return true;
         return false;
     }
     
     handleStorageChange(event) {
-        if (event.key === 'currentUser' || event.key === 'auth_token') {
-            // User data changed in another tab
+        if (event.key === CONFIG.STORAGE_KEYS.USER_DATA || event.key === CONFIG.STORAGE_KEYS.AUTH_TOKEN) {
             if (event.newValue) {
-                this.currentUser = JSON.parse(event.newValue);
-                this.updateUserDisplay();
-                this.dispatchEvent('user:changed', { user: this.currentUser });
+                try {
+                    this.currentUser = JSON.parse(event.newValue);
+                    this.updateUserDisplay();
+                    this.dispatchEvent('user:changed', { user: this.currentUser });
+                } catch (e) {}
             }
         }
         
         if (event.key === 'logout_event') {
-            // Logged out from another tab
             this.clearAuth();
             if (!this.isAuthPage() && !this.isPublicPage()) {
                 window.location.href = 'login.html';
@@ -548,7 +676,7 @@ class AlanVaultApp {
             }
         }
         
-        // Ctrl/Cmd + R - Refresh data (without page reload)
+        // Ctrl/Cmd + R - Refresh data
         if (modKey && e.key === 'r') {
             e.preventDefault();
             this.refreshData();
@@ -571,10 +699,16 @@ class AlanVaultApp {
             e.preventDefault();
             window.location.href = 'tasks.html';
         }
+        
+        // Ctrl/Cmd + S - Sync data
+        if (modKey && e.shiftKey && e.key === 'S') {
+            e.preventDefault();
+            this.syncData();
+            this.showNotification('Syncing data...', 'info');
+        }
     }
     
     triggerSave() {
-        // Trigger save on active editor
         if (window.noteEditor && window.noteEditor.currentNote) {
             window.noteEditor.saveCurrentNote();
         } else if (window.taskEditor && window.taskEditor.currentTask) {
@@ -583,10 +717,8 @@ class AlanVaultApp {
     }
     
     triggerAutoSave() {
-        // Dispatch event for auto-save
         this.dispatchEvent('app:auto-save');
         
-        // Notify editors to auto-save
         if (window.noteEditor && window.noteEditor.isDirty) {
             window.noteEditor.saveCurrentNote();
         }
@@ -594,7 +726,7 @@ class AlanVaultApp {
     
     async refreshSession() {
         if (this.currentUser) {
-            const expiry = Date.now() + (CONFIG?.SECURITY?.SESSION_TIMEOUT || 24 * 60 * 60 * 1000);
+            const expiry = Date.now() + (CONFIG.SECURITY?.SESSION_TIMEOUT || 24 * 60 * 60 * 1000);
             localStorage.setItem('session_expiry', expiry);
             this.dispatchEvent('session:refreshed');
         }
@@ -603,32 +735,33 @@ class AlanVaultApp {
     async refreshData() {
         this.showNotification('Refreshing data...', 'info');
         
-        // Refresh vault data
         if (this.currentUser) {
             await this.loadUserData();
             
-            // Dispatch refresh events for components
             this.dispatchEvent('data:refresh');
             
-            // Refresh specific components if they have refresh methods
+            // Refresh specific components
             if (window.notesManager && window.notesManager.loadNotes) {
                 window.notesManager.loadNotes();
-                window.notesManager.renderNotes();
+                if (window.notesManager.renderNotes) window.notesManager.renderNotes();
             }
             if (window.tasksManager && window.tasksManager.loadTasks) {
                 window.tasksManager.loadTasks();
-                window.tasksManager.renderTasks();
+                if (window.tasksManager.renderTasks) window.tasksManager.renderTasks();
             }
             if (window.bookmarksManager && window.bookmarksManager.loadBookmarks) {
                 window.bookmarksManager.loadBookmarks();
-                window.bookmarksManager.renderBookmarks();
+                if (window.bookmarksManager.renderBookmarks) window.bookmarksManager.renderBookmarks();
             }
             if (window.folderManager && window.folderManager.loadFolders) {
                 window.folderManager.loadFolders();
-                window.folderManager.renderFolders();
+                if (window.folderManager.renderFolders) window.folderManager.renderFolders();
             }
             if (window.storageStats && window.storageStats.update) {
                 window.storageStats.update();
+            }
+            if (window.dashboard && window.dashboard.loadData) {
+                window.dashboard.loadData();
             }
         }
         
@@ -638,11 +771,11 @@ class AlanVaultApp {
     updateStorageDisplay() {
         if (!this.currentUser) return;
         
-        const vaultKey = `vault_${this.currentUser.id}`;
+        const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${this.currentUser.id}`;
         const vault = JSON.parse(localStorage.getItem(vaultKey) || '{"files":[]}');
         const totalSize = vault.files.reduce((sum, f) => sum + (f.size || 0), 0);
         const usedGB = (totalSize / (1024 * 1024 * 1024)).toFixed(2);
-        const percent = Math.min((totalSize / (5 * 1024 * 1024 * 1024)) * 100, 100);
+        const percent = Math.min((totalSize / (CONFIG.STORAGE.FREE)) * 100, 100);
         
         const storageText = document.getElementById('storageText');
         const storageBar = document.getElementById('storageBar');
@@ -663,6 +796,7 @@ class AlanVaultApp {
             'Ctrl/Cmd + Shift + D': 'Toggle dark mode',
             'Ctrl/Cmd + Shift + U': 'Upload file',
             'Ctrl/Cmd + Shift + T': 'Go to tasks',
+            'Ctrl/Cmd + Shift + S': 'Sync data',
             'Escape': 'Close modal',
             '?': 'Show this menu'
         };
@@ -684,21 +818,21 @@ class AlanVaultApp {
         `;
         
         modal.innerHTML = `
-            <div style="background: #1a1a2e; border-radius: 24px; padding: 2rem; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto;">
+            <div style="background: #1a1a2e; border-radius: 24px; padding: 2rem; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; border: 1px solid rgba(139,92,246,0.2);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <h3>⌨️ Keyboard Shortcuts</h3>
+                    <h3 style="color: white;">⌨️ Keyboard Shortcuts</h3>
                     <button onclick="this.closest('.shortcuts-modal').remove()" style="background: none; border: none; color: #a1a1aa; font-size: 1.2rem; cursor: pointer;">✕</button>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                     ${Object.entries(shortcuts).map(([key, description]) => `
                         <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                            <span style="font-family: monospace; background: rgba(139,92,246,0.2); padding: 0.25rem 0.75rem; border-radius: 6px; color: #8B5CF6;">${key}</span>
-                            <span style="color: #a1a1aa;">${description}</span>
+                            <span style="font-family: monospace; background: rgba(139,92,246,0.2); padding: 0.25rem 0.75rem; border-radius: 6px; color: #8B5CF6; font-size: 0.85rem;">${key}</span>
+                            <span style="color: #a1a1aa; font-size: 0.9rem;">${description}</span>
                         </div>
                     `).join('')}
                 </div>
                 <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem; color: #71717a; text-align: center;">
-                    <p>💡 Tip: Press <kbd style="background: rgba(139,92,246,0.2); padding: 2px 6px; border-radius: 4px;">?</kbd> anytime to see this menu</p>
+                    <p>💡 Tip: Press <kbd style="background: rgba(139,92,246,0.2); padding: 2px 6px; border-radius: 4px; color: #8B5CF6;">?</kbd> anytime to see this menu</p>
                 </div>
             </div>
         `;
@@ -727,9 +861,10 @@ class AlanVaultApp {
             this.notifications[type](message);
         } else if (window.notify) {
             window.notify[type](message);
+        } else if (window.showToast) {
+            window.showToast(message, type);
         } else {
             console.log(`[${type.toUpperCase()}] ${message}`);
-            // Fallback toast
             this.showFallbackToast(message, type);
         }
     }
@@ -738,12 +873,18 @@ class AlanVaultApp {
         const toast = document.createElement('div');
         toast.className = `fallback-toast ${type}`;
         toast.textContent = message;
+        const colors = {
+            error: '#ef4444',
+            success: '#10b981',
+            warning: '#f59e0b',
+            info: '#4F46E5'
+        };
         toast.style.cssText = `
             position: fixed;
             bottom: 20px;
             right: 20px;
             padding: 12px 20px;
-            background: ${type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : type === 'warning' ? '#f59e0b' : '#4F46E5'};
+            background: ${colors[type] || '#4F46E5'};
             color: white;
             border-radius: 8px;
             z-index: 10000;
@@ -763,7 +904,6 @@ class AlanVaultApp {
         const event = new CustomEvent(eventName, { detail });
         document.dispatchEvent(event);
         
-        // Call registered listeners
         this.listeners.forEach(listener => {
             if (listener.event === eventName) {
                 listener.callback(detail);
@@ -783,7 +923,6 @@ class AlanVaultApp {
         return this;
     }
     
-    // Utility methods
     isOnline() {
         return navigator.onLine;
     }
@@ -797,7 +936,7 @@ class AlanVaultApp {
     }
     
     getAppVersion() {
-        return CONFIG?.APP?.VERSION || '2.0.0';
+        return CONFIG.APP_VERSION;
     }
     
     getUptime() {
@@ -820,10 +959,10 @@ class AlanVaultApp {
     getStorageUsage() {
         if (!this.currentUser) return { used: 0, limit: 0, percentage: 0 };
         
-        const vaultKey = `vault_${this.currentUser.id}`;
+        const vaultKey = `${CONFIG.STORAGE_KEYS.VAULT_PREFIX}${this.currentUser.id}`;
         const vault = JSON.parse(localStorage.getItem(vaultKey) || '{"files":[]}');
         const totalSize = vault.files.reduce((sum, f) => sum + (f.size || 0), 0);
-        const limit = CONFIG?.STORAGE?.FREE || 5 * 1024 * 1024 * 1024;
+        const limit = CONFIG.STORAGE.FREE;
         
         return {
             used: totalSize,
@@ -844,24 +983,39 @@ class AlanVaultApp {
     
     async logout() {
         if (confirm('Are you sure you want to logout?')) {
-            if (window.logoutHandler) {
-                await window.logoutHandler.handleLogout();
-            } else {
-                this.clearAuth();
-                window.location.href = 'login.html';
+            // Try API logout
+            if (this.api) {
+                try {
+                    await this.api.logout();
+                } catch (e) {
+                    console.log('API logout failed, using local');
+                }
             }
+            
+            this.clearAuth();
+            if (this.syncInterval) {
+                clearInterval(this.syncInterval);
+                this.syncInterval = null;
+            }
+            window.location.href = 'login.html';
         }
     }
     
     destroy() {
-        // Cleanup
+        if (this.syncInterval) {
+            clearInterval(this.syncInterval);
+            this.syncInterval = null;
+        }
         this.listeners = [];
         this.dispatchEvent('app:destroy');
         console.log('Application destroyed');
     }
 }
 
-// Initialize app when DOM is ready
+// ========================================
+// INITIALIZE APP
+// ========================================
+
 let app = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -873,7 +1027,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {});
 } else {
-    // DOM already loaded, but wait a tick for other scripts
     setTimeout(() => {
         if (!app) {
             app = new AlanVaultApp();
@@ -927,7 +1080,23 @@ if (!document.querySelector('#app-styles')) {
             padding: 2px 6px;
             border-radius: 4px;
             font-family: monospace;
+            color: #8B5CF6;
+        }
+        
+        .shortcuts-modal::-webkit-scrollbar {
+            width: 4px;
+        }
+        .shortcuts-modal::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .shortcuts-modal::-webkit-scrollbar-thumb {
+            background: rgba(139,92,246,0.3);
+            border-radius: 2px;
         }
     `;
     document.head.appendChild(style);
 }
+
+console.log('🚀 Alan Vault App loaded (Supabase Ready)');
+console.log('🌐 Using Supabase API with localStorage fallback');
+console.log('💡 Press ? for keyboard shortcuts');
