@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>Settings - Alan Vault</title>
     
     <!-- Favicon -->
@@ -19,7 +19,7 @@
     
     <style>
         /* ========================================
-           ALL STYLES - COMPLETE
+           COMPLETE FIXED STYLES
         ======================================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -29,6 +29,45 @@
             color: #ffffff; 
             transition: background 0.3s ease, color 0.3s ease;
             min-height: 100vh;
+        }
+        
+        /* ===== SIDEBAR OVERLAY (Mobile) ===== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 99;
+        }
+        .sidebar-overlay.active { display: block; }
+        
+        /* ===== MOBILE MENU BUTTON ===== */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 101;
+            width: 44px;
+            height: 44px;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s;
+        }
+        .mobile-menu-btn:hover {
+            background: rgba(139, 92, 246, 0.2);
+            transform: scale(1.05);
         }
         
         /* ===== COMPACT MODE ===== */
@@ -69,7 +108,9 @@
             position: fixed; left: 0; top: 0; width: 280px; height: 100vh; 
             background: rgba(10,10,15,0.95); backdrop-filter: blur(20px); 
             border-right: 1px solid rgba(139,92,246,0.2); z-index: 100; 
-            transition: transform 0.3s; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
         }
         body.light .sidebar { background: rgba(255,255,255,0.95); border-right: 1px solid rgba(0,0,0,0.1); }
         body.purple .sidebar { background: rgba(15,7,23,0.95); border-right: 1px solid rgba(139,92,246,0.2); }
@@ -83,19 +124,76 @@
         .logo { display: flex; align-items: center; gap: 12px; font-size: 1.3rem; font-weight: 700; }
         .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #4F46E5, #8B5CF6); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
         
-        .sidebar-nav { padding: 1.5rem; }
+        .sidebar-nav { padding: 1.5rem; flex: 1; overflow-y: auto; }
         .nav-item { 
             display: flex; align-items: center; gap: 12px; padding: 12px 16px; 
             color: #a1a1aa; text-decoration: none; border-radius: 12px; 
             transition: all 0.3s; margin-bottom: 0.5rem; 
+            cursor: pointer;
         }
         body.light .nav-item { color: #475569; }
         .nav-item:hover, .nav-item.active { background: rgba(139,92,246,0.15); color: #8B5CF6; }
         body.light .nav-item:hover, body.light .nav-item.active { background: rgba(139,92,246,0.1); }
         
+        .admin-nav-item {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 1rem;
+            padding-top: 1rem;
+            color: #ef4444;
+        }
+        .admin-nav-item:hover {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+        
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(10, 10, 15, 0.95);
+        }
+        
+        .storage-info {
+            background: rgba(139, 92, 246, 0.1);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+        
+        .storage-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+        
+        .storage-used {
+            height: 100%;
+            background: linear-gradient(90deg, #4F46E5, #8B5CF6);
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+        
+        .logout-btn {
+            width: 100%;
+            padding: 12px;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: translateY(-2px);
+        }
+        
         /* ===== MAIN CONTENT ===== */
         .main-content { margin-left: 280px; padding: 2rem; transition: margin-left 0.3s; }
         
+        /* ===== TOP BAR ===== */
         .top-bar { 
             background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); 
             border-radius: 16px; padding: 1rem 1.5rem; 
@@ -109,6 +207,22 @@
         body.sunset .top-bar { background: rgba(249,115,22,0.05); border: 1px solid rgba(249,115,22,0.2); }
         
         .user-info { display: flex; align-items: center; gap: 1rem; }
+        
+        .admin-icon {
+            background: linear-gradient(135deg, #ef4444, #f59e0b);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .admin-icon:hover { transform: scale(1.1); }
+        
         .user-avatar { 
             width: 40px; height: 40px; 
             background: linear-gradient(135deg, #4F46E5, #8B5CF6); 
@@ -235,6 +349,7 @@
             border-radius: 12px; color: white; font-size: 0.9rem; 
             z-index: 10001; animation: slideInRight 0.3s ease; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.3); 
+            max-width: 90vw;
         }
         .toast.success { background: #10b981; }
         .toast.error { background: #ef4444; }
@@ -285,19 +400,75 @@
             to { opacity: 1; transform: scale(1); }
         }
         
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) { 
-            .sidebar { transform: translateX(-100%); } 
+        /* ========================================
+           RESPONSIVE BREAKPOINTS
+           ======================================== */
+        @media (max-width: 768px) {
+            .mobile-menu-btn { display: flex; }
+            
+            .sidebar { transform: translateX(-100%); }
             .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 1rem; }
+            
+            .sidebar-overlay.active { display: block; }
+            
+            .main-content { margin-left: 0; padding: 1rem; padding-top: 70px; }
             .top-bar { flex-direction: column; align-items: stretch; }
             .setting-item { flex-direction: column; align-items: stretch; }
             .theme-selector { justify-content: center; }
+            
+            .toast {
+                right: 10px;
+                left: 10px;
+                bottom: 10px;
+                font-size: 0.8rem;
+                padding: 10px 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .mobile-menu-btn {
+                top: 8px;
+                left: 8px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            
+            .main-content { padding-top: 60px; }
+            
+            .theme-option { width: 36px; height: 36px; }
+            .theme-option .theme-label { font-size: 7px; }
+            
+            .btn-outline, .btn-danger, .btn-success { 
+                padding: 6px 14px; 
+                font-size: 0.85rem; 
+            }
+        }
+        
+        @media (max-width: 768px) and (orientation: landscape) {
+            .sidebar { width: 240px; }
+            .main-content { padding-top: 60px; }
+            
+            .mobile-menu-btn {
+                top: 8px;
+                left: 8px;
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="animated-bg"></div>
+    
+    <!-- ===== SIDEBAR OVERLAY (Mobile) ===== -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
+    <!-- ===== MOBILE MENU BUTTON ===== -->
+    <button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Toggle Menu">
+        ☰
+    </button>
     
     <!-- ===== SIDEBAR ===== -->
     <div class="sidebar" id="sidebar">
@@ -315,6 +486,21 @@
             <a href="bookmarks.html" class="nav-item">🔗 Bookmarks</a>
             <a href="analytics.html" class="nav-item">📈 Analytics</a>
             <a href="settings.html" class="nav-item active">⚙️ Settings</a>
+            <button class="nav-item admin-nav-item" onclick="window.open('admin-login.html', '_blank')">
+                👑 Admin Panel
+            </button>
+        </div>
+        <div class="sidebar-footer">
+            <div class="storage-info">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>💾 Storage</span>
+                    <span id="storageText">0 GB / 5 GB</span>
+                </div>
+                <div class="storage-bar">
+                    <div class="storage-used" id="storageBar"></div>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
         </div>
     </div>
 
@@ -324,6 +510,7 @@
             <h2>⚙️ Settings</h2>
             <div class="user-info">
                 <span id="usernameDisplay"></span>
+                <div class="admin-icon" onclick="window.open('admin-login.html', '_blank')" title="Admin Panel">👑</div>
                 <div class="user-avatar" onclick="location.href='profile.html'">👤</div>
             </div>
         </div>
@@ -551,25 +738,72 @@
     </div>
 
     <!-- ============================================ -->
-    <!-- ===== SCRIPTS - ALL WORKING ===== -->
+    <!-- ===== SCRIPTS ===== -->
     <!-- ============================================ -->
     <script src="theme.js"></script>
     <script>
+        // ========================================
+        // COMPLETE FIXED JAVASCRIPT
+        // ========================================
+        
         let currentUser = null;
         let _2faSecret = null;
         let _2faEnabled = false;
+        
+        // ========================================
+        // HELPER FUNCTIONS
+        // ========================================
+        
+        function getCurrentUser() {
+            try {
+                const user = localStorage.getItem('currentUser');
+                return user ? JSON.parse(user) : null;
+            } catch (e) {
+                console.error('Error getting current user:', e);
+                return null;
+            }
+        }
+
+        function getVault(userId) {
+            try {
+                const key = `vault_${userId}`;
+                const data = localStorage.getItem(key);
+                if (!data) {
+                    const empty = { files: [], notes: [], tasks: [], bookmarks: [] };
+                    localStorage.setItem(key, JSON.stringify(empty));
+                    return empty;
+                }
+                return JSON.parse(data);
+            } catch (e) {
+                console.error('Error getting vault:', e);
+                return { files: [], notes: [], tasks: [], bookmarks: [] };
+            }
+        }
+
+        function updateStorage() {
+            const vault = getVault(currentUser.id);
+            const totalSize = vault.files ? vault.files.reduce((sum, f) => sum + (f.size || 0), 0) : 0;
+            const usedGB = (totalSize / (1024 * 1024 * 1024)).toFixed(2);
+            const percent = Math.min((totalSize / (5 * 1024 * 1024 * 1024)) * 100, 100);
+            document.getElementById('storageText').textContent = `${usedGB} GB / 5 GB`;
+            document.getElementById('storageBar').style.width = `${percent}%`;
+        }
         
         // ========================================
         // INITIALIZATION
         // ========================================
         
         function init() {
-            const user = localStorage.getItem('currentUser');
-            if (!user) { location.href='login.html'; return; }
-            currentUser = JSON.parse(user);
+            currentUser = getCurrentUser();
+            if (!currentUser) { 
+                window.location.href = 'login.html'; 
+                return; 
+            }
+            
             document.getElementById('usernameDisplay').textContent = currentUser.username;
             loadSettings();
             check2FAStatus();
+            updateStorage();
             
             const savedTheme = localStorage.getItem('theme') || 'dark';
             setTheme(savedTheme, false);
@@ -581,7 +815,54 @@
         }
         
         // ========================================
-        // COMPACT MODE - WORKING!
+        // SIDEBAR FUNCTIONS
+        // ========================================
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+        }
+        
+        // Close sidebar on resize to desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.remove('active');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+        
+        // Close sidebar on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar.classList.contains('active')) {
+                    toggleSidebar();
+                }
+                const modal = document.getElementById('twoFactorModal');
+                if (modal.classList.contains('active')) {
+                    close2FAModal();
+                }
+            }
+        });
+        
+        // ========================================
+        // LOGOUT
+        // ========================================
+        
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('loggedIn');
+                window.location.href = 'login.html';
+            }
+        }
+        
+        // ========================================
+        // COMPACT MODE
         // ========================================
         
         function toggleCompactMode() {
@@ -597,7 +878,7 @@
         }
         
         // ========================================
-        // THEME FUNCTIONS - WORKING!
+        // THEME FUNCTIONS
         // ========================================
         
         function setTheme(theme, save = true) {
@@ -628,7 +909,7 @@
         }
         
         // ========================================
-        // SETTINGS - WORKING!
+        // SETTINGS
         // ========================================
         
         function loadSettings() {
@@ -654,7 +935,7 @@
         }
         
         // ========================================
-        // TWO-FACTOR AUTHENTICATION - WORKING!
+        // TWO-FACTOR AUTHENTICATION
         // ========================================
         
         function check2FAStatus() {
@@ -774,7 +1055,7 @@
         }
         
         // ========================================
-        // PASSWORD CHANGE - WORKING!
+        // PASSWORD CHANGE
         // ========================================
         
         function changePassword() {
@@ -805,7 +1086,7 @@
         }
         
         // ========================================
-        // DATA EXPORT - WORKING!
+        // DATA EXPORT
         // ========================================
         
         function exportData() {
@@ -825,7 +1106,7 @@
         }
         
         // ========================================
-        // DATA CLEAR - WORKING!
+        // DATA CLEAR
         // ========================================
         
         function clearData() {
@@ -841,12 +1122,12 @@
             setTimeout(() => {
                 localStorage.removeItem('currentUser');
                 localStorage.removeItem('loggedIn');
-                location.href = 'login.html';
+                window.location.href = 'login.html';
             }, 2000);
         }
         
         // ========================================
-        // TERMS & PRIVACY - WORKING!
+        // TERMS & PRIVACY
         // ========================================
         
         function showTerms() {
@@ -858,10 +1139,13 @@
         }
         
         // ========================================
-        // TOAST NOTIFICATIONS - WORKING!
+        // TOAST NOTIFICATIONS
         // ========================================
         
         function showToast(message, type = 'info') {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             toast.textContent = message;

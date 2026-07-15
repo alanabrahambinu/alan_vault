@@ -2,14 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>Login - Alan Vault Premium</title>
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Alan Vault</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -22,8 +16,11 @@
     <meta name="theme-color" content="#4F46E5">
     
     <link rel="stylesheet" href="dashboard.css">
-</head>
+    
     <style>
+        /* ========================================
+           COMPLETE FIXED STYLES
+           ======================================== */
         * {
             margin: 0;
             padding: 0;
@@ -182,6 +179,7 @@
             align-items: center;
             justify-content: center;
             font-size: 0.8rem;
+            flex-shrink: 0;
         }
 
         /* Right Side - Form Section */
@@ -281,11 +279,35 @@
             background: rgba(255, 255, 255, 0.08);
         }
 
+        input::placeholder {
+            color: #71717a;
+        }
+
+        /* Password Toggle */
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: #71717a;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 4px;
+            transition: color 0.3s;
+        }
+        .password-toggle:hover {
+            color: #8B5CF6;
+        }
+
         .form-options {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
         .checkbox {
@@ -308,6 +330,7 @@
             text-decoration: none;
             font-size: 0.875rem;
             transition: color 0.3s;
+            cursor: pointer;
         }
 
         .forgot-link:hover {
@@ -352,6 +375,12 @@
             box-shadow: 0 10px 30px rgba(79, 70, 229, 0.4);
         }
 
+        .btn-login:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .signup-link {
             text-align: center;
             margin-top: 2rem;
@@ -378,6 +407,27 @@
             color: #ef4444;
             font-size: 0.875rem;
             display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            color: #10b981;
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
         }
 
         .social-login {
@@ -447,12 +497,103 @@
             }
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ========================================
+           RESPONSIVE BREAKPOINTS
+           ======================================== */
+        @media (max-width: 1024px) {
+            .brand-section {
+                padding: 2rem;
+            }
+            .brand-title {
+                font-size: 2.5rem;
+            }
+        }
+
         @media (max-width: 968px) {
             .brand-section {
                 display: none;
             }
             .form-section {
                 flex: 1;
+                padding: 1.5rem;
+            }
+            .glass-card {
+                padding: 2rem;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .glass-card {
+                padding: 1.5rem;
+                border-radius: 24px;
+            }
+            .form-header h2 {
+                font-size: 1.5rem;
+            }
+            .brand-title {
+                font-size: 2rem;
+            }
+            .social-buttons {
+                gap: 0.5rem;
+            }
+            .social-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1.2rem;
+            }
+            .form-options {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .forgot-link {
+                margin-top: 0.25rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .glass-card {
+                padding: 1rem;
+            }
+            input {
+                padding: 0.75rem 0.75rem 0.75rem 2.2rem;
+                font-size: 0.9rem;
+            }
+            .btn-login {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Landscape Mode on Mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .brand-section {
+                display: none;
+            }
+            .glass-card {
+                padding: 1.5rem;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            .form-group {
+                margin-bottom: 0.75rem;
+            }
+            .form-header {
+                margin-bottom: 1rem;
+            }
+            .form-header h2 {
+                font-size: 1.3rem;
+            }
+            .social-login {
+                margin-top: 1rem;
+            }
+            .signup-link {
+                margin-top: 1rem;
             }
         }
     </style>
@@ -501,6 +642,7 @@
                 </div>
 
                 <div id="errorMessage" class="error-message"></div>
+                <div id="successMessage" class="success-message"></div>
 
                 <form id="loginForm">
                     <div class="form-group">
@@ -516,6 +658,9 @@
                         <div class="input-group">
                             <span class="input-icon">🔒</span>
                             <input type="password" id="password" required placeholder="Enter your password">
+                            <button type="button" class="password-toggle" onclick="togglePassword()" aria-label="Toggle password visibility">
+                                👁️
+                            </button>
                         </div>
                     </div>
 
@@ -523,19 +668,19 @@
                         <label class="checkbox">
                             <input type="checkbox" id="rememberMe"> Remember me
                         </label>
-                        <a href="#" class="forgot-link">Forgot password?</a>
+                        <a href="forgot-password.html" class="forgot-link">Forgot password?</a>
                     </div>
 
-                    <button type="submit" class="btn-login">Sign In →</button>
+                    <button type="submit" class="btn-login" id="loginBtn">Sign In →</button>
                 </form>
 
                 <div class="social-login">
                     <p>Or continue with</p>
                     <div class="social-buttons">
-                        <div class="social-btn">G</div>
-                        <div class="social-btn">f</div>
-                        <div class="social-btn">in</div>
-                        <div class="social-btn">🐙</div>
+                        <div class="social-btn" onclick="socialLogin('Google')">G</div>
+                        <div class="social-btn" onclick="socialLogin('Facebook')">f</div>
+                        <div class="social-btn" onclick="socialLogin('LinkedIn')">in</div>
+                        <div class="social-btn" onclick="socialLogin('GitHub')">🐙</div>
                     </div>
                 </div>
 
@@ -547,9 +692,18 @@
     </div>
 
     <script>
-        // Create floating particles
+        // ========================================
+        // COMPLETE FIXED JAVASCRIPT
+        // ========================================
+        
+        // ========================================
+        // CREATE PARTICLES
+        // ========================================
+        
         function createParticles() {
             const container = document.getElementById('particles');
+            if (!container) return;
+            
             for (let i = 0; i < 30; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
@@ -566,60 +720,335 @@
 
         createParticles();
 
-        const form = document.getElementById('loginForm');
-        const errorDiv = document.getElementById('errorMessage');
-
-        // Demo account
-        const demoUser = {
-            id: '1',
-            username: 'Demo User',
-            email: 'demo@example.com',
-            password: 'demo123'
-        };
-
-        if (!localStorage.getItem('users')) {
-            localStorage.setItem('users', JSON.stringify([demoUser]));
+        // ========================================
+        // PASSWORD TOGGLE
+        // ========================================
+        
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.querySelector('.password-toggle');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
         }
 
+        // ========================================
+        // HELPER FUNCTIONS
+        // ========================================
+        
+        function getUsers() {
+            try {
+                const users = localStorage.getItem('users');
+                return users ? JSON.parse(users) : [];
+            } catch (e) {
+                console.error('Error loading users:', e);
+                return [];
+            }
+        }
+
+        function saveUsers(users) {
+            try {
+                localStorage.setItem('users', JSON.stringify(users));
+                return true;
+            } catch (e) {
+                console.error('Error saving users:', e);
+                return false;
+            }
+        }
+
+        function initDefaultUsers() {
+            let users = getUsers();
+            if (users.length === 0) {
+                console.log('No users found. Creating default users...');
+                users = [
+                    {
+                        id: 'admin_' + Date.now(),
+                        username: 'Administrator',
+                        email: 'admin@alanvault.com',
+                        password: 'admin123',
+                        role: 'admin',
+                        status: 'active',
+                        verified: true,
+                        createdAt: new Date().toISOString(),
+                        lastLogin: null
+                    },
+                    {
+                        id: 'demo_' + Date.now(),
+                        username: 'Demo User',
+                        email: 'demo@example.com',
+                        password: 'demo123',
+                        role: 'user',
+                        status: 'active',
+                        verified: true,
+                        createdAt: new Date().toISOString(),
+                        lastLogin: null
+                    }
+                ];
+                saveUsers(users);
+                console.log('Default users created!');
+                
+                // Create vaults for default users
+                users.forEach(user => {
+                    const vaultKey = `vault_${user.id}`;
+                    if (!localStorage.getItem(vaultKey)) {
+                        localStorage.setItem(vaultKey, JSON.stringify({
+                            files: [],
+                            notes: [],
+                            tasks: [],
+                            bookmarks: []
+                        }));
+                        console.log('Vault created for:', user.username);
+                    }
+                });
+            }
+            return users;
+        }
+
+        // ========================================
+        // SOCIAL LOGIN
+        // ========================================
+        
+        function socialLogin(provider) {
+            showToast('🔐 ' + provider + ' login coming soon!', 'info');
+            // In production, implement OAuth flow
+        }
+
+        // ========================================
+        // TOAST NOTIFICATION
+        // ========================================
+        
+        function showToast(message, type = 'info') {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ========================================
+        // FORM HANDLER
+        // ========================================
+        
+        const form = document.getElementById('loginForm');
+        const errorDiv = document.getElementById('errorMessage');
+        const successDiv = document.getElementById('successMessage');
+        const loginBtn = document.getElementById('loginBtn');
+
+        // Initialize default users on load
+        initDefaultUsers();
+
+        // Form submission
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const rememberMe = document.getElementById('rememberMe').checked;
             
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            // Clear previous messages
+            errorDiv.classList.remove('show');
+            successDiv.classList.remove('show');
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            
+            // Validate inputs
+            if (!email || !password) {
+                showError('Please enter both email and password');
+                return;
+            }
+            
+            // Get users
+            const users = getUsers();
+            console.log('Users in system:', users.length);
+            
+            // Find user
             const user = users.find(u => u.email === email && u.password === password);
             
             if (user) {
-                localStorage.setItem('loggedIn', 'true');
-                localStorage.setItem('currentUser', JSON.stringify({
+                // Check if user is active
+                if (user.status === 'suspended') {
+                    showError('Your account has been suspended. Please contact support.');
+                    return;
+                }
+                
+                // Update last login
+                user.lastLogin = new Date().toISOString();
+                saveUsers(users);
+                
+                // Store session
+                const sessionUser = {
                     id: user.id,
                     username: user.username,
-                    email: user.email
-                }));
+                    email: user.email,
+                    role: user.role || 'user'
+                };
+                
+                localStorage.setItem('currentUser', JSON.stringify(sessionUser));
+                localStorage.setItem('loggedIn', 'true');
                 
                 if (rememberMe) {
                     localStorage.setItem('rememberMe', 'true');
+                } else {
+                    localStorage.removeItem('rememberMe');
                 }
                 
-                // Add loading effect
-                const btn = document.querySelector('.btn-login');
-                btn.innerHTML = 'Redirecting...';
-                btn.style.opacity = '0.7';
+                // Show success
+                showSuccess('✓ Login successful! Redirecting...');
                 
+                // Redirect
                 setTimeout(() => {
                     window.location.href = 'dashboard.html';
-                }, 500);
-            } else {
-                errorDiv.style.display = 'block';
-                errorDiv.textContent = '❌ Invalid email or password. Try demo@example.com / demo123';
+                }, 1000);
                 
-                setTimeout(() => {
-                    errorDiv.style.display = 'none';
-                }, 3000);
+            } else {
+                // Check if user exists but password is wrong
+                const userExists = users.find(u => u.email === email);
+                if (userExists) {
+                    showError('❌ Invalid password. Please try again.');
+                } else {
+                    showError('❌ No account found with this email. Please <a href="signup.html" style="color:#8B5CF6;">sign up</a>');
+                }
             }
         });
+
+        // ========================================
+        // ERROR & SUCCESS DISPLAY
+        // ========================================
+        
+        function showError(message) {
+            errorDiv.innerHTML = message;
+            errorDiv.style.display = 'block';
+            errorDiv.classList.add('show');
+            
+            // Shake animation for inputs
+            document.getElementById('email').style.animation = 'shake 0.3s ease';
+            document.getElementById('password').style.animation = 'shake 0.3s ease';
+            
+            setTimeout(() => {
+                document.getElementById('email').style.animation = '';
+                document.getElementById('password').style.animation = '';
+            }, 300);
+            
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 300);
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            successDiv.innerHTML = message;
+            successDiv.style.display = 'block';
+            successDiv.classList.add('show');
+            
+            // Disable button
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = 'Redirecting...';
+            loginBtn.style.opacity = '0.7';
+            
+            setTimeout(() => {
+                successDiv.classList.remove('show');
+                setTimeout(() => {
+                    successDiv.style.display = 'none';
+                }, 300);
+            }, 3000);
+        }
+
+        // ========================================
+        // KEYBOARD SHORTCUTS
+        // ========================================
+        
+        document.addEventListener('keydown', function(e) {
+            // Enter key submits form (already handled by form)
+            // Escape key clears inputs
+            if (e.key === 'Escape') {
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
+                document.getElementById('email').focus();
+            }
+        });
+
+        // ========================================
+        // AUTO-FOCUS & SAVED EMAIL
+        // ========================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-focus email field
+            document.getElementById('email').focus();
+            
+            // Load saved email
+            const savedEmail = localStorage.getItem('saved_email');
+            if (savedEmail) {
+                document.getElementById('email').value = savedEmail;
+                document.getElementById('rememberMe').checked = true;
+                // Focus password
+                document.getElementById('password').focus();
+            }
+        });
+
+        // ========================================
+        // ADD SHAKE ANIMATION
+        // ========================================
+        
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+            
+            .toast {
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                padding: 12px 24px;
+                border-radius: 12px;
+                color: white;
+                font-size: 0.9rem;
+                z-index: 10001;
+                animation: slideInRight 0.3s ease;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                max-width: 90vw;
+            }
+            .toast.success { background: #10b981; }
+            .toast.error { background: #ef4444; }
+            .toast.info { background: #3b82f6; }
+            .toast.warning { background: #f59e0b; }
+            
+            @keyframes slideInRight {
+                from { opacity: 0; transform: translateX(100px); }
+                to { opacity: 1; transform: translateX(0); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // ========================================
+        // CONSOLE DEBUG INFO
+        // ========================================
+        
+        console.log('🔐 Alan Vault Login Page');
+        console.log('📧 Available users:', getUsers().map(u => ({
+            username: u.username,
+            email: u.email,
+            password: u.password
+        })));
+        console.log('💡 Default credentials:');
+        console.log('   Admin: admin@alanvault.com / admin123');
+        console.log('   Demo: demo@example.com / demo123');
     </script>
 </body>
 </html>

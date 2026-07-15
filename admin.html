@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>Alan Vault Enterprise Admin</title>
     
     <!-- Favicon -->
@@ -34,16 +34,17 @@
             position: fixed; left: 0; top: 0; width: 280px; height: 100vh; 
             background: rgba(10,10,15,0.95); backdrop-filter: blur(20px); 
             border-right: 1px solid rgba(139,92,246,0.2); z-index: 100; 
-            transition: transform 0.3s; overflow-y: auto; 
+            transition: transform 0.3s ease, width 0.3s ease; 
+            overflow-y: auto; 
         }
         body.light .admin-sidebar { background: rgba(255,255,255,0.95); border-right: 1px solid rgba(0,0,0,0.1); }
         body.purple .admin-sidebar { background: rgba(15,7,23,0.95); border-right: 1px solid rgba(139,92,246,0.2); }
         
         .sidebar-header { padding: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; }
         body.light .sidebar-header { border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .logo { display: flex; align-items: center; gap: 12px; font-size: 1.2rem; font-weight: 700; }
-        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #4F46E5, #8B5CF6); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-        .sidebar-collapse { background: transparent; border: none; color: #a1a1aa; cursor: pointer; font-size: 1.2rem; padding: 4px 8px; }
+        .logo { display: flex; align-items: center; gap: 12px; font-size: 1.2rem; font-weight: 700; white-space: nowrap; }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #4F46E5, #8B5CF6); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .sidebar-collapse { background: transparent; border: none; color: #a1a1aa; cursor: pointer; font-size: 1.2rem; padding: 4px 8px; transition: color 0.3s; }
         .sidebar-collapse:hover { color: #8B5CF6; }
         
         .sidebar-nav { padding: 0.75rem; }
@@ -55,15 +56,60 @@
         }
         body.light .nav-item { color: #475569; }
         .nav-item:hover, .nav-item.active { background: rgba(139,92,246,0.15); color: #8B5CF6; }
-        .nav-item .badge { margin-left: auto; background: #ef4444; color: white; font-size: 0.6rem; padding: 1px 6px; border-radius: 50px; }
+        .nav-item .badge { margin-left: auto; background: #ef4444; color: white; font-size: 0.6rem; padding: 1px 6px; border-radius: 50px; flex-shrink: 0; }
         .nav-item .badge.success { background: #10b981; }
         .nav-item .badge.warning { background: #f59e0b; }
         
         .admin-badge { background: linear-gradient(135deg, #ef4444, #f59e0b); padding: 2px 10px; border-radius: 50px; font-size: 0.6rem; margin-left: auto; }
         
+        /* Sidebar collapsed state */
+        .admin-sidebar.collapsed { width: 80px; }
+        .admin-sidebar.collapsed .logo span { display: none; }
+        .admin-sidebar.collapsed .nav-item span:not(.nav-icon) { display: none; }
+        .admin-sidebar.collapsed .nav-item .badge { display: none; }
+        .admin-sidebar.collapsed .nav-item { justify-content: center; padding: 10px; }
+        .admin-sidebar.collapsed .sidebar-header { justify-content: center; }
+        .admin-sidebar.collapsed .sidebar-collapse { transform: rotate(180deg); }
+        
+        /* ===== MOBILE MENU BUTTON ===== */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 101;
+            width: 44px;
+            height: 44px;
+            background: rgba(10,10,15,0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(139,92,246,0.3);
+            border-radius: 12px;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s;
+        }
+        .mobile-menu-btn:hover { background: rgba(139,92,246,0.2); transform: scale(1.05); }
+        
+        /* ===== SIDEBAR OVERLAY ===== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 99;
+        }
+        .sidebar-overlay.active { display: block; }
+        
         /* ===== MAIN CONTENT ===== */
-        .admin-main { margin-left: 280px; padding: 1.5rem; width: calc(100% - 280px); min-height: 100vh; transition: margin-left 0.3s; }
-        .admin-main.collapsed { margin-left: 80px; }
+        .admin-main { margin-left: 280px; padding: 1.5rem; width: calc(100% - 280px); min-height: 100vh; transition: margin-left 0.3s ease; }
+        .admin-main.collapsed { margin-left: 80px; width: calc(100% - 80px); }
         
         .top-bar { 
             background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); 
@@ -153,7 +199,7 @@
         .search-box::placeholder { color: #71717a; }
         
         /* ===== TOAST ===== */
-        .toast { position: fixed; bottom: 30px; right: 30px; padding: 10px 20px; border-radius: 10px; color: white; font-size: 0.85rem; z-index: 10001; animation: slideInRight 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .toast { position: fixed; bottom: 30px; right: 30px; padding: 12px 24px; border-radius: 12px; color: white; font-size: 0.9rem; z-index: 10001; animation: slideInRight 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-width: 90vw; }
         .toast.success { background: #10b981; }
         .toast.error { background: #ef4444; }
         .toast.info { background: #3b82f6; }
@@ -192,19 +238,53 @@
         .health-status .dot.red { background: #ef4444; }
         
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            .admin-sidebar { transform: translateX(-100%); }
+        @media (max-width: 1024px) {
+            .mobile-menu-btn { display: flex; }
+            .admin-sidebar { transform: translateX(-100%); width: 280px; }
             .admin-sidebar.active { transform: translateX(0); }
-            .admin-main { margin-left: 0; padding: 1rem; }
+            .admin-main { margin-left: 0; padding: 1rem; width: 100%; }
             .stats-grid { grid-template-columns: 1fr 1fr; }
             .top-bar { flex-direction: column; align-items: stretch; }
             .section-header { flex-direction: column; align-items: stretch; }
             .search-box { width: 100%; }
+            .admin-sidebar.collapsed { width: 280px; }
+            .admin-main.collapsed { margin-left: 0; width: 100%; }
+            .admin-sidebar.collapsed .logo span { display: inline; }
+            .admin-sidebar.collapsed .nav-item span:not(.nav-icon) { display: inline; }
+            .admin-sidebar.collapsed .nav-item .badge { display: inline; }
+            .admin-sidebar.collapsed .nav-item { justify-content: flex-start; padding: 10px 14px; }
+            .admin-sidebar.collapsed .sidebar-header { justify-content: space-between; }
+            .admin-sidebar.collapsed .sidebar-collapse { transform: none; }
+        }
+        
+        @media (max-width: 640px) {
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+            .stat-card { padding: 0.75rem; }
+            .stat-value { font-size: 1.2rem; }
+            .top-bar { padding: 0.75rem 1rem; }
+            .section { padding: 1rem; }
+            .admin-main { padding: 0.75rem; }
+            .mobile-menu-btn { top: 8px; left: 8px; width: 40px; height: 40px; font-size: 1.2rem; }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .admin-badge { font-size: 0.5rem; padding: 1px 6px; }
+            .breadcrumb { font-size: 0.7rem; }
+            .toast { right: 10px; left: 10px; bottom: 10px; font-size: 0.8rem; padding: 10px 16px; }
         }
     </style>
 </head>
 <body>
     <div class="animated-bg"></div>
+    
+    <!-- ===== SIDEBAR OVERLAY (Mobile) ===== -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileSidebar()"></div>
+    
+    <!-- ===== MOBILE MENU BUTTON ===== -->
+    <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Toggle Menu">
+        ☰
+    </button>
     
     <!-- ===== ADMIN AUTH CHECK ===== -->
     <script>
@@ -225,7 +305,7 @@
                     <div class="logo-icon">👑</div>
                     <span>Alan Vault</span>
                 </div>
-                <button class="sidebar-collapse" onclick="toggleSidebar()">◀</button>
+                <button class="sidebar-collapse" onclick="toggleSidebar()" title="Toggle Sidebar">◀</button>
             </div>
             <div class="sidebar-nav">
                 <button class="nav-item active" onclick="showTab('overview')">📊 Overview <span class="badge success">Live</span></button>
@@ -249,7 +329,7 @@
                     <h2>👑 <span id="pageTitle">Overview</span> <span class="admin-badge">Super Admin</span></h2>
                     <div class="breadcrumb">📂 <span id="breadcrumb">Dashboard / Overview</span></div>
                 </div>
-                <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                     <div class="notification-bell" onclick="showNotifications()">
                         🔔 <span class="count" id="notifCount">0</span>
                     </div>
@@ -292,7 +372,7 @@
             </div>
 
             <!-- ============================================ -->
-            <!-- ===== USERS ===== -->
+            <!-- ===== USERS - FIXED ===== -->
             <!-- ============================================ -->
             <div id="usersTab" class="tab-content">
                 <div class="section">
@@ -561,10 +641,212 @@
     </div>
 
     <!-- ============================================ -->
-    <!-- ===== SCRIPTS ===== -->
+    <!-- ===== SCRIPTS - FIXED ===== -->
     <!-- ============================================ -->
     <script src="theme.js"></script>
     <script>
+        // ========================================
+        // COMPLETE UPGRADED ADMIN SCRIPT - FIXED
+        // ========================================
+
+        // ========================================
+        // STORAGE HELPERS - SINGLE SOURCE OF TRUTH
+        // ========================================
+
+        function getUsers() {
+            try {
+                // Try to get users from the main users key
+                let users = localStorage.getItem('users');
+                if (users) {
+                    return JSON.parse(users);
+                }
+                
+                // If no users key, try to get from registered_users (alternative key)
+                let registeredUsers = localStorage.getItem('registered_users');
+                if (registeredUsers) {
+                    return JSON.parse(registeredUsers);
+                }
+                
+                // If no users exist, return empty array
+                return [];
+            } catch (e) {
+                console.error('Error loading users:', e);
+                return [];
+            }
+        }
+
+        function saveUsers(users) {
+            try {
+                // Save to both possible keys for compatibility
+                localStorage.setItem('users', JSON.stringify(users));
+                localStorage.setItem('registered_users', JSON.stringify(users));
+                console.log('✅ Users saved:', users.length);
+                return true;
+            } catch (e) {
+                console.error('Error saving users:', e);
+                return false;
+            }
+        }
+
+        function getVault(userId) {
+            try {
+                const key = `vault_${userId}`;
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : { files: [], notes: [], tasks: [], bookmarks: [] };
+            } catch (e) {
+                return { files: [], notes: [], tasks: [], bookmarks: [] };
+            }
+        }
+
+        function saveVault(userId, data) {
+            try {
+                const key = `vault_${userId}`;
+                localStorage.setItem(key, JSON.stringify(data));
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function getProfile(userId) {
+            try {
+                const key = `profile_${userId}`;
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : {};
+            } catch (e) {
+                return {};
+            }
+        }
+
+        function saveProfile(userId, data) {
+            try {
+                const key = `profile_${userId}`;
+                localStorage.setItem(key, JSON.stringify(data));
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function getSettings(userId) {
+            try {
+                const key = `settings_${userId}`;
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : {};
+            } catch (e) {
+                return {};
+            }
+        }
+
+        function saveSettings(userId, data) {
+            try {
+                const key = `settings_${userId}`;
+                localStorage.setItem(key, JSON.stringify(data));
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function generateId() {
+            return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // ========================================
+        // INITIALIZE DEFAULT USERS - FIXED
+        // ========================================
+
+        function initDefaultUsers() {
+            let users = getUsers();
+            if (users.length === 0) {
+                console.log('⚠️ No users found. Creating default users...');
+                users = [
+                    {
+                        id: 'admin_' + Date.now(),
+                        username: 'Administrator',
+                        email: 'admin@alanvault.com',
+                        password: 'admin123',
+                        role: 'super-admin',
+                        status: 'active',
+                        verified: true,
+                        createdAt: new Date().toISOString(),
+                        lastLogin: null,
+                        storageUsed: 0,
+                        plan: 'premium'
+                    },
+                    {
+                        id: 'demo_' + (Date.now() + 1),
+                        username: 'Demo User',
+                        email: 'demo@example.com',
+                        password: 'demo123',
+                        role: 'user',
+                        status: 'active',
+                        verified: true,
+                        createdAt: new Date().toISOString(),
+                        lastLogin: null,
+                        storageUsed: 0,
+                        plan: 'free'
+                    }
+                ];
+                saveUsers(users);
+                
+                // Create vaults for default users
+                users.forEach(user => {
+                    const vaultKey = `vault_${user.id}`;
+                    if (!localStorage.getItem(vaultKey)) {
+                        localStorage.setItem(vaultKey, JSON.stringify({
+                            files: [],
+                            notes: [],
+                            tasks: [],
+                            bookmarks: []
+                        }));
+                    }
+                    // Create profile
+                    const profileKey = `profile_${user.id}`;
+                    if (!localStorage.getItem(profileKey)) {
+                        localStorage.setItem(profileKey, JSON.stringify({
+                            fullName: user.username,
+                            username: user.username,
+                            email: user.email,
+                            memberSince: new Date().toLocaleDateString()
+                        }));
+                    }
+                    // Create settings
+                    const settingsKey = `settings_${user.id}`;
+                    if (!localStorage.getItem(settingsKey)) {
+                        localStorage.setItem(settingsKey, JSON.stringify({
+                            theme: 'dark',
+                            compactMode: false,
+                            emailNotifications: true,
+                            pushNotifications: true,
+                            taskReminders: true,
+                            sessionTimeout: '60'
+                        }));
+                    }
+                });
+                
+                console.log('✅ Default users created!');
+                console.log('   👤 Admin: admin@alanvault.com / admin123');
+                console.log('   👤 Demo: demo@example.com / demo123');
+            }
+            return users;
+        }
+
         // ========================================
         // GLOBALS
         // ========================================
@@ -572,25 +854,78 @@
         let currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
         // ========================================
-        // SIDEBAR TOGGLE
+        // SIDEBAR TOGGLE FUNCTIONS
         // ========================================
+        
         function toggleSidebar() {
             const sidebar = document.getElementById('adminSidebar');
             const main = document.getElementById('adminMain');
-            sidebar.classList.toggle('collapsed');
-            main.classList.toggle('collapsed');
+            if (sidebar) sidebar.classList.toggle('collapsed');
+            if (main) main.classList.toggle('collapsed');
+            localStorage.setItem('admin_sidebar_collapsed', sidebar.classList.contains('collapsed'));
         }
+        
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (sidebar) sidebar.classList.toggle('active');
+            if (overlay) overlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+        }
+        
+        function restoreSidebarState() {
+            const isCollapsed = localStorage.getItem('admin_sidebar_collapsed') === 'true';
+            if (isCollapsed && window.innerWidth > 1024) {
+                const sidebar = document.getElementById('adminSidebar');
+                const main = document.getElementById('adminMain');
+                if (sidebar) sidebar.classList.add('collapsed');
+                if (main) main.classList.add('collapsed');
+            }
+        }
+        
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 1024) {
+                const sidebar = document.getElementById('adminSidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                if (sidebar) sidebar.classList.remove('active');
+                if (overlay) overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const sidebar = document.getElementById('adminSidebar');
+                if (sidebar && sidebar.classList.contains('active')) {
+                    toggleMobileSidebar();
+                }
+                const modal = document.getElementById('modalOverlay');
+                if (modal && modal.classList.contains('active')) {
+                    closeModal();
+                }
+            }
+        });
 
         // ========================================
         // TAB MANAGEMENT
         // ========================================
+
         function showTab(tab) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             const target = document.getElementById(tab + 'Tab');
             if (target) target.classList.add('active');
             
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            if (event && event.target) event.target.classList.add('active');
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(n => n.classList.remove('active'));
+            
+            let clickedBtn = null;
+            navItems.forEach(btn => {
+                const onclickAttr = btn.getAttribute('onclick');
+                if (onclickAttr && onclickAttr.includes(`'${tab}'`)) {
+                    clickedBtn = btn;
+                }
+            });
+            if (clickedBtn) clickedBtn.classList.add('active');
             
             const titles = {
                 overview: 'Overview',
@@ -621,32 +956,31 @@
         // ========================================
         // OVERVIEW
         // ========================================
+
         function loadOverview() {
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const users = getUsers();
             const total = users.length;
             document.getElementById('totalUsers').textContent = total;
             document.getElementById('userBadge').textContent = total;
             
-            let totalSize = 0, totalFiles = 0, uploadsToday = 0, newRegistrations = 0;
+            let totalSize = 0, totalFiles = 0, uploadsToday = 0;
             const today = new Date().toDateString();
             
             users.forEach(u => {
-                const vault = JSON.parse(localStorage.getItem(`vault_${u.id}`) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}');
+                const vault = getVault(u.id);
                 totalSize += vault.files.reduce((s, f) => s + (f.size || 0), 0);
                 totalFiles += vault.files.length;
                 vault.files.forEach(f => {
-                    if (new Date(f.date).toDateString() === today) uploadsToday++;
+                    if (new Date(f.date || f.uploadDate).toDateString() === today) uploadsToday++;
                 });
-                if (new Date(u.createdAt).toDateString() === today) newRegistrations++;
             });
             
             document.getElementById('totalFiles').textContent = totalFiles;
             document.getElementById('fileBadge').textContent = totalFiles;
             document.getElementById('totalStorage').textContent = (totalSize / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
-            document.getElementById('activeUsers').textContent = users.length;
+            document.getElementById('activeUsers').textContent = users.filter(u => u.status === 'active').length;
             document.getElementById('uploadsToday').textContent = uploadsToday;
             
-            // Security Score - calculate based on real data
             const logs = JSON.parse(localStorage.getItem('system_logs') || '[]');
             const failedLogins = logs.filter(l => l.level === 'error' && l.action?.toLowerCase().includes('login')).length;
             const score = Math.max(0, 100 - (failedLogins * 2));
@@ -655,7 +989,6 @@
             const modReports = JSON.parse(localStorage.getItem('reported_content') || '[]').filter(r => r.status === 'pending').length;
             document.getElementById('modBadge').textContent = modReports;
             
-            // Trends (real calculated)
             document.getElementById('userTrend').textContent = total > 0 ? '+' + Math.floor(Math.random() * 15 + 1) + '%' : '0%';
             document.getElementById('fileTrend').textContent = totalFiles > 0 ? '+' + Math.floor(Math.random() * 12 + 1) + '%' : '0%';
             document.getElementById('storageTrend').textContent = totalSize > 0 ? '+' + Math.floor(Math.random() * 8 + 1) + '%' : '0%';
@@ -663,7 +996,6 @@
             document.getElementById('uploadTrend').textContent = uploadsToday > 0 ? '+' + Math.floor(Math.random() * 20 + 1) + '%' : '0%';
             document.getElementById('secTrend').textContent = score > 80 ? '✅ Secure' : score > 50 ? '⚠️ At Risk' : '❌ Critical';
             
-            // Recent activity
             const recent = logs.slice(0, 15);
             const container = document.getElementById('recentActivity');
             if (recent.length === 0) {
@@ -677,91 +1009,422 @@
                 `).join('');
             }
             
-            // Notification count
             const notifCount = logs.filter(l => l.level === 'warning' || l.level === 'error').length;
             document.getElementById('notifCount').textContent = notifCount;
         }
 
         // ========================================
-        // USERS
+        // USERS - COMPLETE FIXED (SHOWS ALL REGISTERED USERS)
         // ========================================
+
         function loadUsers() {
-            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            let users = getUsers();
+            console.log('🔄 Loading users, total:', users.length);
             
             const search = document.getElementById('userSearch')?.value?.toLowerCase() || '';
             const roleFilter = document.getElementById('userRoleFilter')?.value || 'all';
             const statusFilter = document.getElementById('userStatusFilter')?.value || 'all';
             
-            if (search) users = users.filter(u => u.username.toLowerCase().includes(search) || u.email.toLowerCase().includes(search));
-            if (roleFilter !== 'all') users = users.filter(u => (u.role || 'user') === roleFilter);
-            if (statusFilter !== 'all') users = users.filter(u => (u.status || 'active') === statusFilter);
+            // Filter users
+            let filteredUsers = users;
+            if (search) {
+                filteredUsers = filteredUsers.filter(u => 
+                    u.username?.toLowerCase().includes(search) || 
+                    u.email?.toLowerCase().includes(search)
+                );
+            }
+            if (roleFilter !== 'all') {
+                filteredUsers = filteredUsers.filter(u => (u.role || 'user') === roleFilter);
+            }
+            if (statusFilter !== 'all') {
+                filteredUsers = filteredUsers.filter(u => (u.status || 'active') === statusFilter);
+            }
             
             const container = document.getElementById('usersList');
-            if (!users.length) {
-                container.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:2rem; color:#71717a;">No users found</td></tr>';
+            if (!container) return;
+            
+            if (!filteredUsers.length) {
+                container.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:2rem; color:#71717a;">No users found. Users will appear here once they register.</td></tr>';
                 return;
             }
             
-            container.innerHTML = users.map(u => {
-                const vault = JSON.parse(localStorage.getItem(`vault_${u.id}`) || '{"files":[]}');
-                const storage = vault.files.reduce((s, f) => s + (f.size || 0), 0);
+            container.innerHTML = filteredUsers.map(u => {
+                const vault = getVault(u.id);
+                const storage = vault?.files?.reduce((s, f) => s + (f.size || 0), 0) || 0;
                 const role = u.role || 'user';
                 const roleClass = 'role-' + role.replace(' ', '-');
+                const status = u.status || 'active';
+                const statusClass = status === 'active' ? 'status-active' : status === 'suspended' ? 'status-suspended' : 'status-inactive';
+                
                 return `
-                <tr>
-                    <td><strong>${escapeHtml(u.username)}</strong></td>
-                    <td>${escapeHtml(u.email)}</td>
+                <tr data-user-id="${u.id}">
+                    <td>
+                        <div style="display:flex; align-items:center; gap:0.75rem;">
+                            <div style="width:32px; height:32px; background:linear-gradient(135deg,#4F46E5,#8B5CF6); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8rem; color:white; flex-shrink:0;">
+                                ${(u.username || 'U').charAt(0).toUpperCase()}
+                            </div>
+                            <strong>${escapeHtml(u.username || 'Unknown')}</strong>
+                        </div>
+                    </td>
+                    <td>${escapeHtml(u.email || '')}</td>
                     <td><span class="role-badge ${roleClass}">${role}</span></td>
-                    <td><span class="status-badge ${u.status === 'active' ? 'status-active' : u.status === 'suspended' ? 'status-suspended' : 'status-inactive'}">${u.status || 'active'}</span></td>
+                    <td><span class="status-badge ${statusClass}">${status}</span></td>
                     <td>${formatBytes(storage)}</td>
                     <td>${u.lastLogin ? new Date(u.lastLogin).toLocaleDateString() : 'Never'}</td>
                     <td>
-                        <button class="btn-success" onclick="editUser('${u.id}')" style="font-size:0.65rem;">✏️</button>
+                        <button class="btn-success" onclick="editUser('${u.id}')" style="font-size:0.65rem; padding:4px 8px; margin:2px;">✏️</button>
                         ${u.email !== 'admin@alanvault.com' ? 
-                            `<button class="btn-danger" onclick="deleteUser('${u.id}')" style="font-size:0.65rem;">🗑️</button>` : 
+                            `<button class="btn-danger" onclick="deleteUser('${u.id}')" style="font-size:0.65rem; padding:4px 8px; margin:2px;">🗑️</button>` : 
                             '<span style="color:#71717a;font-size:0.6rem;">🔒</span>'}
                     </td>
                 </tr>
             `}).join('');
+            
+            // Update badge
+            document.getElementById('userBadge').textContent = users.length;
         }
 
+        // ========================================
+        // DELETE USER
+        // ========================================
+
         function deleteUser(id) {
-            if (!confirm('Delete this user? This cannot be undone!')) return;
-            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            if (!confirm('⚠️ Delete this user? This cannot be undone!')) return;
+            
+            let users = getUsers();
+            const userToDelete = users.find(u => u.id === id);
+            
+            if (!userToDelete) {
+                showToast('User not found', 'error');
+                return;
+            }
+            
             users = users.filter(u => u.id !== id);
-            localStorage.setItem('users', JSON.stringify(users));
+            saveUsers(users);
+            
+            // Delete all user data
             localStorage.removeItem(`vault_${id}`);
             localStorage.removeItem(`profile_${id}`);
             localStorage.removeItem(`settings_${id}`);
+            
             loadUsers();
             loadOverview();
-            showToast('User deleted', 'success');
-            addLog('admin', 'User deleted', 'Deleted user ID: ' + id);
+            
+            showToast(`🗑️ User "${userToDelete.username}" deleted`, 'success');
+            addLog('admin', 'User deleted', 'Deleted user: ' + userToDelete.username);
         }
 
+        // ========================================
+        // EDIT USER
+        // ========================================
+
         function editUser(id) {
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const users = getUsers();
             const user = users.find(u => u.id === id);
-            if (!user) return;
+            if (!user) {
+                showToast('User not found', 'error');
+                return;
+            }
             
-            const newRole = prompt('Enter new role (super-admin, security-admin, moderator, support, user):', user.role || 'user');
-            if (newRole && ['super-admin', 'security-admin', 'moderator', 'support', 'user'].includes(newRole)) {
-                user.role = newRole;
-                localStorage.setItem('users', JSON.stringify(users));
-                loadUsers();
-                showToast('User role updated', 'success');
-                addLog('admin', 'User role updated', user.username + ' -> ' + newRole);
+            // Create modal for editing
+            const modal = document.getElementById('modalOverlay');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+            
+            title.textContent = '✏️ Edit User';
+            body.innerHTML = `
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label style="color:#a1a1aa; font-size:0.85rem;">Username</label>
+                    <input type="text" id="editUsername" value="${escapeHtml(user.username)}" style="width:100%; padding:0.75rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white;">
+                </div>
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label style="color:#a1a1aa; font-size:0.85rem;">Email</label>
+                    <input type="email" id="editEmail" value="${escapeHtml(user.email)}" style="width:100%; padding:0.75rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white;">
+                </div>
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label style="color:#a1a1aa; font-size:0.85rem;">Role</label>
+                    <select id="editRole" style="width:100%; padding:0.75rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white;">
+                        <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
+                        <option value="moderator" ${user.role === 'moderator' ? 'selected' : ''}>Moderator</option>
+                        <option value="support" ${user.role === 'support' ? 'selected' : ''}>Support</option>
+                        <option value="security-admin" ${user.role === 'security-admin' ? 'selected' : ''}>Security Admin</option>
+                        <option value="super-admin" ${user.role === 'super-admin' ? 'selected' : ''}>Super Admin</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label style="color:#a1a1aa; font-size:0.85rem;">Status</label>
+                    <select id="editStatus" style="width:100%; padding:0.75rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white;">
+                        <option value="active" ${user.status === 'active' ? 'selected' : ''}>Active</option>
+                        <option value="inactive" ${user.status === 'inactive' ? 'selected' : ''}>Inactive</option>
+                        <option value="suspended" ${user.status === 'suspended' ? 'selected' : ''}>Suspended</option>
+                    </select>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+            
+            document.getElementById('modalConfirmBtn').style.display = 'block';
+            document.getElementById('modalConfirmBtn').textContent = 'Save Changes';
+            
+            modalCallback = () => {
+                const username = document.getElementById('editUsername').value.trim();
+                const email = document.getElementById('editEmail').value.trim();
+                const role = document.getElementById('editRole').value;
+                const status = document.getElementById('editStatus').value;
+                
+                if (!username || !email) {
+                    showToast('Username and email required', 'error');
+                    return;
+                }
+                
+                // Update user
+                const users = getUsers();
+                const index = users.findIndex(u => u.id === id);
+                if (index !== -1) {
+                    users[index].username = username;
+                    users[index].email = email;
+                    users[index].role = role;
+                    users[index].status = status;
+                    users[index].updatedAt = new Date().toISOString();
+                    saveUsers(users);
+                    
+                    // Update profile
+                    const profile = getProfile(id);
+                    profile.fullName = username;
+                    profile.username = username;
+                    profile.email = email;
+                    saveProfile(id, profile);
+                    
+                    loadUsers();
+                    loadOverview();
+                    showToast('User updated successfully!', 'success');
+                    addLog('admin', 'User updated', 'Updated user: ' + username);
+                    closeModal();
+                }
+            };
+        }
+
+        // ========================================
+        // ADD USER
+        // ========================================
+
+        function openModal(type) {
+            const overlay = document.getElementById('modalOverlay');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+            
+            if (type === 'addUser') {
+                title.textContent = '➕ Add New User';
+                body.innerHTML = `
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label style="color:#a1a1aa; font-size:0.85rem;">Username *</label>
+                        <input type="text" id="modalUsername" placeholder="Enter username" style="width:100%; padding:0.75rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white;">
+                    </div>
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label style="color:#a1a1aa; font-size:0.85rem;">Email *</label>
+                        <input type="email" id="modalEmail" placeholder="Enter email" style="width:100%; padding:0.75rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white;">
+                    </div>
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label style="color:#a1a1aa; font-size:0.85rem;">Password</label>
+                        <input type="password" id="modalPassword" placeholder="Leave blank for auto-generate" style="width:100%; padding:0.75rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white;">
+                    </div>
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label style="color:#a1a1aa; font-size:0.85rem;">Role</label>
+                        <select id="modalRole" style="width:100%; padding:0.75rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white;">
+                            <option value="user">User</option>
+                            <option value="moderator">Moderator</option>
+                            <option value="support">Support</option>
+                            <option value="security-admin">Security Admin</option>
+                            <option value="super-admin">Super Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label style="color:#a1a1aa; font-size:0.85rem;">Status</label>
+                        <select id="modalStatus" style="width:100%; padding:0.75rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white;">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="suspended">Suspended</option>
+                        </select>
+                    </div>
+                `;
+                
+                document.getElementById('modalConfirmBtn').style.display = 'block';
+                document.getElementById('modalConfirmBtn').textContent = 'Create User';
+                
+                modalCallback = () => {
+                    const username = document.getElementById('modalUsername').value.trim();
+                    const email = document.getElementById('modalEmail').value.trim();
+                    const password = document.getElementById('modalPassword').value || 'password123';
+                    const role = document.getElementById('modalRole').value;
+                    const status = document.getElementById('modalStatus').value;
+                    
+                    if (!username || !email) {
+                        showToast('Username and email required', 'error');
+                        return;
+                    }
+                    
+                    const users = getUsers();
+                    if (users.find(u => u.email === email)) {
+                        showToast('Email already exists', 'error');
+                        return;
+                    }
+                    
+                    const newUser = {
+                        id: generateId(),
+                        username: username,
+                        email: email,
+                        password: password,
+                        role: role,
+                        status: status,
+                        verified: false,
+                        createdAt: new Date().toISOString(),
+                        lastLogin: null,
+                        storageUsed: 0,
+                        plan: 'free'
+                    };
+                    
+                    users.push(newUser);
+                    saveUsers(users);
+                    
+                    // Create vault
+                    const vaultKey = `vault_${newUser.id}`;
+                    localStorage.setItem(vaultKey, JSON.stringify({
+                        files: [],
+                        notes: [],
+                        tasks: [],
+                        bookmarks: []
+                    }));
+                    
+                    // Create profile
+                    const profileKey = `profile_${newUser.id}`;
+                    localStorage.setItem(profileKey, JSON.stringify({
+                        fullName: username,
+                        username: username,
+                        email: email,
+                        memberSince: new Date().toLocaleDateString()
+                    }));
+                    
+                    // Create settings
+                    const settingsKey = `settings_${newUser.id}`;
+                    localStorage.setItem(settingsKey, JSON.stringify({
+                        theme: 'dark',
+                        compactMode: false,
+                        emailNotifications: true,
+                        pushNotifications: true,
+                        taskReminders: true,
+                        sessionTimeout: '60'
+                    }));
+                    
+                    loadUsers();
+                    loadOverview();
+                    showToast(`✅ User "${username}" created successfully!`, 'success');
+                    addLog('admin', 'User added', 'Added user: ' + username + ' (' + role + ')');
+                    closeModal();
+                };
+            } else if (type === 'maintenance') {
+                title.textContent = '🔧 Maintenance Tools';
+                body.innerHTML = `
+                    <p style="margin-bottom:0.75rem;color:#a1a1aa;">Choose a maintenance action:</p>
+                    <button class="btn-warning" onclick="toggleMaintenance();closeModal();" style="width:100%;margin-bottom:0.5rem; padding:0.5rem; border-radius:8px; cursor:pointer;">🔧 Toggle Maintenance Mode</button>
+                    <button class="btn-danger" onclick="clearCache();closeModal();" style="width:100%;margin-bottom:0.5rem; padding:0.5rem; border-radius:8px; cursor:pointer;">🗑️ Clear Cache</button>
+                    <button class="btn-danger" onclick="emergencyLockdown();closeModal();" style="width:100%; padding:0.5rem; border-radius:8px; cursor:pointer;">🚨 Emergency Lockdown</button>
+                `;
+                modalCallback = null;
+                document.getElementById('modalConfirmBtn').style.display = 'none';
+            }
+            
+            overlay.classList.add('active');
+        }
+
+        // ========================================
+        // CLOSE MODAL
+        // ========================================
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            modalCallback = null;
+            document.getElementById('modalConfirmBtn').style.display = 'block';
+        }
+
+        function modalConfirm() {
+            if (modalCallback) modalCallback();
+        }
+
+        // ========================================
+        // TOAST NOTIFICATION
+        // ========================================
+
+        function showToast(message, type = 'info') {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ========================================
+        // SHOW NOTIFICATIONS
+        // ========================================
+
+        function showNotifications() {
+            const logs = JSON.parse(localStorage.getItem('system_logs') || '[]');
+            const alerts = logs.filter(l => l.level === 'warning' || l.level === 'error').slice(0, 10);
+            if (alerts.length === 0) {
+                showToast('No notifications', 'info');
+            } else {
+                alerts.forEach(l => showToast(l.action || 'Notification', l.level === 'error' ? 'error' : 'warning'));
             }
         }
 
         // ========================================
-        // FILES
+        // ADD LOG
         // ========================================
+
+        function addLog(action, details, user = 'admin') {
+            const logs = JSON.parse(localStorage.getItem('system_logs') || '[]');
+            logs.unshift({
+                id: Date.now(),
+                level: 'info',
+                action: action,
+                details: details,
+                user: user,
+                ip: '127.0.0.1',
+                timestamp: new Date().toISOString()
+            });
+            if (logs.length > 500) logs.pop();
+            localStorage.setItem('system_logs', JSON.stringify(logs));
+        }
+
+        // ========================================
+        // ADMIN LOGOUT
+        // ========================================
+
+        function adminLogout() {
+            if (confirm('Logout from admin panel?')) {
+                localStorage.removeItem('adminLoggedIn');
+                localStorage.removeItem('adminEmail');
+                localStorage.removeItem('adminName');
+                window.location.href = 'admin-login.html';
+            }
+        }
+
+        // ========================================
+        // FILES FUNCTIONS
+        // ========================================
+
         function loadFiles() {
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const users = getUsers();
             let allFiles = [];
             users.forEach(u => {
-                const vault = JSON.parse(localStorage.getItem(`vault_${u.id}`) || '{"files":[]}');
+                const vault = getVault(u.id);
                 vault.files.forEach(f => allFiles.push({ ...f, owner: u.username }));
             });
             
@@ -770,7 +1433,13 @@
             
             if (search) allFiles = allFiles.filter(f => f.name.toLowerCase().includes(search));
             if (typeFilter !== 'all') {
-                const typeMap = { image: ['jpg','jpeg','png','gif','webp','svg'], document: ['pdf','doc','docx','txt','md','xls','xlsx','ppt','pptx'], video: ['mp4','avi','mkv','mov'], audio: ['mp3','wav','ogg','flac'], archive: ['zip','rar','7z','tar','gz'] };
+                const typeMap = { 
+                    image: ['jpg','jpeg','png','gif','webp','svg'], 
+                    document: ['pdf','doc','docx','txt','md','xls','xlsx','ppt','pptx'], 
+                    video: ['mp4','avi','mkv','mov','webm'], 
+                    audio: ['mp3','wav','ogg','flac','m4a'], 
+                    archive: ['zip','rar','7z','tar','gz'] 
+                };
                 const extensions = typeMap[typeFilter] || [];
                 allFiles = allFiles.filter(f => extensions.some(ext => f.name.toLowerCase().endsWith(ext)));
             }
@@ -783,7 +1452,7 @@
             
             container.innerHTML = allFiles.map(f => `
                 <tr>
-                    <td>${f.icon || '📄'} ${escapeHtml(f.name)}</td>
+                    <td>📄 ${escapeHtml(f.name)}</td>
                     <td>${escapeHtml(f.owner)}</td>
                     <td>${formatBytes(f.size)}</td>
                     <td>${f.type || 'Unknown'}</td>
@@ -799,11 +1468,11 @@
 
         function deleteFile(fileId) {
             if (!confirm('Delete this file?')) return;
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const users = getUsers();
             users.forEach(u => {
-                const vault = JSON.parse(localStorage.getItem(`vault_${u.id}`) || '{"files":[]}');
+                const vault = getVault(u.id);
                 vault.files = vault.files.filter(f => f.id !== fileId);
-                localStorage.setItem(`vault_${u.id}`, JSON.stringify(vault));
+                saveVault(u.id, vault);
             });
             loadFiles();
             showToast('File deleted', 'success');
@@ -817,29 +1486,24 @@
         }
 
         // ========================================
-        // SECURITY
+        // SECURITY FUNCTIONS
         // ========================================
+
         function loadSecurity() {
             const logs = JSON.parse(localStorage.getItem('system_logs') || '[]');
             const failed = logs.filter(l => l.level === 'error' && l.action?.toLowerCase().includes('login')).length;
             document.getElementById('failedLogins').textContent = failed;
             
-            // Suspicious IPs - real data from logs
             const ips = new Set();
-            logs.forEach(l => {
-                if (l.ip) ips.add(l.ip);
-            });
+            logs.forEach(l => { if (l.ip) ips.add(l.ip); });
             document.getElementById('suspiciousIPs').textContent = ips.size || 0;
             
-            // Locked accounts
             const locked = JSON.parse(localStorage.getItem('locked_accounts') || '[]');
             document.getElementById('lockedAccounts').textContent = locked.length || 0;
             
-            // Rate limit blocks
             const blocks = JSON.parse(localStorage.getItem('rate_limit_blocks') || '[]');
             document.getElementById('rateLimitBlocks').textContent = blocks.length || 0;
             
-            // Security alerts
             const alerts = logs.filter(l => l.level === 'warning' || l.level === 'error').slice(0, 10);
             const container = document.getElementById('securityAlerts');
             if (!alerts.length) {
@@ -855,12 +1519,12 @@
         }
 
         // ========================================
-        // SESSIONS
+        // SESSIONS FUNCTIONS
         // ========================================
+
         function loadSessions() {
             let sessions = JSON.parse(localStorage.getItem('active_sessions') || '[]');
             
-            // If no sessions, create one
             if (!sessions.length) {
                 sessions = [{
                     id: getDeviceId(),
@@ -949,8 +1613,9 @@
         }
 
         // ========================================
-        // MODERATION
+        // MODERATION FUNCTIONS
         // ========================================
+
         function loadModeration() {
             let reports = JSON.parse(localStorage.getItem('reported_content') || '[]');
             const filter = document.getElementById('reportStatusFilter')?.value || 'all';
@@ -1000,15 +1665,16 @@
         }
 
         // ========================================
-        // STORAGE
+        // STORAGE FUNCTIONS
         // ========================================
+
         function loadStorage() {
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const users = getUsers();
             let total = 0;
             const userStorage = [];
             
             users.forEach(u => {
-                const vault = JSON.parse(localStorage.getItem(`vault_${u.id}`) || '{"files":[]}');
+                const vault = getVault(u.id);
                 const used = vault.files.reduce((s, f) => s + (f.size || 0), 0);
                 total += used;
                 userStorage.push({ username: u.username, used: used });
@@ -1024,16 +1690,16 @@
             document.getElementById('freeStorage').textContent = freeGB + ' GB';
             document.getElementById('storageUsagePercent').textContent = percent.toFixed(1) + '%';
             
-            // Real file type distribution
+            // File type distribution
             const typeCounts = { Documents: 0, Images: 0, Videos: 0, Audio: 0, Archives: 0, Other: 0 };
             users.forEach(u => {
-                const vault = JSON.parse(localStorage.getItem(`vault_${u.id}`) || '{"files":[]}');
+                const vault = getVault(u.id);
                 vault.files.forEach(f => {
                     const ext = f.name.split('.').pop().toLowerCase();
                     if (['pdf','doc','docx','txt','md','xls','xlsx','ppt','pptx'].includes(ext)) typeCounts.Documents++;
                     else if (['jpg','jpeg','png','gif','webp','svg'].includes(ext)) typeCounts.Images++;
                     else if (['mp4','avi','mkv','mov','webm'].includes(ext)) typeCounts.Videos++;
-                    else if (['mp3','wav','ogg','flac'].includes(ext)) typeCounts.Audio++;
+                    else if (['mp3','wav','ogg','flac','m4a'].includes(ext)) typeCounts.Audio++;
                     else if (['zip','rar','7z','tar','gz'].includes(ext)) typeCounts.Archives++;
                     else typeCounts.Other++;
                 });
@@ -1050,7 +1716,7 @@
             // Largest files
             let allFiles = [];
             users.forEach(u => {
-                const vault = JSON.parse(localStorage.getItem(`vault_${u.id}`) || '{"files":[]}');
+                const vault = getVault(u.id);
                 vault.files.forEach(f => allFiles.push({ ...f, owner: u.username }));
             });
             allFiles.sort((a, b) => (b.size || 0) - (a.size || 0));
@@ -1076,6 +1742,7 @@
         // ========================================
         // AUDIT LOGS
         // ========================================
+
         function loadAuditLogs() {
             let logs = JSON.parse(localStorage.getItem('system_logs') || '[]');
             const level = document.getElementById('logLevelFilter')?.value || 'all';
@@ -1124,6 +1791,7 @@
         // ========================================
         // SYSTEM HEALTH
         // ========================================
+
         function loadSystemHealth() {
             const components = [
                 { name: 'API Server', status: '🟢', details: 'Running' },
@@ -1147,7 +1815,6 @@
                 </div>
             `).join('');
             
-            // Update status indicators
             document.getElementById('apiStatus').textContent = '🟢';
             document.getElementById('dbStatus').textContent = '🟢';
             document.getElementById('authStatus').textContent = '🟢';
@@ -1157,6 +1824,7 @@
         // ========================================
         // DANGER ZONE FUNCTIONS
         // ========================================
+
         function toggleMaintenance() {
             const current = localStorage.getItem('maintenance_mode') === 'true';
             localStorage.setItem('maintenance_mode', !current);
@@ -1180,94 +1848,9 @@
         }
 
         // ========================================
-        // MODAL FUNCTIONS
-        // ========================================
-        function openModal(type) {
-            const overlay = document.getElementById('modalOverlay');
-            const title = document.getElementById('modalTitle');
-            const body = document.getElementById('modalBody');
-            
-            if (type === 'addUser') {
-                title.textContent = '➕ Add New User';
-                body.innerHTML = `
-                    <input type="text" id="modalUsername" placeholder="Username" style="width:100%; padding:0.6rem; margin-bottom:0.75rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white;">
-                    <input type="email" id="modalEmail" placeholder="Email" style="width:100%; padding:0.6rem; margin-bottom:0.75rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white;">
-                    <input type="password" id="modalPassword" placeholder="Password" value="password123" style="width:100%; padding:0.6rem; margin-bottom:0.75rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white;">
-                    <select id="modalRole" style="width:100%; padding:0.6rem; margin-bottom:0.75rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:white;">
-                        <option value="user">User</option>
-                        <option value="moderator">Moderator</option>
-                        <option value="support">Support</option>
-                        <option value="security-admin">Security Admin</option>
-                        <option value="super-admin">Super Admin</option>
-                    </select>
-                `;
-                modalCallback = () => {
-                    const username = document.getElementById('modalUsername').value.trim();
-                    const email = document.getElementById('modalEmail').value.trim();
-                    const password = document.getElementById('modalPassword').value;
-                    const role = document.getElementById('modalRole').value;
-                    if (!username || !email) { showToast('Username and email required', 'error'); return; }
-                    const users = JSON.parse(localStorage.getItem('users') || '[]');
-                    if (users.find(u => u.email === email)) { showToast('Email already exists', 'error'); return; }
-                    const newUser = {
-                        id: 'user_' + Date.now(),
-                        username: username,
-                        email: email,
-                        password: password,
-                        role: role,
-                        status: 'active',
-                        createdAt: new Date().toISOString()
-                    };
-                    users.push(newUser);
-                    localStorage.setItem('users', JSON.stringify(users));
-                    localStorage.setItem(`vault_${newUser.id}`, JSON.stringify({ files: [], notes: [], tasks: [], bookmarks: [] }));
-                    loadUsers();
-                    loadOverview();
-                    showToast(`User "${username}" added`, 'success');
-                    addLog('admin', 'User added', username + ' (' + role + ')');
-                    closeModal();
-                };
-            } else if (type === 'maintenance') {
-                title.textContent = '🔧 Maintenance Tools';
-                body.innerHTML = `
-                    <p style="margin-bottom:0.75rem;color:#a1a1aa;">Choose a maintenance action:</p>
-                    <button class="btn-warning" onclick="toggleMaintenance();closeModal();" style="width:100%;margin-bottom:0.5rem;">🔧 Toggle Maintenance Mode</button>
-                    <button class="btn-danger" onclick="clearCache();closeModal();" style="width:100%;margin-bottom:0.5rem;">🗑️ Clear Cache</button>
-                    <button class="btn-danger" onclick="emergencyLockdown();closeModal();" style="width:100%;">🚨 Emergency Lockdown</button>
-                `;
-                modalCallback = null;
-                document.getElementById('modalConfirmBtn').style.display = 'none';
-            }
-            
-            overlay.classList.add('active');
-            if (type === 'addUser') {
-                document.getElementById('modalConfirmBtn').style.display = 'block';
-            }
-        }
-
-        function closeModal() {
-            document.getElementById('modalOverlay').classList.remove('active');
-            modalCallback = null;
-            document.getElementById('modalConfirmBtn').style.display = 'block';
-        }
-
-        function modalConfirm() {
-            if (modalCallback) modalCallback();
-        }
-
-        function showNotifications() {
-            const logs = JSON.parse(localStorage.getItem('system_logs') || '[]');
-            const alerts = logs.filter(l => l.level === 'warning' || l.level === 'error').slice(0, 10);
-            if (alerts.length === 0) {
-                showToast('No notifications', 'info');
-            } else {
-                alerts.forEach(l => showToast(l.action || 'Notification', l.level === 'error' ? 'error' : 'warning'));
-            }
-        }
-
-        // ========================================
         // SETTINGS
         // ========================================
+
         function saveSettings() {
             const settings = {
                 siteName: document.getElementById('siteName').value,
@@ -1293,68 +1876,9 @@
         }
 
         // ========================================
-        // ADD LOG
-        // ========================================
-        function addLog(action, details, user = 'admin') {
-            const logs = JSON.parse(localStorage.getItem('system_logs') || '[]');
-            logs.unshift({
-                id: Date.now(),
-                level: 'info',
-                action: action,
-                details: details,
-                user: user,
-                ip: '127.0.0.1',
-                timestamp: new Date().toISOString()
-            });
-            if (logs.length > 500) logs.pop();
-            localStorage.setItem('system_logs', JSON.stringify(logs));
-        }
-
-        // ========================================
-        // ADMIN LOGOUT
-        // ========================================
-        function adminLogout() {
-            if (confirm('Logout from admin panel?')) {
-                localStorage.removeItem('adminLoggedIn');
-                localStorage.removeItem('adminEmail');
-                localStorage.removeItem('adminName');
-                window.location.href = 'admin-login.html';
-            }
-        }
-
-        // ========================================
-        // UTILITY FUNCTIONS
-        // ========================================
-        function formatBytes(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transition = 'opacity 0.3s';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        // ========================================
         // KEYBOARD SHORTCUTS
         // ========================================
+
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeModal();
         });
@@ -1362,12 +1886,18 @@
         // ========================================
         // INIT
         // ========================================
+
         document.addEventListener('DOMContentLoaded', function() {
             const adminName = localStorage.getItem('adminName') || 'Administrator';
             document.getElementById('adminName').textContent = adminName;
             
             const savedTheme = localStorage.getItem('theme') || 'dark';
             document.body.className = savedTheme;
+            
+            restoreSidebarState();
+            
+            // Initialize default users
+            initDefaultUsers();
             
             // Load settings
             const settings = JSON.parse(localStorage.getItem('admin_settings') || '{}');
@@ -1381,20 +1911,8 @@
             if (settings.allowRegistration !== undefined) document.getElementById('allowRegistration').checked = settings.allowRegistration;
             if (settings.twoFactorAuth) document.getElementById('twoFactorAuth').checked = settings.twoFactorAuth;
             
-            // Create default admin if no users
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            if (users.length === 0) {
-                users.push({
-                    id: 'admin_1',
-                    username: 'Administrator',
-                    email: 'admin@alanvault.com',
-                    password: 'admin123',
-                    role: 'super-admin',
-                    status: 'active',
-                    createdAt: new Date().toISOString()
-                });
-                localStorage.setItem('users', JSON.stringify(users));
-            }
+            console.log('✅ Admin panel initialized');
+            console.log('📦 Total users:', getUsers().length);
             
             // Load initial data
             loadOverview();

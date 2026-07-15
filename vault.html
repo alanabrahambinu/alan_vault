@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>My Vault - Alan Vault</title>
     
     <!-- Favicon -->
@@ -18,39 +18,253 @@
     <link rel="stylesheet" href="theme.css">
     
     <style>
+        /* ========================================
+           COMPLETE FIXED STYLES
+           ======================================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: white; transition: background 0.3s, color 0.3s; }
         .animated-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 20% 50%, rgba(79,70,229,0.15) 0%, transparent 50%); }
         
-        /* ===== SIDEBAR ===== */
-        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: rgba(10,10,15,0.95); backdrop-filter: blur(20px); border-right: 1px solid rgba(139,92,246,0.2); z-index: 100; transition: transform 0.3s; }
+        /* ========================================
+           SIDEBAR OVERLAY (Mobile)
+           ======================================== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 99;
+        }
+        .sidebar-overlay.active { display: block; }
+        
+        /* ========================================
+           MOBILE MENU BUTTON
+           ======================================== */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 101;
+            width: 44px;
+            height: 44px;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s;
+        }
+        .mobile-menu-btn:hover {
+            background: rgba(139, 92, 246, 0.2);
+            transform: scale(1.05);
+        }
+        
+        /* ========================================
+           SIDEBAR
+           ======================================== */
+        .sidebar { 
+            position: fixed; left: 0; top: 0; width: 280px; height: 100vh; 
+            background: rgba(10,10,15,0.95); backdrop-filter: blur(20px); 
+            border-right: 1px solid rgba(139,92,246,0.2); z-index: 100; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+        body.light .sidebar { background: rgba(255,255,255,0.95); border-right: 1px solid rgba(0,0,0,0.1); }
+        body.purple .sidebar { background: rgba(15,7,23,0.95); border-right: 1px solid rgba(139,92,246,0.2); }
+        body.ocean .sidebar { background: rgba(8,47,73,0.95); border-right: 1px solid rgba(14,165,233,0.2); }
+        body.forest .sidebar { background: rgba(6,78,59,0.95); border-right: 1px solid rgba(16,185,129,0.2); }
+        body.sunset .sidebar { background: rgba(67,20,7,0.95); border-right: 1px solid rgba(249,115,22,0.2); }
+        
         .sidebar-header { padding: 2rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        body.light .sidebar-header { border-bottom: 1px solid rgba(0,0,0,0.05); }
+        
         .logo { display: flex; align-items: center; gap: 12px; font-size: 1.3rem; font-weight: 700; }
         .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #4F46E5, #8B5CF6); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-        .sidebar-nav { padding: 1.5rem; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #a1a1aa; text-decoration: none; border-radius: 12px; transition: all 0.3s; margin-bottom: 0.5rem; }
-        .nav-item:hover, .nav-item.active { background: rgba(139,92,246,0.15); color: #8B5CF6; }
         
-        /* ===== MAIN CONTENT ===== */
+        .sidebar-nav { padding: 1.5rem; flex: 1; overflow-y: auto; }
+        .nav-item { 
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px; 
+            color: #a1a1aa; text-decoration: none; border-radius: 12px; 
+            transition: all 0.3s; margin-bottom: 0.5rem; 
+            cursor: pointer;
+        }
+        .nav-item:hover, .nav-item.active { background: rgba(139,92,246,0.15); color: #8B5CF6; }
+        body.light .nav-item { color: #475569; }
+        body.light .nav-item:hover, body.light .nav-item.active { background: rgba(139,92,246,0.1); }
+        
+        .admin-nav-item {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 1rem;
+            padding-top: 1rem;
+            color: #ef4444;
+        }
+        .admin-nav-item:hover {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+        
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(10, 10, 15, 0.95);
+        }
+        
+        .storage-info {
+            background: rgba(139, 92, 246, 0.1);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+        
+        .storage-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+        
+        .storage-used {
+            height: 100%;
+            background: linear-gradient(90deg, #4F46E5, #8B5CF6);
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+        
+        .logout-btn {
+            width: 100%;
+            padding: 12px;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* ========================================
+           MAIN CONTENT
+           ======================================== */
         .main-content { margin-left: 280px; padding: 2rem; transition: margin-left 0.3s; }
         
-        .top-bar { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
-        .search-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 50px; width: 300px; color: white; transition: all 0.3s; }
+        /* ========================================
+           TOP BAR
+           ======================================== */
+        .top-bar { 
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 16px; padding: 1rem 1.5rem; 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; 
+        }
+        body.light .top-bar { background: rgba(255,255,255,0.8); border: 1px solid rgba(0,0,0,0.05); }
+        body.purple .top-bar { background: rgba(139,92,246,0.05); border: 1px solid rgba(139,92,246,0.2); }
+        body.ocean .top-bar { background: rgba(14,165,233,0.05); border: 1px solid rgba(14,165,233,0.2); }
+        body.forest .top-bar { background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2); }
+        body.sunset .top-bar { background: rgba(249,115,22,0.05); border: 1px solid rgba(249,115,22,0.2); }
+        
+        .search-box { 
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
+            padding: 10px 20px; border-radius: 50px; width: 300px; color: white; 
+            transition: all 0.3s; 
+        }
+        body.light .search-box { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.1); color: #0f172a; }
         .search-box:focus { outline: none; border-color: #8B5CF6; box-shadow: 0 0 0 3px rgba(139,92,246,0.1); }
         .search-box::placeholder { color: #71717a; }
         
         .user-info { display: flex; align-items: center; gap: 1rem; }
-        .user-avatar { width: 40px; height: 40px; background: linear-gradient(135deg, #4F46E5, #8B5CF6); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         
-        /* ===== TOOLBAR ===== */
-        .toolbar { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1rem; margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
-        .btn-primary { background: linear-gradient(135deg, #4F46E5, #8B5CF6); padding: 10px 20px; border: none; border-radius: 12px; color: white; cursor: pointer; transition: all 0.3s; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(79,70,229,0.4); }
-        .btn-outline { background: transparent; border: 1px solid rgba(139,92,246,0.5); color: #8B5CF6; padding: 10px 20px; border-radius: 12px; cursor: pointer; }
-        .btn-outline:hover { background: rgba(139,92,246,0.1); transform: translateY(-2px); }
-        .btn-danger { background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+        .admin-icon {
+            background: linear-gradient(135deg, #ef4444, #f59e0b);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .admin-icon:hover { transform: scale(1.1); }
         
-        /* ===== SEARCH RESULTS COUNT ===== */
+        .user-avatar { 
+            width: 40px; height: 40px; 
+            background: linear-gradient(135deg, #4F46E5, #8B5CF6); 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; transition: transform 0.3s; 
+        }
+        .user-avatar:hover { transform: scale(1.05); }
+        
+        /* ========================================
+           TOOLBAR
+           ======================================== */
+        .toolbar { 
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 16px; 
+            padding: 1rem; 
+            margin-bottom: 1.5rem; 
+            display: flex; 
+            gap: 1rem; 
+            flex-wrap: wrap; 
+            align-items: center; 
+        }
+        
+        .btn-primary { 
+            background: linear-gradient(135deg, #4F46E5, #8B5CF6); 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 12px; 
+            color: white; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+        }
+        .btn-primary:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 5px 15px rgba(79,70,229,0.4); 
+        }
+        
+        .btn-outline { 
+            background: transparent; 
+            border: 1px solid rgba(139,92,246,0.5); 
+            color: #8B5CF6; 
+            padding: 10px 20px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+        }
+        .btn-outline:hover { 
+            background: rgba(139,92,246,0.1); 
+            transform: translateY(-2px); 
+        }
+        
+        .btn-danger { 
+            background: rgba(239,68,68,0.2); 
+            border: 1px solid rgba(239,68,68,0.3); 
+            color: #ef4444; 
+            padding: 8px 16px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+        }
+        
+        /* ========================================
+           SEARCH RESULTS COUNT
+           ======================================== */
         .search-info { 
             display: flex; 
             align-items: center; 
@@ -79,37 +293,123 @@
             font-weight: 600; 
         }
         
-        /* ===== FOLDER PATH ===== */
-        .folder-path { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; padding: 0.75rem 1rem; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        /* ========================================
+           FOLDER PATH
+           ======================================== */
+        .folder-path { 
+            display: flex; 
+            align-items: center; 
+            gap: 0.5rem; 
+            margin-bottom: 0.75rem; 
+            padding: 0.75rem 1rem; 
+            background: rgba(255,255,255,0.03); 
+            border-radius: 12px; 
+            border: 1px solid rgba(255,255,255,0.05); 
+        }
         .folder-path-label { color: #71717a; font-size: 0.8rem; }
         .folder-path-value { color: #8B5CF6; font-weight: 600; font-size: 0.95rem; }
         
-        /* ===== BREADCRUMB ===== */
-        .breadcrumb { display: flex; gap: 0.5rem; margin-bottom: 1rem; color: #a1a1aa; flex-wrap: wrap; padding: 0.5rem 0; }
-        .breadcrumb a { color: #8B5CF6; text-decoration: none; cursor: pointer; }
-        .breadcrumb a:hover { color: #4F46E5; text-decoration: underline; }
+        /* ========================================
+           BREADCRUMB
+           ======================================== */
+        .breadcrumb { 
+            display: flex; 
+            gap: 0.5rem; 
+            margin-bottom: 1rem; 
+            color: #a1a1aa; 
+            flex-wrap: wrap; 
+            padding: 0.5rem 0; 
+        }
+        .breadcrumb a { 
+            color: #8B5CF6; 
+            text-decoration: none; 
+            cursor: pointer; 
+        }
+        .breadcrumb a:hover { 
+            color: #4F46E5; 
+            text-decoration: underline; 
+        }
         .breadcrumb-separator { color: #71717a; }
         
-        /* ===== GRIDS ===== */
-        .folder-grid, .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
-        .folder-card, .file-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1rem; text-align: center; cursor: pointer; transition: all 0.3s; }
-        .folder-card:hover, .file-card:hover { transform: translateY(-5px); border-color: rgba(139,92,246,0.3); background: rgba(139,92,246,0.05); }
+        /* ========================================
+           GRIDS
+           ======================================== */
+        .folder-grid, .file-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+            gap: 1rem; 
+            margin-top: 1rem; 
+        }
+        
+        .folder-card, .file-card { 
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 16px; 
+            padding: 1rem; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+        }
+        .folder-card:hover, .file-card:hover { 
+            transform: translateY(-5px); 
+            border-color: rgba(139,92,246,0.3); 
+            background: rgba(139,92,246,0.05); 
+        }
+        
         .folder-icon, .file-icon { font-size: 3rem; margin-bottom: 0.5rem; }
-        .folder-name, .file-name { font-weight: 500; margin-bottom: 0.25rem; word-break: break-word; }
+        .folder-name, .file-name { 
+            font-weight: 500; 
+            margin-bottom: 0.25rem; 
+            word-break: break-word; 
+        }
         .file-size { font-size: 0.75rem; color: #71717a; }
         .file-date { font-size: 0.65rem; color: #71717a; margin-top: 0.25rem; }
-        .folder-actions, .file-actions { margin-top: 0.75rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
-        .folder-actions .btn-outline, .file-actions .btn-outline { padding: 4px 10px; font-size: 0.7rem; }
-        .folder-actions .btn-danger, .file-actions .btn-danger { padding: 4px 10px; font-size: 0.7rem; }
         
-        /* ===== EMPTY STATE ===== */
-        .empty-state { text-align: center; padding: 4rem; color: #71717a; grid-column: 1 / -1; }
+        .folder-actions, .file-actions { 
+            margin-top: 0.75rem; 
+            display: flex; 
+            gap: 0.5rem; 
+            justify-content: center; 
+            flex-wrap: wrap; 
+        }
+        .folder-actions .btn-outline, .file-actions .btn-outline { 
+            padding: 4px 10px; 
+            font-size: 0.7rem; 
+        }
+        .folder-actions .btn-danger, .file-actions .btn-danger { 
+            padding: 4px 10px; 
+            font-size: 0.7rem; 
+        }
+        
+        /* ========================================
+           EMPTY STATE
+           ======================================== */
+        .empty-state { 
+            text-align: center; 
+            padding: 4rem; 
+            color: #71717a; 
+            grid-column: 1 / -1; 
+        }
         .empty-state-icon { font-size: 4rem; margin-bottom: 1rem; }
         .empty-state h3 { margin-bottom: 0.5rem; color: #a1a1aa; }
         .empty-state p { margin-bottom: 1rem; }
         
-        /* ===== MODAL ===== */
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); justify-content: center; align-items: center; z-index: 1000; }
+        /* ========================================
+           MODAL
+           ======================================== */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background: rgba(0,0,0,0.8); 
+            backdrop-filter: blur(10px); 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 1000; 
+        }
         .modal.active { display: flex; animation: fadeIn 0.3s ease; }
         
         @keyframes fadeIn {
@@ -117,20 +417,73 @@
             to { opacity: 1; transform: scale(1); }
         }
         
-        .modal-content { background: #1a1a2e; border: 1px solid rgba(139,92,246,0.3); border-radius: 24px; padding: 2rem; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+        .modal-content { 
+            background: #1a1a2e; 
+            border: 1px solid rgba(139,92,246,0.3); 
+            border-radius: 24px; 
+            padding: 2rem; 
+            width: 90%; 
+            max-width: 500px; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+        }
         .modal-content h3 { margin-bottom: 1.5rem; font-size: 1.4rem; }
-        .modal-content label { display: block; margin-bottom: 0.5rem; color: #a1a1aa; font-size: 0.875rem; }
+        .modal-content label { 
+            display: block; 
+            margin-bottom: 0.5rem; 
+            color: #a1a1aa; 
+            font-size: 0.875rem; 
+        }
         .modal-content input[type="text"],
-        .modal-content input[type="file"] { width: 100%; padding: 12px; margin-bottom: 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; font-size: 0.95rem; transition: all 0.3s; }
-        .modal-content input:focus { outline: none; border-color: #8B5CF6; box-shadow: 0 0 0 3px rgba(139,92,246,0.1); }
+        .modal-content input[type="file"] { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 1rem; 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 12px; 
+            color: white; 
+            font-size: 0.95rem; 
+            transition: all 0.3s; 
+        }
+        .modal-content input:focus { 
+            outline: none; 
+            border-color: #8B5CF6; 
+            box-shadow: 0 0 0 3px rgba(139,92,246,0.1); 
+        }
         .modal-content input[type="file"] { padding: 8px; }
-        .modal-content small { color: #71717a; display: block; margin-top: -0.5rem; margin-bottom: 0.5rem; font-size: 0.8rem; }
-        .modal-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; }
+        .modal-content small { 
+            color: #71717a; 
+            display: block; 
+            margin-top: -0.5rem; 
+            margin-bottom: 0.5rem; 
+            font-size: 0.8rem; 
+        }
+        .modal-actions { 
+            display: flex; 
+            gap: 1rem; 
+            justify-content: flex-end; 
+            margin-top: 1.5rem; 
+        }
         .modal-actions .btn-outline { padding: 10px 20px; }
         .modal-actions .btn-primary { padding: 10px 20px; }
         
-        /* ===== TOAST ===== */
-        .toast { position: fixed; bottom: 30px; right: 30px; padding: 12px 24px; border-radius: 12px; color: white; font-size: 0.9rem; z-index: 10001; animation: slideInRight 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        /* ========================================
+           TOAST
+           ======================================== */
+        .toast { 
+            position: fixed; 
+            bottom: 30px; 
+            right: 30px; 
+            padding: 12px 24px; 
+            border-radius: 12px; 
+            color: white; 
+            font-size: 0.9rem; 
+            z-index: 10001; 
+            animation: slideInRight 0.3s ease; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3); 
+            max-width: 90vw;
+        }
         .toast.success { background: #10b981; }
         .toast.error { background: #ef4444; }
         .toast.info { background: #3b82f6; }
@@ -141,21 +494,99 @@
             to { opacity: 1; transform: translateX(0); }
         }
         
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) { 
-            .sidebar { transform: translateX(-100%); } 
+        /* ========================================
+           RESPONSIVE BREAKPOINTS
+           ======================================== */
+        @media (max-width: 768px) {
+            .mobile-menu-btn { display: flex; }
+            
+            .sidebar { transform: translateX(-100%); }
             .sidebar.active { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 1rem; }
+            
+            .sidebar-overlay.active { display: block; }
+            
+            .main-content { 
+                margin-left: 0; 
+                padding: 1rem; 
+                padding-top: 70px; 
+            }
             .search-box { width: 100%; }
             .top-bar { flex-direction: column; align-items: stretch; }
-            .toolbar { flex-direction: column; }
-            .folder-grid, .file-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-            .search-info { flex-wrap: wrap; font-size: 0.8rem; }
+            .toolbar { 
+                flex-direction: column; 
+                align-items: stretch;
+            }
+            .toolbar .btn-primary,
+            .toolbar .btn-outline {
+                width: 100%;
+                text-align: center;
+            }
+            .folder-grid, .file-grid { 
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+            }
+            .search-info { 
+                flex-wrap: wrap; 
+                font-size: 0.8rem; 
+            }
+            
+            .toast {
+                right: 10px;
+                left: 10px;
+                bottom: 10px;
+                font-size: 0.8rem;
+                padding: 10px 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .mobile-menu-btn {
+                top: 8px;
+                left: 8px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            
+            .main-content { padding-top: 60px; }
+            
+            .folder-grid, .file-grid { 
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
+                gap: 0.75rem; 
+            }
+            
+            .folder-card, .file-card { padding: 0.75rem; }
+            .folder-icon, .file-icon { font-size: 2rem; }
+            .folder-name, .file-name { font-size: 0.85rem; }
+        }
+        
+        @media (max-width: 768px) and (orientation: landscape) {
+            .sidebar { width: 240px; }
+            .main-content { padding-top: 60px; }
+            
+            .mobile-menu-btn {
+                top: 8px;
+                left: 8px;
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+            
+            .folder-grid, .file-grid { 
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+            }
         }
     </style>
 </head>
 <body>
     <div class="animated-bg"></div>
+    
+    <!-- ===== SIDEBAR OVERLAY (Mobile) ===== -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
+    <!-- ===== MOBILE MENU BUTTON ===== -->
+    <button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Toggle Menu">
+        ☰
+    </button>
     
     <!-- ===== SIDEBAR ===== -->
     <div class="sidebar" id="sidebar">
@@ -173,16 +604,31 @@
             <a href="bookmarks.html" class="nav-item">🔗 Bookmarks</a>
             <a href="analytics.html" class="nav-item">📈 Analytics</a>
             <a href="settings.html" class="nav-item">⚙️ Settings</a>
+            <button class="nav-item admin-nav-item" onclick="window.open('admin-login.html', '_blank')">
+                👑 Admin Panel
+            </button>
+        </div>
+        <div class="sidebar-footer">
+            <div class="storage-info">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>💾 Storage</span>
+                    <span id="storageText">0 GB / 5 GB</span>
+                </div>
+                <div class="storage-bar">
+                    <div class="storage-used" id="storageBar"></div>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
         </div>
     </div>
 
     <!-- ===== MAIN CONTENT ===== -->
     <div class="main-content">
         <div class="top-bar">
-            <!-- SEARCH BOX - Connected to searchFiles() -->
             <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search files and folders..." onkeyup="searchFiles()">
             <div class="user-info">
                 <span id="usernameDisplay"></span>
+                <div class="admin-icon" onclick="window.open('admin-login.html', '_blank')" title="Admin Panel">👑</div>
                 <div class="user-avatar" onclick="location.href='profile.html'">👤</div>
             </div>
         </div>
@@ -196,7 +642,7 @@
             <button class="btn-outline" onclick="clearSearch()" style="color: #ef4444; border-color: rgba(239,68,68,0.3);">✕ Clear Search</button>
         </div>
         
-        <!-- ===== SEARCH INFO - Shows search results count ===== -->
+        <!-- ===== SEARCH INFO ===== -->
         <div id="searchInfo" class="search-info" style="display: none;">
             <span>🔍 Search results:</span>
             <span class="count" id="searchCount">0</span>
@@ -232,6 +678,10 @@
 
     <!-- ===== SCRIPTS ===== -->
     <script>
+        // ========================================
+        // COMPLETE FIXED JAVASCRIPT
+        // ========================================
+        
         let currentUser = null;
         let currentPath = '';
         let currentModalType = null;
@@ -241,36 +691,140 @@
         let searchQuery = '';
         
         // ========================================
+        // HELPER FUNCTIONS
+        // ========================================
+        
+        function getCurrentUser() {
+            try {
+                const user = localStorage.getItem('currentUser');
+                return user ? JSON.parse(user) : null;
+            } catch (e) {
+                console.error('Error getting current user:', e);
+                return null;
+            }
+        }
+
+        function getVaultData(userId) {
+            try {
+                const key = `vault_folders_${userId}`;
+                const data = localStorage.getItem(key);
+                if (data) {
+                    return JSON.parse(data);
+                }
+                return { folders: [], files: [] };
+            } catch (e) {
+                console.error('Error getting vault data:', e);
+                return { folders: [], files: [] };
+            }
+        }
+
+        function saveVaultData(userId, data) {
+            try {
+                const key = `vault_folders_${userId}`;
+                localStorage.setItem(key, JSON.stringify(data));
+                return true;
+            } catch (e) {
+                console.error('Error saving vault data:', e);
+                return false;
+            }
+        }
+
+        function updateStorage() {
+            const totalSize = files.reduce((sum, f) => sum + (f.size || 0), 0);
+            const usedGB = (totalSize / (1024 * 1024 * 1024)).toFixed(2);
+            const percent = Math.min((totalSize / (5 * 1024 * 1024 * 1024)) * 100, 100);
+            document.getElementById('storageText').textContent = `${usedGB} GB / 5 GB`;
+            document.getElementById('storageBar').style.width = `${percent}%`;
+        }
+        
+        // ========================================
         // INITIALIZATION
         // ========================================
         
         function init() {
-            const user = localStorage.getItem('currentUser');
-            if (!user) { location.href='login.html'; return; }
-            currentUser = JSON.parse(user);
-            document.getElementById('usernameDisplay').textContent = currentUser.username;
-            
-            const data = localStorage.getItem(`vault_folders_${currentUser.id}`);
-            if (data) {
-                const parsed = JSON.parse(data);
-                folders = parsed.folders || [];
-                files = parsed.files || [];
+            currentUser = getCurrentUser();
+            if (!currentUser) { 
+                window.location.href = 'login.html'; 
+                return; 
             }
             
+            document.getElementById('usernameDisplay').textContent = currentUser.username;
+            
+            const data = getVaultData(currentUser.id);
+            folders = data.folders || [];
+            files = data.files || [];
+            
+            updateStorage();
             render();
+            
+            // Apply theme
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.className = savedTheme;
+            
+            // Apply compact mode
+            const settings = JSON.parse(localStorage.getItem(`settings_${currentUser.id}`) || '{}');
+            if (settings.compactMode) {
+                document.body.classList.add('compact');
+            }
         }
         
         function loadData() {
-            const data = localStorage.getItem(`vault_folders_${currentUser.id}`);
-            if (data) {
-                const parsed = JSON.parse(data);
-                folders = parsed.folders || [];
-                files = parsed.files || [];
-            }
+            const data = getVaultData(currentUser.id);
+            folders = data.folders || [];
+            files = data.files || [];
+            updateStorage();
         }
         
         function saveData() {
-            localStorage.setItem(`vault_folders_${currentUser.id}`, JSON.stringify({folders, files}));
+            saveVaultData(currentUser.id, { folders, files });
+            updateStorage();
+        }
+        
+        // ========================================
+        // SIDEBAR FUNCTIONS
+        // ========================================
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+        }
+        
+        // Close sidebar on resize to desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.remove('active');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+        
+        // Close sidebar on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar.classList.contains('active')) {
+                    toggleSidebar();
+                }
+                const modal = document.getElementById('vaultModal');
+                if (modal.classList.contains('active')) {
+                    closeVaultModal();
+                }
+            }
+        });
+        
+        // ========================================
+        // LOGOUT
+        // ========================================
+        
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('loggedIn');
+                window.location.href = 'login.html';
+            }
         }
         
         // ========================================
@@ -345,9 +899,8 @@
                         </div>
                     </div>
                 `;
-                if (!folderGrid.innerHTML) {
-                    folderGrid.innerHTML = emptyHtml;
-                }
+                folderGrid.innerHTML = emptyHtml;
+                fileGrid.innerHTML = '';
             }
         }
         
@@ -402,7 +955,7 @@
         }
         
         // ========================================
-        // 🔍 SEARCH FUNCTIONS - WORKING!
+        // 🔍 SEARCH FUNCTIONS
         // ========================================
         
         function searchFiles() {
@@ -434,7 +987,6 @@
         
         function navigateTo(path) {
             currentPath = path;
-            // Don't clear search when navigating
             render();
             showToast(`📁 Navigated to: ${path || 'Root'}`, 'info');
         }
@@ -466,6 +1018,14 @@
                     document.getElementById('folderNameInput').focus();
                     if (item) document.getElementById('folderNameInput').select();
                 }, 100);
+                
+                // Enter key support
+                document.getElementById('folderNameInput').onkeypress = function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        saveVaultModal();
+                    }
+                };
             } else if (type === 'file') {
                 title.textContent = '📤 Upload File';
                 body.innerHTML = `
@@ -536,16 +1096,27 @@
                     return;
                 }
                 
+                // Check file size (max 100MB)
+                if (file.size > 100 * 1024 * 1024) {
+                    showToast('File too large. Max 100MB allowed.', 'error');
+                    return;
+                }
+                
                 const duplicate = files.find(f => f.parent === currentPath && f.name === file.name);
                 if (duplicate) {
                     if (!confirm(`File "${file.name}" already exists in this folder. Overwrite?`)) {
                         return;
                     }
+                    // Revoke old URL
+                    if (duplicate.data && duplicate.data.startsWith('blob:')) {
+                        URL.revokeObjectURL(duplicate.data);
+                    }
                     files = files.filter(f => f.id !== duplicate.id);
                 }
                 
+                const fileId = Date.now().toString();
                 files.push({
-                    id: Date.now().toString(),
+                    id: fileId,
                     name: file.name,
                     size: file.size,
                     type: file.type,
@@ -640,6 +1211,9 @@
         }
         
         function showToast(message, type = 'info') {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             toast.textContent = message;

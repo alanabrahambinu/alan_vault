@@ -2,14 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>Sign Up - Alan Vault Premium</title>
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Alan Vault</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -22,8 +16,11 @@
     <meta name="theme-color" content="#4F46E5">
     
     <link rel="stylesheet" href="dashboard.css">
-</head>
+    
     <style>
+        /* ========================================
+           COMPLETE FIXED STYLES
+           ======================================== */
         * {
             margin: 0;
             padding: 0;
@@ -281,6 +278,10 @@
             background: rgba(255, 255, 255, 0.08);
         }
 
+        input::placeholder {
+            color: #71717a;
+        }
+
         /* Password Strength Meter */
         .strength-meter {
             margin-top: 0.5rem;
@@ -294,6 +295,7 @@
             height: 100%;
             width: 0%;
             transition: all 0.3s;
+            border-radius: 2px;
         }
 
         .strength-text {
@@ -301,11 +303,6 @@
             margin-top: 0.25rem;
             color: #71717a;
         }
-
-        .strength-weak { background: #ef4444; width: 25%; }
-        .strength-medium { background: #f59e0b; width: 50%; }
-        .strength-good { background: #10b981; width: 75%; }
-        .strength-strong { background: #10b981; width: 100%; }
 
         .checkbox {
             display: flex;
@@ -360,6 +357,12 @@
             box-shadow: 0 10px 30px rgba(79, 70, 229, 0.4);
         }
 
+        .btn-signup:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .login-link {
             text-align: center;
             margin-top: 2rem;
@@ -388,6 +391,11 @@
             display: none;
         }
 
+        .error-message.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
         .success-message {
             background: rgba(16, 185, 129, 0.1);
             border: 1px solid rgba(16, 185, 129, 0.3);
@@ -397,6 +405,11 @@
             color: #10b981;
             font-size: 0.875rem;
             display: none;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
         }
 
         @keyframes fadeInUp {
@@ -410,15 +423,100 @@
             }
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* ========================================
+           RESPONSIVE BREAKPOINTS
+           ======================================== */
+        @media (max-width: 1024px) {
+            .brand-section {
+                padding: 2rem;
+            }
+            .brand-title {
+                font-size: 2.5rem;
+            }
+        }
+
         @media (max-width: 968px) {
             .brand-section {
                 display: none;
             }
             .form-section {
                 flex: 1;
+                padding: 1.5rem;
+            }
+            .glass-card {
+                padding: 2rem;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .glass-card {
+                padding: 1.5rem;
+                border-radius: 24px;
+            }
+            .form-header h2 {
+                font-size: 1.5rem;
             }
             .form-row {
                 grid-template-columns: 1fr;
+            }
+            .btn-signup {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+            input {
+                padding: 0.75rem 0.75rem 0.75rem 2.2rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .glass-card {
+                padding: 1rem;
+            }
+            .pricing-badge {
+                padding: 0.75rem;
+            }
+            .pricing-badge .price {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Landscape Mode on Mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .brand-section {
+                display: none;
+            }
+            .glass-card {
+                padding: 1.5rem;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            .form-group {
+                margin-bottom: 0.75rem;
+            }
+            .form-header {
+                margin-bottom: 1rem;
+            }
+            .form-header h2 {
+                font-size: 1.3rem;
+            }
+            .login-link {
+                margin-top: 1rem;
+            }
+            .form-row {
+                grid-template-columns: 1fr 1fr;
             }
         }
     </style>
@@ -455,7 +553,7 @@
                 <div id="errorMessage" class="error-message"></div>
                 <div id="successMessage" class="success-message"></div>
 
-                <form id="signupForm">
+                <form id="signupForm" novalidate>
                     <div class="form-row">
                         <div class="form-group">
                             <label>First Name</label>
@@ -521,7 +619,7 @@
                         </label>
                     </div>
 
-                    <button type="submit" class="btn-signup">Create Free Account →</button>
+                    <button type="submit" class="btn-signup" id="signupBtn">Create Free Account →</button>
                 </form>
 
                 <div class="login-link">
@@ -532,9 +630,18 @@
     </div>
 
     <script>
-        // Create floating particles
+        // ========================================
+        // COMPLETE FIXED JAVASCRIPT
+        // ========================================
+        
+        // ========================================
+        // CREATE PARTICLES
+        // ========================================
+        
         function createParticles() {
             const container = document.getElementById('particles');
+            if (!container) return;
+            
             for (let i = 0; i < 30; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
@@ -551,7 +658,38 @@
 
         createParticles();
 
-        // Password strength checker
+        // ========================================
+        // HELPER FUNCTIONS
+        // ========================================
+        
+        function getUsers() {
+            try {
+                const users = localStorage.getItem('users');
+                return users ? JSON.parse(users) : [];
+            } catch (e) {
+                console.error('Error loading users:', e);
+                return [];
+            }
+        }
+
+        function saveUsers(users) {
+            try {
+                localStorage.setItem('users', JSON.stringify(users));
+                return true;
+            } catch (e) {
+                console.error('Error saving users:', e);
+                return false;
+            }
+        }
+
+        function generateId() {
+            return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // ========================================
+        // PASSWORD STRENGTH CHECKER
+        // ========================================
+        
         const passwordInput = document.getElementById('password');
         const strengthFill = document.getElementById('strengthFill');
         const strengthText = document.getElementById('strengthText');
@@ -566,120 +704,288 @@
             if (/[0-9]/.test(password)) strength++;
             if (/[^A-Za-z0-9]/.test(password)) strength++;
             
-            strengthFill.className = 'strength-fill';
-            if (strength <= 1) {
-                strengthFill.classList.add('strength-weak');
-                strengthText.textContent = 'Weak password';
-                strengthText.style.color = '#ef4444';
-            } else if (strength <= 3) {
-                strengthFill.classList.add('strength-medium');
-                strengthText.textContent = 'Medium password';
-                strengthText.style.color = '#f59e0b';
-            } else if (strength <= 4) {
-                strengthFill.classList.add('strength-good');
-                strengthText.textContent = 'Good password';
-                strengthText.style.color = '#10b981';
-            } else {
-                strengthFill.classList.add('strength-strong');
-                strengthText.textContent = 'Strong password!';
-                strengthText.style.color = '#10b981';
-            }
+            const percentage = (strength / 5) * 100;
+            strengthFill.style.width = percentage + '%';
             
             if (!password) {
                 strengthFill.style.width = '0%';
                 strengthText.textContent = '';
+                strengthFill.style.background = '';
+                return;
+            }
+            
+            if (strength <= 1) {
+                strengthFill.style.background = '#ef4444';
+                strengthText.textContent = 'Weak password';
+                strengthText.style.color = '#ef4444';
+            } else if (strength <= 3) {
+                strengthFill.style.background = '#f59e0b';
+                strengthText.textContent = 'Medium password';
+                strengthText.style.color = '#f59e0b';
+            } else if (strength <= 4) {
+                strengthFill.style.background = '#10b981';
+                strengthText.textContent = 'Good password';
+                strengthText.style.color = '#10b981';
+            } else {
+                strengthFill.style.background = '#10b981';
+                strengthText.textContent = 'Strong password! 💪';
+                strengthText.style.color = '#10b981';
             }
         });
 
+        // ========================================
+        // FORM HANDLER
+        // ========================================
+        
         const form = document.getElementById('signupForm');
         const errorDiv = document.getElementById('errorMessage');
         const successDiv = document.getElementById('successMessage');
+        const signupBtn = document.getElementById('signupBtn');
 
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            const username = document.getElementById('username').value;
-            const email = document.getElementById('email').value;
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             const terms = document.getElementById('terms').checked;
+            const newsletter = document.getElementById('newsletter').checked;
             
+            // Clear previous messages
+            errorDiv.classList.remove('show');
+            successDiv.classList.remove('show');
             errorDiv.style.display = 'none';
             successDiv.style.display = 'none';
             
-            const fullName = firstName && lastName ? `${firstName} ${lastName}` : username;
+            // Build full name
+            const fullName = firstName || lastName ? `${firstName} ${lastName}`.trim() : username;
             
+            // ========================================
+            // VALIDATION
+            // ========================================
+            
+            // Username validation
             if (username.length < 3) {
                 showError('Username must be at least 3 characters');
+                document.getElementById('username').style.animation = 'shake 0.3s ease';
+                setTimeout(() => {
+                    document.getElementById('username').style.animation = '';
+                }, 300);
                 return;
             }
             
+            if (username.length > 20) {
+                showError('Username must be less than 20 characters');
+                return;
+            }
+            
+            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                showError('Username can only contain letters, numbers, and underscores');
+                return;
+            }
+            
+            // Email validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 showError('Please enter a valid email address');
+                document.getElementById('email').style.animation = 'shake 0.3s ease';
+                setTimeout(() => {
+                    document.getElementById('email').style.animation = '';
+                }, 300);
                 return;
             }
             
-            if (password.length < 8) {
-                showError('Password must be at least 8 characters');
+            // Password validation
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters');
+                document.getElementById('password').style.animation = 'shake 0.3s ease';
+                setTimeout(() => {
+                    document.getElementById('password').style.animation = '';
+                }, 300);
                 return;
             }
             
             if (password !== confirmPassword) {
                 showError('Passwords do not match');
+                document.getElementById('confirmPassword').style.animation = 'shake 0.3s ease';
+                setTimeout(() => {
+                    document.getElementById('confirmPassword').style.animation = '';
+                }, 300);
                 return;
             }
             
+            // Terms validation
             if (!terms) {
                 showError('You must agree to the Terms of Service');
+                document.getElementById('terms').style.animation = 'shake 0.3s ease';
+                setTimeout(() => {
+                    document.getElementById('terms').style.animation = '';
+                }, 300);
                 return;
             }
             
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            // ========================================
+            // CHECK EXISTING USERS
+            // ========================================
+            
+            const users = getUsers();
+            
+            // Check email
             if (users.find(u => u.email === email)) {
                 showError('An account already exists with this email');
+                document.getElementById('email').style.animation = 'shake 0.3s ease';
+                setTimeout(() => {
+                    document.getElementById('email').style.animation = '';
+                }, 300);
                 return;
             }
             
+            // Check username
+            if (users.find(u => u.username === username)) {
+                showError('Username already taken');
+                document.getElementById('username').style.animation = 'shake 0.3s ease';
+                setTimeout(() => {
+                    document.getElementById('username').style.animation = '';
+                }, 300);
+                return;
+            }
+            
+            // ========================================
+            // CREATE USER
+            // ========================================
+            
             const newUser = {
-                id: Date.now().toString(),
+                id: generateId(),
                 username: fullName,
                 email: email,
                 password: password,
-                createdAt: new Date().toISOString()
+                role: 'user',
+                status: 'active',
+                verified: false,
+                createdAt: new Date().toISOString(),
+                lastLogin: null,
+                storageUsed: 0,
+                plan: 'free'
             };
             
+            // Save user
             users.push(newUser);
-            localStorage.setItem('users', JSON.stringify(users));
+            saveUsers(users);
+            console.log('User created:', newUser.username);
             
-            localStorage.setItem(`vault_${newUser.id}`, JSON.stringify({
+            // Create vault for new user
+            const vaultKey = `vault_${newUser.id}`;
+            const emptyVault = {
                 files: [],
                 notes: [],
                 tasks: [],
                 bookmarks: []
+            };
+            localStorage.setItem(vaultKey, JSON.stringify(emptyVault));
+            console.log('Vault created for:', newUser.username);
+            
+            // Create settings
+            const settingsKey = `settings_${newUser.id}`;
+            localStorage.setItem(settingsKey, JSON.stringify({
+                theme: 'dark',
+                compactMode: false,
+                emailNotifications: true,
+                pushNotifications: true,
+                taskReminders: true,
+                sessionTimeout: '60'
             }));
             
-            showSuccess('Account created successfully! Redirecting to login...');
+            // Create profile
+            const profileKey = `profile_${newUser.id}`;
+            localStorage.setItem(profileKey, JSON.stringify({
+                fullName: fullName,
+                username: username,
+                email: email,
+                memberSince: new Date().toLocaleDateString()
+            }));
             
+            // Show success
+            showSuccess('✓ Account created successfully! Redirecting to login...');
+            
+            // Disable button
+            signupBtn.disabled = true;
+            signupBtn.innerHTML = 'Creating...';
+            signupBtn.style.opacity = '0.7';
+            
+            // Store email for verification
+            sessionStorage.setItem('verifyEmail', email);
+            
+            // Redirect to login
             setTimeout(() => {
                 window.location.href = 'login.html';
             }, 2000);
         });
+
+        // ========================================
+        // ERROR & SUCCESS DISPLAY
+        // ========================================
         
         function showError(message) {
-            errorDiv.textContent = '❌ ' + message;
+            errorDiv.innerHTML = '❌ ' + message;
             errorDiv.style.display = 'block';
+            errorDiv.classList.add('show');
+            
             setTimeout(() => {
-                errorDiv.style.display = 'none';
+                errorDiv.classList.remove('show');
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 300);
             }, 4000);
         }
-        
+
         function showSuccess(message) {
-            successDiv.textContent = '✓ ' + message;
+            successDiv.innerHTML = message;
             successDiv.style.display = 'block';
+            successDiv.classList.add('show');
+            
+            setTimeout(() => {
+                successDiv.classList.remove('show');
+                setTimeout(() => {
+                    successDiv.style.display = 'none';
+                }, 300);
+            }, 3000);
         }
+
+        // ========================================
+        // KEYBOARD SHORTCUTS
+        // ========================================
+        
+        document.addEventListener('keydown', function(e) {
+            // Escape key clears form
+            if (e.key === 'Escape') {
+                document.getElementById('firstName').value = '';
+                document.getElementById('lastName').value = '';
+                document.getElementById('username').value = '';
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
+                document.getElementById('confirmPassword').value = '';
+                document.getElementById('firstName').focus();
+            }
+        });
+
+        // ========================================
+        // AUTO-FOCUS
+        // ========================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('firstName').focus();
+        });
+
+        // ========================================
+        // CONSOLE DEBUG INFO
+        // ========================================
+        
+        console.log('📝 Alan Vault Signup Page');
+        console.log('👤 Existing users:', getUsers().length);
+        console.log('💡 Sign up to create your account!');
     </script>
 </body>
 </html>

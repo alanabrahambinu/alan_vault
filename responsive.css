@@ -1,9 +1,11 @@
 /* ========================================
    ALAN VAULT - RESPONSIVE DESIGN
-   Mobile-First Breakpoints
+   Complete Mobile-First Breakpoints
    ======================================== */
 
-/* Mobile Devices (up to 640px) */
+/* ========================================
+   BASE MOBILE STYLES (0 - 640px)
+   ======================================== */
 @media (max-width: 640px) {
     :root {
         --sidebar-width: 0;
@@ -20,10 +22,12 @@
     h2 { font-size: 1.5rem; }
     h3 { font-size: 1.25rem; }
 
+    /* Container */
     .container {
         padding: 0 var(--spacing-md);
     }
 
+    /* Grid System */
     .grid-cols-2,
     .grid-cols-3,
     .grid-cols-4,
@@ -32,112 +36,275 @@
         grid-template-columns: 1fr;
     }
 
+    /* Visibility */
     .hide-mobile {
         display: none !important;
     }
-
     .show-mobile {
         display: block !important;
     }
 
+    /* Stats Grid */
     .stats-grid {
         grid-template-columns: 1fr;
     }
 
+    /* Sidebar */
     .sidebar {
         transform: translateX(-100%);
         position: fixed;
         z-index: 1000;
+        width: 280px;
+        height: 100vh;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
     .sidebar.active {
         transform: translateX(0);
     }
 
+    /* Sidebar Overlay */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 999;
+    }
+    .sidebar-overlay.active {
+        display: block;
+    }
+
+    /* Mobile Menu Button */
+    .mobile-menu-btn {
+        display: flex !important;
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        z-index: 1001;
+        width: 44px;
+        height: 44px;
+        background: rgba(10, 10, 15, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        border-radius: 12px;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        cursor: pointer;
+        color: white;
+        transition: all 0.3s;
+    }
+    .mobile-menu-btn:hover {
+        background: rgba(139, 92, 246, 0.2);
+        transform: scale(1.05);
+    }
+
+    /* Main Content */
     .main-content {
         margin-left: 0 !important;
         padding: 1rem;
+        padding-top: 70px;
+        width: 100%;
     }
 
+    /* Top Bar */
     .top-bar {
         flex-direction: column;
         gap: 1rem;
+        padding: 0.75rem 1rem;
     }
 
     .search-box {
         width: 100% !important;
     }
 
+    /* Navigation */
     .nav-links {
         display: none;
     }
-
-    .mobile-menu-btn {
-        display: block;
+    .nav-links.active {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(10, 10, 15, 0.98);
+        backdrop-filter: blur(20px);
+        padding: 1rem;
+        border-bottom: 1px solid rgba(139, 92, 246, 0.2);
     }
 
+    /* Hero Section */
     .hero {
         flex-direction: column;
         text-align: center;
         padding: 2rem 1rem;
     }
-
     .hero-buttons {
         justify-content: center;
+        flex-wrap: wrap;
     }
-
     .hero-stats {
         justify-content: center;
+        gap: 1.5rem;
+    }
+    .hero-content h1 {
+        font-size: 2.5rem;
     }
 
+    /* Features */
     .features-grid {
         grid-template-columns: 1fr;
+        gap: 1rem;
     }
 
+    /* Footer */
     .footer-content {
         grid-template-columns: 1fr;
         text-align: center;
     }
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
 
+    /* Modal */
     .modal-content {
         width: 95%;
         margin: 1rem;
         padding: 1.5rem;
+        max-height: 85vh;
     }
 
+    /* Cards */
     .card-grid {
         grid-template-columns: 1fr;
     }
 
+    /* Tables */
     .table-wrapper {
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
-
     table {
         min-width: 600px;
     }
-
-    .action-buttons {
-        flex-direction: column;
+    .table-card-view thead {
+        display: none;
+    }
+    .table-card-view tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid var(--border-light);
+        border-radius: 12px;
+        padding: 1rem;
+    }
+    .table-card-view td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border: none;
+    }
+    .table-card-view td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--text-secondary);
     }
 
+    /* Action Buttons */
+    .action-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+    .action-buttons .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Forms */
     .form-row {
         flex-direction: column;
     }
 
+    /* Breadcrumb */
     .breadcrumb {
         font-size: 0.75rem;
+        flex-wrap: wrap;
     }
 
+    /* Toast */
     .toast {
         bottom: 10px;
         right: 10px;
         left: 10px;
         width: auto;
+        max-width: none;
+        font-size: 0.8rem;
+        padding: 10px 16px;
+    }
+
+    /* Notification */
+    .notification-dropdown {
+        width: calc(100vw - 32px);
+        right: -10px;
+    }
+
+    /* File Grid */
+    .file-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 0.75rem;
+    }
+
+    /* Note Grid */
+    .notes-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    /* Task Filters */
+    .task-filters {
+        gap: 0.5rem;
+        justify-content: center;
+    }
+    .filter-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+
+    /* Admin */
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+    .admin-sidebar {
+        width: 280px;
+        transform: translateX(-100%);
+    }
+    .admin-sidebar.active {
+        transform: translateX(0);
+    }
+    .admin-main {
+        margin-left: 0 !important;
+        padding: 1rem;
+        padding-top: 70px;
     }
 }
 
-/* Tablets (641px to 768px) */
+/* ========================================
+   TABLET STYLES (641px - 768px)
+   ======================================== */
 @media (min-width: 641px) and (max-width: 768px) {
     .container {
         padding: 0 var(--spacing-lg);
@@ -151,6 +318,9 @@
     .hide-tablet {
         display: none !important;
     }
+    .show-tablet {
+        display: block !important;
+    }
 
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -160,7 +330,6 @@
         flex-direction: column;
         text-align: center;
     }
-
     .hero-buttons {
         justify-content: center;
     }
@@ -172,7 +341,6 @@
     .sidebar {
         width: 240px;
     }
-
     .main-content {
         margin-left: 240px;
     }
@@ -180,12 +348,32 @@
     .search-box {
         width: 200px;
     }
+
+    .file-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+
+    .notes-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Admin */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
-/* Laptops (769px to 1024px) */
+/* ========================================
+   LAPTOP STYLES (769px - 1024px)
+   ======================================== */
 @media (min-width: 769px) and (max-width: 1024px) {
     .container {
         padding: 0 var(--spacing-xl);
+        max-width: 1200px;
     }
 
     .grid-cols-4 {
@@ -207,13 +395,35 @@
     .sidebar {
         width: 260px;
     }
-
     .main-content {
         margin-left: 260px;
     }
+
+    .search-box {
+        width: 250px;
+    }
+
+    .file-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+
+    .notes-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .footer-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Admin */
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
-/* Desktops (1025px to 1280px) */
+/* ========================================
+   DESKTOP STYLES (1025px - 1280px)
+   ======================================== */
 @media (min-width: 1025px) and (max-width: 1280px) {
     .container {
         max-width: 1200px;
@@ -226,9 +436,31 @@
     .hide-desktop {
         display: none !important;
     }
+
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .search-box {
+        width: 300px;
+    }
+
+    .file-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+
+    .notes-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .footer-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
 
-/* Wide Screens (1281px and above) */
+/* ========================================
+   WIDE SCREENS (1281px and above)
+   ======================================== */
 @media (min-width: 1281px) {
     .container {
         max-width: 1400px;
@@ -237,46 +469,99 @@
     .grid-cols-6 {
         grid-template-columns: repeat(6, 1fr);
     }
+
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .file-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+
+    .notes-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .footer-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
 }
 
-/* Print Styles */
+/* ========================================
+   PRINT STYLES
+   ======================================== */
 @media print {
     .sidebar,
     .top-bar,
     .btn-primary,
+    .btn-outline,
     .logout-btn,
-    .chat-float {
+    .chat-float,
+    .mobile-menu-btn,
+    .sidebar-overlay,
+    .admin-sidebar,
+    .notification-bell,
+    .user-avatar {
         display: none !important;
     }
 
     .main-content {
         margin: 0 !important;
         padding: 0 !important;
+        max-width: 100% !important;
     }
 
     body {
-        background: white;
-        color: black;
+        background: white !important;
+        color: black !important;
     }
 
     .glass-card,
     .stat-card,
-    .section {
-        background: transparent;
-        border: 1px solid #ddd;
-        box-shadow: none;
+    .section,
+    .card {
+        background: transparent !important;
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+    }
+
+    .animated-bg {
+        display: none !important;
+    }
+
+    .file-card,
+    .note-card,
+    .task-item {
+        break-inside: avoid;
+        page-break-inside: avoid;
     }
 }
 
-/* Dark Mode Support */
+/* ========================================
+   DARK MODE SUPPORT (System Preference)
+   ======================================== */
 @media (prefers-color-scheme: dark) {
     :root {
         --bg-primary: #0a0a0f;
         --text-primary: #ffffff;
+        --bg-card: rgba(255, 255, 255, 0.03);
+        --border-light: rgba(255, 255, 255, 0.05);
     }
 }
 
-/* Reduced Motion */
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg-primary: #f8fafc;
+        --text-primary: #0f172a;
+        --bg-card: rgba(0, 0, 0, 0.02);
+        --border-light: rgba(0, 0, 0, 0.05);
+    }
+}
+
+/* ========================================
+   REDUCED MOTION
+   ======================================== */
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -286,41 +571,220 @@
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
-}
 
-/* High Contrast Mode */
-@media (prefers-contrast: high) {
-    :root {
-        --bg-primary: #000000;
-        --text-primary: #ffffff;
-        --primary: #00ffff;
-        --border-light: 1px solid white;
+    .sidebar,
+    .mobile-menu-btn,
+    .stat-card,
+    .quick-action-btn,
+    .activity-item {
+        transition: none !important;
     }
 }
 
-/* Touch Devices */
+/* ========================================
+   HIGH CONTRAST MODE
+   ======================================== */
+@media (prefers-contrast: high) {
+    :root {
+        --bg-primary: #000000;
+        --bg-card: #111111;
+        --text-primary: #ffffff;
+        --text-secondary: #dddddd;
+        --primary: #00ffff;
+        --secondary: #ff00ff;
+        --border-light: 2px solid white;
+        --border-medium: 2px solid white;
+    }
+
+    .btn-primary {
+        background: #00ffff;
+        color: #000000;
+    }
+
+    .stat-value {
+        color: #00ffff;
+    }
+}
+
+/* ========================================
+   TOUCH DEVICES
+   ======================================== */
 @media (hover: none) and (pointer: coarse) {
     .hover-scale:hover,
     .hover-lift:hover,
     .hover-glow:hover {
-        transform: none;
+        transform: none !important;
     }
 
     button,
     a,
-    .clickable {
+    .clickable,
+    .nav-item,
+    .stat-card,
+    .quick-action-btn,
+    .activity-item {
         min-height: 44px;
         min-width: 44px;
     }
+
+    .file-card,
+    .note-card,
+    .folder-card {
+        min-height: 120px;
+    }
+
+    .task-checkbox {
+        width: 28px;
+        height: 28px;
+    }
 }
 
-/* Landscape Mode */
+/* ========================================
+   LANDSCAPE MODE ON MOBILE
+   ======================================== */
 @media (max-width: 768px) and (orientation: landscape) {
     .hero {
         padding: 1rem;
+        min-height: auto;
     }
 
     .sidebar {
+        width: 240px;
         overflow-y: auto;
+    }
+
+    .main-content {
+        padding-top: 60px;
+    }
+
+    .mobile-menu-btn {
+        top: 8px;
+        left: 8px;
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+    }
+
+    .stat-card {
+        padding: 0.5rem;
+    }
+    .stat-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+    }
+    .stat-value {
+        font-size: 1rem;
+    }
+    .stat-label {
+        font-size: 0.6rem;
+    }
+
+    .quick-actions {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+    }
+
+    .file-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+
+    .notes-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .task-filters {
+        gap: 0.25rem;
+    }
+    .filter-btn {
+        padding: 4px 10px;
+        font-size: 0.7rem;
+    }
+
+    .modal-content {
+        max-height: 90vh;
+        padding: 1rem;
+    }
+
+    .top-bar {
+        padding: 0.5rem 0.75rem;
+        gap: 0.5rem;
+    }
+
+    .search-box {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+}
+
+/* ========================================
+   NOTCH DEVICES (iPhone 12/13/14 and above)
+   ======================================== */
+@supports (padding: max(0px)) {
+    @media (max-width: 768px) {
+        .main-content {
+            padding-left: max(1rem, env(safe-area-inset-left));
+            padding-right: max(1rem, env(safe-area-inset-right));
+            padding-top: max(70px, env(safe-area-inset-top));
+            padding-bottom: max(1rem, env(safe-area-inset-bottom));
+        }
+
+        .mobile-menu-btn {
+            top: max(12px, env(safe-area-inset-top));
+            left: max(12px, env(safe-area-inset-left));
+        }
+    }
+}
+
+/* ========================================
+   FOLDABLE DEVICES
+   ======================================== */
+@media (max-width: 280px) {
+    /* Ultra small screens */
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .file-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .notes-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .task-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* ========================================
+   TABLET LANDSCAPE
+   ======================================== */
+@media (min-width: 769px) and (max-width: 1024px) and (orientation: landscape) {
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .features-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .file-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+
+    .notes-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
 }

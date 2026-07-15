@@ -2,14 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>Bookmarks - Alan Vault</title>
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Alan Vault</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -22,48 +16,599 @@
     <meta name="theme-color" content="#4F46E5">
     
     <link rel="stylesheet" href="dashboard.css">
-</head>
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: white; }
-        .animated-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 20% 50%, rgba(79,70,229,0.15) 0%, transparent 50%); }
+        /* ========================================
+           COMPLETE FIXED STYLES
+           ======================================== */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
         
-        .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: rgba(10,10,15,0.95); backdrop-filter: blur(20px); border-right: 1px solid rgba(139,92,246,0.2); }
-        .sidebar-header { padding: 2rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .logo { display: flex; align-items: center; gap: 12px; font-size: 1.3rem; font-weight: 700; }
-        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #4F46E5, #8B5CF6); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-        .sidebar-nav { padding: 1.5rem; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #a1a1aa; text-decoration: none; border-radius: 12px; transition: all 0.3s; margin-bottom: 0.5rem; }
-        .nav-item:hover, .nav-item.active { background: rgba(139,92,246,0.15); color: #8B5CF6; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #0a0a0f; 
+            color: white; 
+            overflow-x: hidden;
+        }
         
-        .main-content { margin-left: 280px; padding: 2rem; }
-        .top-bar { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-        .search-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 50px; width: 300px; color: white; }
+        .animated-bg { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            z-index: -1; 
+            background: radial-gradient(circle at 20% 50%, rgba(79,70,229,0.15) 0%, transparent 50%); 
+        }
         
-        .bookmarks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
-        .bookmark-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 1.5rem; transition: all 0.3s; }
-        .bookmark-card:hover { transform: translateY(-5px); border-color: rgba(139,92,246,0.3); background: rgba(139,92,246,0.05); }
-        .bookmark-favicon { font-size: 2rem; margin-bottom: 1rem; }
-        .bookmark-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
-        .bookmark-url { color: #8B5CF6; font-size: 0.75rem; word-break: break-all; margin-bottom: 1rem; }
-        .bookmark-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+        /* ========================================
+           SIDEBAR OVERLAY (Mobile)
+           ======================================== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 99;
+        }
+        .sidebar-overlay.active { display: block; }
         
-        .btn-primary { background: linear-gradient(135deg, #4F46E5, #8B5CF6); padding: 10px 20px; border: none; border-radius: 12px; color: white; cursor: pointer; }
-        .btn-icon { padding: 6px 12px; background: rgba(139,92,246,0.2); border: none; border-radius: 8px; color: #8B5CF6; cursor: pointer; }
-        .btn-danger { background: rgba(239,68,68,0.2); color: #ef4444; }
+        /* ========================================
+           MOBILE MENU BUTTON
+           ======================================== */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 101;
+            width: 44px;
+            height: 44px;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s;
+        }
+        .mobile-menu-btn:hover {
+            background: rgba(139, 92, 246, 0.2);
+            transform: scale(1.05);
+        }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); justify-content: center; align-items: center; z-index: 1000; }
-        .modal.active { display: flex; }
-        .modal-content { background: #1a1a2e; border: 1px solid rgba(139,92,246,0.3); border-radius: 24px; padding: 2rem; width: 90%; max-width: 500px; }
-        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 12px; margin: 10px 0; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; }
+        /* ========================================
+           SIDEBAR
+           ======================================== */
+        .sidebar { 
+            position: fixed; 
+            left: 0; 
+            top: 0; 
+            width: 280px; 
+            height: 100vh; 
+            background: rgba(10,10,15,0.95); 
+            backdrop-filter: blur(20px); 
+            border-right: 1px solid rgba(139,92,246,0.2);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
         
-        @media (max-width: 768px) { .sidebar { transform: translateX(-100%); } .main-content { margin-left: 0; } }
+        .sidebar-header { 
+            padding: 2rem 1.5rem; 
+            border-bottom: 1px solid rgba(255,255,255,0.05); 
+        }
+        
+        .logo { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            font-size: 1.3rem; 
+            font-weight: 700; 
+        }
+        
+        .logo-icon { 
+            width: 40px; 
+            height: 40px; 
+            background: linear-gradient(135deg, #4F46E5, #8B5CF6); 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        
+        .sidebar-nav { 
+            padding: 1.5rem; 
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .nav-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            padding: 12px 16px; 
+            color: #a1a1aa; 
+            text-decoration: none; 
+            border-radius: 12px; 
+            transition: all 0.3s; 
+            margin-bottom: 0.5rem; 
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        
+        .nav-item:hover, .nav-item.active { 
+            background: rgba(139,92,246,0.15); 
+            color: #8B5CF6; 
+        }
+        
+        .admin-nav-item {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 1rem;
+            padding-top: 1rem;
+            color: #ef4444;
+        }
+        .admin-nav-item:hover {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+        
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(10, 10, 15, 0.95);
+        }
+        
+        .storage-info {
+            background: rgba(139, 92, 246, 0.1);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+        
+        .storage-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+        
+        .storage-used {
+            height: 100%;
+            background: linear-gradient(90deg, #4F46E5, #8B5CF6);
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+        
+        .logout-btn {
+            width: 100%;
+            padding: 12px;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* ========================================
+           MAIN CONTENT
+           ======================================== */
+        .main-content { 
+            margin-left: 280px; 
+            padding: 2rem; 
+            transition: margin-left 0.3s;
+            min-height: 100vh;
+        }
+        
+        /* ========================================
+           TOP BAR
+           ======================================== */
+        .top-bar { 
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 16px; 
+            padding: 1rem 1.5rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .search-box { 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            padding: 10px 20px; 
+            border-radius: 50px; 
+            width: 300px; 
+            color: white;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        .search-box:focus {
+            outline: none;
+            border-color: #8B5CF6;
+            box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+        }
+        .search-box::placeholder { color: #71717a; }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .admin-icon {
+            background: linear-gradient(135deg, #ef4444, #f59e0b);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .admin-icon:hover { transform: scale(1.1); }
+        
+        .user-avatar { 
+            width: 40px; 
+            height: 40px; 
+            background: linear-gradient(135deg, #4F46E5, #8B5CF6); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            transition: transform 0.3s;
+            font-size: 1.2rem;
+        }
+        .user-avatar:hover { transform: scale(1.05); }
+        
+        /* ========================================
+           BOOKMARKS GRID
+           ======================================== */
+        .bookmarks-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            gap: 1.5rem; 
+            margin-top: 1rem; 
+        }
+        
+        .bookmark-card { 
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid rgba(255,255,255,0.05); 
+            border-radius: 20px; 
+            padding: 1.5rem; 
+            transition: all 0.3s; 
+        }
+        
+        .bookmark-card:hover { 
+            transform: translateY(-5px); 
+            border-color: rgba(139,92,246,0.3); 
+            background: rgba(139,92,246,0.05); 
+        }
+        
+        .bookmark-favicon { 
+            font-size: 2rem; 
+            margin-bottom: 0.5rem; 
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .bookmark-favicon img {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+        }
+        
+        .bookmark-title { 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            margin-bottom: 0.5rem; 
+        }
+        
+        .bookmark-url { 
+            color: #8B5CF6; 
+            font-size: 0.75rem; 
+            word-break: break-all; 
+            margin-bottom: 1rem; 
+        }
+        
+        .bookmark-actions { 
+            display: flex; 
+            gap: 0.5rem; 
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        /* ========================================
+           BUTTONS
+           ======================================== */
+        .btn-primary { 
+            background: linear-gradient(135deg, #4F46E5, #8B5CF6); 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 12px; 
+            color: white; 
+            cursor: pointer; 
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79,70,229,0.4);
+        }
+        
+        .btn-icon { 
+            padding: 6px 12px; 
+            background: rgba(139,92,246,0.2); 
+            border: none; 
+            border-radius: 8px; 
+            color: #8B5CF6; 
+            cursor: pointer; 
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+        .btn-icon:hover {
+            background: rgba(139,92,246,0.4);
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger { 
+            background: rgba(239,68,68,0.2); 
+            color: #ef4444; 
+        }
+        .btn-danger:hover {
+            background: rgba(239,68,68,0.4);
+        }
+        
+        /* ========================================
+           MODAL
+           ======================================== */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background: rgba(0,0,0,0.8); 
+            backdrop-filter: blur(10px); 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 1000; 
+        }
+        .modal.active { display: flex; animation: fadeIn 0.3s ease; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content { 
+            background: #1a1a2e; 
+            border: 1px solid rgba(139,92,246,0.3); 
+            border-radius: 24px; 
+            padding: 2rem; 
+            width: 90%; 
+            max-width: 500px;
+            animation: slideUp 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-content input, 
+        .modal-content select, 
+        .modal-content textarea { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 12px; 
+            color: white;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        .modal-content input:focus,
+        .modal-content select:focus,
+        .modal-content textarea:focus {
+            outline: none;
+            border-color: #8B5CF6;
+            box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+        }
+        .modal-content textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+        .modal-content select option {
+            background: #1a1a2e;
+            color: white;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+        
+        /* ========================================
+           TOAST NOTIFICATION
+           ======================================== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: white;
+            font-size: 0.9rem;
+            z-index: 10001;
+            animation: slideInRight 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            max-width: 90vw;
+        }
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        .toast.info { background: #3b82f6; }
+        .toast.warning { background: #f59e0b; }
+        
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        /* ========================================
+           EMPTY STATE
+           ======================================== */
+        .empty-state {
+            text-align: center;
+            padding: 4rem;
+            color: #71717a;
+        }
+        .empty-state-icon { font-size: 4rem; margin-bottom: 1rem; }
+        .empty-state p { margin-bottom: 1rem; }
+        
+        /* ========================================
+           RESPONSIVE BREAKPOINTS
+           ======================================== */
+        @media (max-width: 768px) {
+            .mobile-menu-btn { display: flex; }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            .sidebar.active { transform: translateX(0); }
+            
+            .sidebar-overlay.active { display: block; }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                padding-top: 70px;
+            }
+            
+            .top-bar {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 0.75rem 1rem;
+            }
+            
+            .search-box { width: 100%; }
+            
+            .bookmarks-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .bookmark-card { padding: 1rem; }
+            
+            .modal-content { padding: 1.5rem; width: 95%; }
+            
+            .toast {
+                right: 10px;
+                left: 10px;
+                bottom: 10px;
+                font-size: 0.8rem;
+                padding: 10px 16px;
+            }
+            
+            .user-info {
+                justify-content: flex-end;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .mobile-menu-btn {
+                top: 8px;
+                left: 8px;
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            
+            .main-content { padding-top: 60px; }
+            
+            .bookmark-favicon { font-size: 1.5rem; }
+            .bookmark-title { font-size: 1rem; }
+            
+            .btn-primary { padding: 8px 14px; font-size: 0.85rem; }
+        }
+        
+        @media (max-width: 768px) and (orientation: landscape) {
+            .sidebar { width: 240px; }
+            .main-content { padding-top: 60px; }
+            
+            .mobile-menu-btn {
+                top: 8px;
+                left: 8px;
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+            
+            .bookmarks-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
     </style>
 </head>
 <body>
     <div class="animated-bg"></div>
+    
+    <!-- ===== SIDEBAR OVERLAY (Mobile) ===== -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    
+    <!-- ===== MOBILE MENU BUTTON ===== -->
+    <button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Toggle Menu">
+        ☰
+    </button>
+    
+    <!-- ===== SIDEBAR ===== -->
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-header"><div class="logo"><div class="logo-icon">🔐</div><span>Alan Vault</span></div></div>
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon">🔐</div>
+                <span>Alan Vault</span>
+            </div>
+        </div>
         <div class="sidebar-nav">
             <a href="dashboard.html" class="nav-item">📊 Dashboard</a>
             <a href="vault.html" class="nav-item">📁 My Vault</a>
@@ -72,12 +617,33 @@
             <a href="bookmarks.html" class="nav-item active">🔗 Bookmarks</a>
             <a href="analytics.html" class="nav-item">📈 Analytics</a>
             <a href="settings.html" class="nav-item">⚙️ Settings</a>
+            <button class="nav-item admin-nav-item" onclick="window.open('admin-login.html', '_blank')">
+                👑 Admin Panel
+            </button>
+        </div>
+        <div class="sidebar-footer">
+            <div class="storage-info">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>💾 Storage</span>
+                    <span id="storageText">0 GB / 5 GB</span>
+                </div>
+                <div class="storage-bar">
+                    <div class="storage-used" id="storageBar"></div>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
         </div>
     </div>
+    
+    <!-- ===== MAIN CONTENT ===== -->
     <div class="main-content">
         <div class="top-bar">
             <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search bookmarks..." onkeyup="filterBookmarks()">
-            <div class="user-info"><span id="usernameDisplay"></span><div class="user-avatar" style="width:40px;height:40px;background:linear-gradient(135deg,#4F46E5,#8B5CF6);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;" onclick="location.href='profile.html'">👤</div></div>
+            <div class="user-info">
+                <span id="usernameDisplay"></span>
+                <div class="admin-icon" onclick="window.open('admin-login.html', '_blank')" title="Admin Panel">👑</div>
+                <div class="user-avatar" onclick="location.href='profile.html'">👤</div>
+            </div>
         </div>
         
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
@@ -88,31 +654,396 @@
         <div class="bookmarks-grid" id="bookmarksGrid"></div>
     </div>
     
-    <div id="modal" class="modal"><div class="modal-content"><h3 id="modalTitle">Add Bookmark</h3><div id="modalBody"></div><div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;"><button class="btn-icon" onclick="closeModal()">Cancel</button><button class="btn-primary" onclick="saveBookmark()">Save</button></div></div></div>
-    
+    <!-- ===== MODAL ===== -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Add Bookmark</h3>
+            <div id="modalBody"></div>
+            <div class="modal-actions">
+                <button class="btn-icon" onclick="closeModal()">Cancel</button>
+                <button class="btn-primary" onclick="saveBookmark()">Save</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        let currentUser = null, currentEditId = null, bookmarks = [], categories = ['Work', 'Personal', 'Learning', 'Entertainment', 'Development'];
+        // ========================================
+        // COMPLETE FIXED JAVASCRIPT
+        // ========================================
         
-        function init() { const user = localStorage.getItem('currentUser'); if (!user) { location.href='login.html'; return; } currentUser = JSON.parse(user); document.getElementById('usernameDisplay').textContent = currentUser.username; loadBookmarks(); renderBookmarks(); }
+        let currentUser = null;
+        let currentEditId = null;
+        let bookmarks = [];
+        let categories = ['Work', 'Personal', 'Learning', 'Entertainment', 'Development'];
+
+        // ========================================
+        // HELPER FUNCTIONS
+        // ========================================
         
-        function loadBookmarks() { const vault = JSON.parse(localStorage.getItem(`vault_${currentUser.id}`) || '{"bookmarks":[]}'); bookmarks = vault.bookmarks || []; }
+        function getCurrentUser() {
+            try {
+                const user = localStorage.getItem('currentUser');
+                return user ? JSON.parse(user) : null;
+            } catch (e) {
+                console.error('Error getting current user:', e);
+                return null;
+            }
+        }
+
+        function getVault(userId) {
+            try {
+                const key = `vault_${userId}`;
+                const data = localStorage.getItem(key);
+                if (!data) {
+                    const empty = { files: [], notes: [], tasks: [], bookmarks: [] };
+                    localStorage.setItem(key, JSON.stringify(empty));
+                    return empty;
+                }
+                return JSON.parse(data);
+            } catch (e) {
+                console.error('Error getting vault:', e);
+                return { bookmarks: [] };
+            }
+        }
+
+        function saveVault(userId, data) {
+            try {
+                const key = `vault_${userId}`;
+                localStorage.setItem(key, JSON.stringify(data));
+                return true;
+            } catch (e) {
+                console.error('Error saving vault:', e);
+                return false;
+            }
+        }
+
+        // ========================================
+        // INITIALIZATION
+        // ========================================
         
-        function saveBookmarks() { const vault = JSON.parse(localStorage.getItem(`vault_${currentUser.id}`) || '{"files":[],"notes":[],"tasks":[],"bookmarks":[]}'); vault.bookmarks = bookmarks; localStorage.setItem(`vault_${currentUser.id}`, JSON.stringify(vault)); renderBookmarks(); }
+        function init() {
+            currentUser = getCurrentUser();
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            document.getElementById('usernameDisplay').textContent = currentUser.username;
+            loadBookmarks();
+            renderBookmarks();
+            updateStorage();
+        }
+
+        // ========================================
+        // DATA OPERATIONS
+        // ========================================
         
-        function getFavicon(url) { try { const domain = new URL(url).hostname; return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`; } catch(e) { return ''; } }
+        function loadBookmarks() {
+            const vault = getVault(currentUser.id);
+            bookmarks = vault.bookmarks || [];
+        }
         
-        function renderBookmarks() { const query = document.getElementById('searchInput').value.toLowerCase(); let filtered = bookmarks; if(query) filtered = bookmarks.filter(b => b.title.toLowerCase().includes(query) || b.url.toLowerCase().includes(query)); const container = document.getElementById('bookmarksGrid'); if(!filtered.length) { container.innerHTML = '<div style="text-align:center; padding:4rem; color:#71717a;"><div style="font-size:4rem; margin-bottom:1rem;">🔗</div><p>No bookmarks yet. Click "Add Bookmark" to get started!</p></div>'; return; } container.innerHTML = filtered.map((b, i) => `<div class="bookmark-card"><div class="bookmark-favicon"><img src="${getFavicon(b.url)}" onerror="this.style.display=\'none\'" style="width:32px;height:32px;"> 🔗</div><div class="bookmark-title">${escapeHtml(b.title)}</div><div class="bookmark-url">${escapeHtml(b.url)}</div><div style="font-size:0.7rem; color:#71717a; margin-bottom:0.5rem;">Category: ${escapeHtml(b.category)}</div><div class="bookmark-actions"><button class="btn-icon" onclick="window.open('${escapeHtml(b.url)}','_blank')">🔗 Visit</button><button class="btn-icon" onclick="editBookmark(${bookmarks.indexOf(b)})">✏️ Edit</button><button class="btn-icon btn-danger" onclick="deleteBookmark(${bookmarks.indexOf(b)})">🗑 Delete</button></div></div>`).join(''); }
+        function saveBookmarks() {
+            const vault = getVault(currentUser.id);
+            vault.bookmarks = bookmarks;
+            saveVault(currentUser.id, vault);
+            renderBookmarks();
+            updateStorage();
+            showToast('Bookmarks saved!', 'success');
+        }
+
+        function updateStorage() {
+            const vault = getVault(currentUser.id);
+            const totalSize = vault.files ? vault.files.reduce((sum, f) => sum + (f.size || 0), 0) : 0;
+            const usedGB = (totalSize / (1024 * 1024 * 1024)).toFixed(2);
+            const percent = Math.min((totalSize / (5 * 1024 * 1024 * 1024)) * 100, 100);
+            document.getElementById('storageText').textContent = `${usedGB} GB / 5 GB`;
+            document.getElementById('storageBar').style.width = `${percent}%`;
+        }
+
+        // ========================================
+        // FAVICON
+        // ========================================
         
-        function openBookmarkModal(bookmark=null) { currentEditId = bookmark ? bookmarks.indexOf(bookmark) : null; const title = document.getElementById('modalTitle'); const body = document.getElementById('modalBody'); title.textContent = bookmark ? 'Edit Bookmark' : 'Add Bookmark'; body.innerHTML = `<input type="text" id="bookmarkTitle" placeholder="Bookmark title" value="${bookmark ? escapeHtml(bookmark.title) : ''}"><input type="url" id="bookmarkUrl" placeholder="https://example.com" value="${bookmark ? escapeHtml(bookmark.url) : ''}"><select id="bookmarkCategory">${categories.map(c => `<option value="${c}" ${bookmark && bookmark.category === c ? 'selected' : ''}>${c}</option>`).join('')}</select><textarea id="bookmarkNotes" rows="2" placeholder="Notes (optional)">${bookmark ? escapeHtml(bookmark.notes || '') : ''}</textarea>`; document.getElementById('modal').classList.add('active'); }
+        function getFavicon(url) { 
+            try { 
+                const domain = new URL(url).hostname; 
+                return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`; 
+            } catch(e) { 
+                return ''; 
+            } 
+        }
+
+        // ========================================
+        // RENDER
+        // ========================================
         
-        function saveBookmark() { const title = document.getElementById('bookmarkTitle').value; const url = document.getElementById('bookmarkUrl').value; const category = document.getElementById('bookmarkCategory').value; const notes = document.getElementById('bookmarkNotes').value; if(!title || !url) { alert('Please enter both title and URL'); return; } if(currentEditId !== null) { bookmarks[currentEditId] = {...bookmarks[currentEditId], title, url, category, notes, updated: new Date().toISOString()}; } else { bookmarks.unshift({ id: Date.now(), title, url, category, notes, created: new Date().toISOString() }); } saveBookmarks(); closeModal(); }
+        function renderBookmarks() { 
+            const query = document.getElementById('searchInput').value.toLowerCase(); 
+            let filtered = bookmarks; 
+            if(query) filtered = bookmarks.filter(b => 
+                b.title.toLowerCase().includes(query) || 
+                b.url.toLowerCase().includes(query) ||
+                (b.category && b.category.toLowerCase().includes(query))
+            ); 
+            
+            const container = document.getElementById('bookmarksGrid'); 
+            if(!filtered.length) { 
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔗</div>
+                        <p>${query ? 'No bookmarks found matching "' + escapeHtml(query) + '"' : 'No bookmarks yet. Click "Add Bookmark" to get started!'}</p>
+                        ${!query ? '<button class="btn-primary" onclick="openBookmarkModal()">+ Add Bookmark</button>' : ''}
+                    </div>
+                `; 
+                return; 
+            } 
+            
+            container.innerHTML = filtered.map((b, i) => {
+                const realIndex = bookmarks.indexOf(b);
+                return `
+                <div class="bookmark-card">
+                    <div class="bookmark-favicon">
+                        <img src="${getFavicon(b.url)}" onerror="this.style.display='none'" style="width:32px;height:32px;border-radius:4px;">
+                        <span>🔗</span>
+                    </div>
+                    <div class="bookmark-title">${escapeHtml(b.title)}</div>
+                    <div class="bookmark-url">${escapeHtml(b.url)}</div>
+                    <div style="font-size:0.7rem; color:#71717a; margin-bottom:0.5rem;">
+                        Category: ${escapeHtml(b.category || 'General')}
+                        ${b.notes ? ` • 📝 ${escapeHtml(b.notes.substring(0, 50))}${b.notes.length > 50 ? '...' : ''}` : ''}
+                    </div>
+                    <div class="bookmark-actions">
+                        <button class="btn-icon" onclick="window.open('${escapeHtml(b.url)}','_blank')">🔗 Visit</button>
+                        <button class="btn-icon" onclick="editBookmark(${realIndex})">✏️ Edit</button>
+                        <button class="btn-icon btn-danger" onclick="deleteBookmark(${realIndex})">🗑 Delete</button>
+                    </div>
+                </div>
+            `}).join(''); 
+        }
+
+        // ========================================
+        // MODAL FUNCTIONS
+        // ========================================
         
-        function editBookmark(i) { openBookmarkModal(bookmarks[i]); }
-        function deleteBookmark(i) { if(confirm('Delete this bookmark?')) { bookmarks.splice(i,1); saveBookmarks(); } }
-        function filterBookmarks() { renderBookmarks(); }
-        function closeModal() { document.getElementById('modal').classList.remove('active'); currentEditId = null; }
-        function escapeHtml(t){ const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
-        init();
+        function openBookmarkModal(bookmark=null) { 
+            currentEditId = bookmark ? bookmarks.indexOf(bookmark) : null; 
+            const title = document.getElementById('modalTitle'); 
+            const body = document.getElementById('modalBody'); 
+            
+            title.textContent = bookmark ? '✏️ Edit Bookmark' : '📌 Add Bookmark'; 
+            
+            body.innerHTML = `
+                <input type="text" id="bookmarkTitle" placeholder="Bookmark title" value="${bookmark ? escapeHtml(bookmark.title) : ''}">
+                <input type="url" id="bookmarkUrl" placeholder="https://example.com" value="${bookmark ? escapeHtml(bookmark.url) : ''}">
+                <select id="bookmarkCategory">
+                    ${categories.map(c => `<option value="${c}" ${bookmark && bookmark.category === c ? 'selected' : ''}>${c}</option>`).join('')}
+                    <option value="General" ${bookmark && (!bookmark.category || bookmark.category === 'General') ? 'selected' : ''}>General</option>
+                </select>
+                <textarea id="bookmarkNotes" rows="2" placeholder="Notes (optional)">${bookmark ? escapeHtml(bookmark.notes || '') : ''}</textarea>
+            `; 
+            
+            document.getElementById('modal').classList.add('active');
+            
+            // Auto-focus title
+            setTimeout(() => {
+                document.getElementById('bookmarkTitle').focus();
+            }, 100);
+            
+            // Enter key support
+            document.getElementById('bookmarkTitle').onkeypress = function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('bookmarkUrl').focus();
+                }
+            };
+            document.getElementById('bookmarkUrl').onkeypress = function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('bookmarkCategory').focus();
+                }
+            };
+            document.getElementById('bookmarkCategory').onkeypress = function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('bookmarkNotes').focus();
+                }
+            };
+            document.getElementById('bookmarkNotes').onkeypress = function(e) {
+                if (e.key === 'Enter' && e.shiftKey) {
+                    e.preventDefault();
+                    saveBookmark();
+                }
+            };
+        }
+        
+        function saveBookmark() { 
+            const title = document.getElementById('bookmarkTitle').value.trim();
+            const url = document.getElementById('bookmarkUrl').value.trim();
+            const category = document.getElementById('bookmarkCategory').value;
+            const notes = document.getElementById('bookmarkNotes').value.trim();
+            
+            if(!title) { 
+                showToast('Please enter a bookmark title', 'error');
+                document.getElementById('bookmarkTitle').style.borderColor = '#ef4444';
+                setTimeout(() => {
+                    document.getElementById('bookmarkTitle').style.borderColor = '';
+                }, 2000);
+                return; 
+            }
+            if(!url) { 
+                showToast('Please enter a URL', 'error');
+                document.getElementById('bookmarkUrl').style.borderColor = '#ef4444';
+                setTimeout(() => {
+                    document.getElementById('bookmarkUrl').style.borderColor = '';
+                }, 2000);
+                return; 
+            }
+            
+            if(currentEditId !== null) { 
+                bookmarks[currentEditId] = {
+                    ...bookmarks[currentEditId], 
+                    title, 
+                    url, 
+                    category, 
+                    notes, 
+                    updated: new Date().toISOString()
+                }; 
+                showToast('Bookmark updated!', 'success');
+            } else { 
+                bookmarks.unshift({ 
+                    id: Date.now(), 
+                    title, 
+                    url, 
+                    category: category || 'General',
+                    notes, 
+                    created: new Date().toISOString(),
+                    updated: new Date().toISOString()
+                }); 
+                showToast('Bookmark added!', 'success');
+            } 
+            
+            saveBookmarks(); 
+            closeModal(); 
+        }
+        
+        function editBookmark(i) { 
+            openBookmarkModal(bookmarks[i]); 
+        }
+        
+        function deleteBookmark(i) { 
+            if(confirm('Delete this bookmark?')) { 
+                bookmarks.splice(i,1); 
+                saveBookmarks(); 
+                showToast('Bookmark deleted', 'info');
+            } 
+        }
+        
+        function filterBookmarks() { 
+            renderBookmarks(); 
+        }
+        
+        function closeModal() { 
+            document.getElementById('modal').classList.remove('active'); 
+            currentEditId = null; 
+        }
+
+        // ========================================
+        // SIDEBAR FUNCTIONS
+        // ========================================
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+        }
+        
+        // Close sidebar on resize to desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.remove('active');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+        
+        // Close sidebar on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar.classList.contains('active')) {
+                    toggleSidebar();
+                }
+                const modal = document.getElementById('modal');
+                if (modal.classList.contains('active')) {
+                    closeModal();
+                }
+            }
+        });
+
+        // ========================================
+        // LOGOUT
+        // ========================================
+        
+        function logout() { 
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('currentUser'); 
+                localStorage.removeItem('loggedIn'); 
+                window.location.href = 'login.html'; 
+            }
+        }
+
+        // ========================================
+        // TOAST NOTIFICATIONS
+        // ========================================
+        
+        function showToast(message, type = 'info') {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ========================================
+        // UTILITY FUNCTIONS
+        // ========================================
+        
+        function escapeHtml(t){ 
+            if (!t) return '';
+            const d=document.createElement('div'); 
+            d.textContent=t; 
+            return d.innerHTML; 
+        }
+        
+        // ========================================
+        // CLOSE MODAL ON CLICK OUTSIDE
+        // ========================================
+        
+        document.getElementById('modal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeModal();
+            }
+        });
+        
+        // ========================================
+        // START
+        // ========================================
+        
+        document.addEventListener('DOMContentLoaded', init);
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            init();
+        }
     </script>
 </body>
 </html>
